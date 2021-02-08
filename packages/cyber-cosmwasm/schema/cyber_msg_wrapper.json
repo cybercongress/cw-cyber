@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CyberMsgWrapper",
+  "description": "CyberMsgWrapper is an override of CosmosMsg::Custom to show this works and can be extended in the contract",
+  "type": "object",
+  "required": [
+    "msg_data",
+    "route"
+  ],
+  "properties": {
+    "msg_data": {
+      "$ref": "#/definitions/CyberMsg"
+    },
+    "route": {
+      "$ref": "#/definitions/CyberRoute"
+    }
+  },
+  "definitions": {
+    "CyberMsg": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "cyberlink"
+          ],
+          "properties": {
+            "cyberlink": {
+              "type": "object",
+              "required": [
+                "address",
+                "links"
+              ],
+              "properties": {
+                "address": {
+                  "$ref": "#/definitions/HumanAddr"
+                },
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Link"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CyberRoute": {
+      "description": "CyberRoute is enum type to represent cyber query route path",
+      "type": "string",
+      "enum": [
+        "rank",
+        "graph"
+      ]
+    },
+    "HumanAddr": {
+      "type": "string"
+    },
+    "Link": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

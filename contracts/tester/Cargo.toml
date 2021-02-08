@@ -1,0 +1,29 @@
+[package]
+name = "bindings-tester"
+version = "0.7.0"
+authors = ["Valery Litvin <litvintech@gmail.com>"]
+edition = "2018"
+description = "simple tester for cyber-cosmwasm bindings"
+license = ""
+repository = "https://github.com/cybercongress/cyber-cosmwasm"
+homepage = "https://cyber.page"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all init/handle/query exports
+library = []
+
+[dependencies]
+cyber-cosmwasm = { path = "../../packages/cyber-cosmwasm", version = "0.7.0" }
+cosmwasm-std = { version = "0.11.1", features = ["iterator"] }
+cosmwasm-storage = { version = "0.11.1", features = ["iterator"] }
+schemars = "0.7"
+serde = { version = "1.0.103", default-features = false, features = ["derive"] }
+thiserror = { version = "1.0.20" }
+snafu = { version = "0.6.3" }
+
+[dev-dependencies]
+cosmwasm-schema = { version = "0.11.1" }

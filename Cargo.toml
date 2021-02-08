@@ -1,0 +1,9 @@
+[workspace]
+members = ["packages/*", "contracts/*"]
+
+[profile.release.package.cyber-cosmwasm]
+opt-level = 3
+debug = false
+debug-assertions = false
+codegen-units = 1
+incremental = false

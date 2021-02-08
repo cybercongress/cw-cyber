@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CyberQueryWrapper",
+  "description": "CyberQueryWrapper is an override of QueryRequest::Custom to access Cyber-specific modules",
+  "type": "object",
+  "required": [
+    "query_data",
+    "route"
+  ],
+  "properties": {
+    "query_data": {
+      "$ref": "#/definitions/CyberQuery"
+    },
+    "route": {
+      "$ref": "#/definitions/CyberRoute"
+    }
+  },
+  "definitions": {
+    "CyberQuery": {
+      "description": "CyberQuery is defines avaliable query datas",
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "rank_value_by_id"
+          ],
+          "properties": {
+            "rank_value_by_id": {
+              "type": "object",
+              "required": [
+                "cid_number"
+              ],
+              "properties": {
+                "cid_number": {
+                  "type": "integer",
+                  "format": "uint64",
+                  "minimum": 0.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "rank_value_by_cid"
+          ],
+          "properties": {
+            "rank_value_by_cid": {
+              "type": "object",
+              "required": [
+                "cid"
+              ],
+              "properties": {
+                "cid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "cids_count"
+          ],
+          "properties": {
+            "cids_count": {
+              "type": "object"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "links_count"
+          ],
+          "properties": {
+            "links_count": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "CyberRoute": {
+      "description": "CyberRoute is enum type to represent cyber query route path",
+      "type": "string",
+      "enum": [
+        "rank",
+        "graph"
+      ]
+    }
+  }
+}
