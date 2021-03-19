@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CyberQueryWrapper",
-  "description": "CyberQueryWrapper is an override of QueryRequest::Custom to access Cyber-specific modules",
   "type": "object",
   "required": [
     "query_data",
@@ -17,7 +16,6 @@
   },
   "definitions": {
     "CyberQuery": {
-      "description": "CyberQuery is defines avaliable query datas",
       "anyOf": [
         {
           "type": "object",

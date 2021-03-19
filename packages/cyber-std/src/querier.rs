@@ -1,15 +1,15 @@
-use cosmwasm_std::{Querier, StdResult};
+use cosmwasm_std::{QuerierWrapper, StdResult};
 
 use crate::route::CyberRoute;
 use crate::query::{CyberQuery, CyberQueryWrapper, RankValueResponse, CidsCountResponse, LinksCountResponse};
 
 /// This is a helper wrapper to easily use our custom queries
-pub struct CyberQuerier<'a, Q: Querier> {
-    querier: &'a Q,
+pub struct CyberQuerier<'a> {
+    querier: &'a QuerierWrapper<'a>,
 }
 
-impl<'a, Q: Querier> CyberQuerier<'a, Q> {
-    pub fn new(querier: &'a Q) -> Self {
+impl<'a> CyberQuerier<'a> {
+    pub fn new(querier: &'a QuerierWrapper) -> Self {
         CyberQuerier { querier }
     }
 

@@ -1,15 +1,13 @@
 # Cyber Bindings for CosmWasm
+
+Note: support in Bostrom's [bostromdev-1](https://github.com/cybercongress/go-cyber), cosmwasm [0.14.0-beta1](https://github.com/CosmWasm/cosmwasm/releases/tag/v0.14.0-beta1%2Bcontracts1) 
+
 ​
+Note: not yet published to crates
+
+
 This crate provides Cyber-specific bindings to enable your CosmWasm smart contracts to interact with the Cyber blockchain by exposing messages and queriers that can be emitted and used from within your contract.
-​
-## Installation
-​
-Add the following to your smart contract's `Cargo.toml`:
-​
-```toml
-[dependencies]
-cyber-cosmwasm = { version = "0.7.0" }
-```
+
 ​
 ## Contents
 ​
@@ -35,13 +33,13 @@ In order to use the query functions enabled by the bindings, create a `CyberQuer
 ```rust
 // src/contract.rs
 use cosmwasm_std::Coin;
-use cyber_cosmwasm::{ CyberQuerier, RankValueResponse};
+use cyber_std::{ CyberQuerier, RankValueResponse };
 ​
 ...
 ​
 // handler
-pub fn try_something<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
+pub fn try_something(
+    deps: Deps,
     _env: Env,
     cid: String
 ) -> StdResult<HandleResponse> {
@@ -63,19 +61,20 @@ And add it to the vector of `messages` in your `HandleResponse` before you retur
 ​
 ```rust
 use cosmwasm_std::CosmosMsg;
-use cyber_cosmwasm::{create_cyberlink_msg, CyberMsgWrapper};
+use cyber_std::{create_cyberlink_msg, CyberMsgWrapper};
 ​
 ...
 ​
-pub fn try_something<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
+pub fn try_something(
+    deps: DepsMut,
     env: Env,
     links: Vec<Link>
-) -> StdResult<HandleResponse<CyberMsgWrapper>> {
+) -> Result<Response<CyberMsgWrapper>, Never> {
     ...
     ​let contract_addr = env.contract.address;
     let msg: CosmosMsg<CyberMsgWrapper> = create_cyberlink_msg(contract_addr, links);
     let res = HandleResponse {
+        submessages: vec![],
         messages: vec![msg],
         log: vec![],
         data: None
@@ -84,4 +83,13 @@ pub fn try_something<S: Storage, A: Api, Q: Querier>(
 }
 ```
 
-Thanks to [Terra](https://github.com/terra-project) developers and community for initial contribution to CosmWasm [custom integrations](https://github.com/terra-project/terra-cosmwasm).
+## Build
+
+```
+docker run --rm -v "$(pwd)":/code \
+  --mount type=volume,source="std_test_cache",target=/code/target \
+  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
+  cosmwasm/workspace-optimizer:0.10.7
+```
+
+The optimized contracts are generated in the `artifacts/` directory.

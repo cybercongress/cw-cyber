@@ -1,11 +1,11 @@
 [package]
-name = "bindings-tester"
-version = "0.7.0"
+name = "std-test"
+version = "0.1.0"
 authors = ["Valery Litvin <litvintech@gmail.com>"]
 edition = "2018"
-description = "simple tester for cyber-cosmwasm bindings"
+description = "simple tester for cyber-std bindings"
 license = ""
-repository = "https://github.com/cybercongress/cyber-cosmwasm"
+repository = "https://github.com/cybercongress/cw-cyber"
 homepage = "https://cyber.page"
 
 [lib]
@@ -17,13 +17,13 @@ backtraces = ["cosmwasm-std/backtraces"]
 library = []
 
 [dependencies]
-cyber-cosmwasm = { path = "../../packages/cyber-cosmwasm", version = "0.7.0" }
-cosmwasm-std = { version = "0.11.1", features = ["iterator"] }
-cosmwasm-storage = { version = "0.11.1", features = ["iterator"] }
+cyber-std = { path = "../../packages/cyber-std", version = "0.1.0" }
+cosmwasm-std = { version = "0.14.0-beta1", features = ["iterator"] }
+cosmwasm-storage = { version = "0.14.0-beta1", features = ["iterator"] }
 schemars = "0.7"
 serde = { version = "1.0.103", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.20" }
 snafu = { version = "0.6.3" }
 
 [dev-dependencies]
-cosmwasm-schema = { version = "0.11.1" }
+cosmwasm-schema = { version = "0.14.0-beta1" }

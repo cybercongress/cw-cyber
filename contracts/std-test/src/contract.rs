@@ -1,29 +1,27 @@
-use cosmwasm_std::{
-    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier,
-    StdResult, Storage, MessageInfo
-};
-
+use cosmwasm_std::{to_binary, Binary, Env, Response, StdResult, MessageInfo, DepsMut, Deps};
+use crate::error::Never;
 use crate::msg::{HandleMsg, InitMsg, QueryMsg};
-use cyber_cosmwasm::{
+use cyber_std::{
     CyberMsgWrapper, CyberQuerier, create_cyberlink_msg,
     RankValueResponse, CidsCountResponse, LinksCountResponse, Link,
 };
 
-pub fn init<S: Storage, A: Api, Q: Querier>(
-    _deps: &mut Extern<S, A, Q>,
+pub fn instantiate(
+    _deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
     _msg: InitMsg,
-) -> StdResult<InitResponse> {
-    Ok(InitResponse::default())
+) -> StdResult<Response> {
+    Ok(Response::default())
 }
 
-pub fn handle<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
+
+pub fn execute(
+    deps: DepsMut,
     env: Env,
     info: MessageInfo,
     msg: HandleMsg,
-) -> StdResult<HandleResponse<CyberMsgWrapper>> {
+) -> Result<Response<CyberMsgWrapper>, Never> {
     match msg {
         HandleMsg::MsgCyberlink {
             links,
@@ -31,16 +29,17 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     }
 }
 
-pub fn handle_msg_cyberlink<S: Storage, A: Api, Q: Querier>(
-    _deps: &mut Extern<S, A, Q>,
+pub fn handle_msg_cyberlink(
+    _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
     links: Vec<Link>
-) -> StdResult<HandleResponse<CyberMsgWrapper>> {
+) -> Result<Response<CyberMsgWrapper>, Never> {
     let contract = env.contract.address;
     let msg = create_cyberlink_msg(contract, links);
 
-    let res = HandleResponse {
+    let res = Response {
+        submessages: vec![],
         messages: vec![msg],
         attributes: vec![],
         data: None,
@@ -50,8 +49,8 @@ pub fn handle_msg_cyberlink<S: Storage, A: Api, Q: Querier>(
 
 
 
-pub fn query<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+pub fn query(
+    deps: Deps,
     _env: Env,
     msg: QueryMsg,
 ) -> StdResult<Binary> {
@@ -63,8 +62,8 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     }
 }
 
-pub fn query_rank_value_by_id<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+pub fn query_rank_value_by_id(
+    deps: Deps,
     cid_number: u64,
 ) -> StdResult<RankValueResponse> {
     let querier = CyberQuerier::new(&deps.querier);
@@ -73,8 +72,8 @@ pub fn query_rank_value_by_id<S: Storage, A: Api, Q: Querier>(
     Ok(res)
 }
 
-pub fn query_rank_value_by_cid<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+pub fn query_rank_value_by_cid(
+    deps: Deps,
     cid: String,
 ) -> StdResult<RankValueResponse> {
     let querier = CyberQuerier::new(&deps.querier);
@@ -83,8 +82,8 @@ pub fn query_rank_value_by_cid<S: Storage, A: Api, Q: Querier>(
     Ok(res)
 }
 
-pub fn query_cids_count<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+pub fn query_cids_count(
+    deps: Deps,
 ) -> StdResult<CidsCountResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: CidsCountResponse = querier.query_cids_count()?;
@@ -92,8 +91,8 @@ pub fn query_cids_count<S: Storage, A: Api, Q: Querier>(
     Ok(res)
 }
 
-pub fn query_links_count<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+pub fn query_links_count(
+    deps: Deps,
 ) -> StdResult<LinksCountResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: LinksCountResponse = querier.query_links_count()?;

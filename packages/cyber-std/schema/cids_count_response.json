@@ -1,13 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "LinksCountResponse",
-  "description": "ExchangeRatesResponse is data format returned from OracleRequest::ExchangeRates query",
+  "title": "CidsCountResponse",
   "type": "object",
   "required": [
-    "links_count"
+    "cids_count"
   ],
   "properties": {
-    "links_count": {
+    "cids_count": {
       "type": "integer",
       "format": "uint64",
       "minimum": 0.0

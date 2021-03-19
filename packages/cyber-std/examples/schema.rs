@@ -2,7 +2,8 @@ use std::env::current_dir;
 use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
-use cyber_cosmwasm::{
+
+use cyber_std::{
     CyberMsg, CyberMsgWrapper, CyberQuery, CyberQueryWrapper, CyberRoute,
     RankValueResponse, CidsCountResponse, LinksCountResponse,
 };

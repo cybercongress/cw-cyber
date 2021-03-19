@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cyber_cosmwasm::{Link};
+use cyber_std::{Link};
 
 #[derive(Serialize, Deserialize, JsonSchema)]
 pub struct InitMsg {}
