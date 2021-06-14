@@ -8,4 +8,8 @@ use serde::{Deserialize, Serialize};
 pub enum CyberRoute {
     Rank,
     Graph,
+    Resources,
+    Energy,
+    Cron,
+    Bandwidth,
 }

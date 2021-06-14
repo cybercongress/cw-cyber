@@ -5,27 +5,6 @@
     {
       "type": "object",
       "required": [
-        "rank_value_by_id"
-      ],
-      "properties": {
-        "rank_value_by_id": {
-          "type": "object",
-          "required": [
-            "cid_number"
-          ],
-          "properties": {
-            "cid_number": {
-              "type": "integer",
-              "format": "uint64",
-              "minimum": 0.0
-            }
-          }
-        }
-      }
-    },
-    {
-      "type": "object",
-      "required": [
         "rank_value_by_cid"
       ],
       "properties": {
@@ -40,7 +19,8 @@
             }
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     {
       "type": "object",
@@ -51,7 +31,8 @@
         "cids_count": {
           "type": "object"
         }
-      }
+      },
+      "additionalProperties": false
     },
     {
       "type": "object",
@@ -62,7 +43,216 @@
         "links_count": {
           "type": "object"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "config"
+      ],
+      "properties": {
+        "config": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_job"
+      ],
+      "properties": {
+        "get_job": {
+          "type": "object",
+          "required": [
+            "contract",
+            "creator",
+            "label"
+          ],
+          "properties": {
+            "contract": {
+              "type": "string"
+            },
+            "creator": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_job_stats"
+      ],
+      "properties": {
+        "get_job_stats": {
+          "type": "object",
+          "required": [
+            "contract",
+            "creator",
+            "label"
+          ],
+          "properties": {
+            "contract": {
+              "type": "string"
+            },
+            "creator": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_source_routes"
+      ],
+      "properties": {
+        "get_source_routes": {
+          "type": "object",
+          "required": [
+            "source"
+          ],
+          "properties": {
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_source_routed_energy"
+      ],
+      "properties": {
+        "get_source_routed_energy": {
+          "type": "object",
+          "required": [
+            "source"
+          ],
+          "properties": {
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_destination_routed_energy"
+      ],
+      "properties": {
+        "get_destination_routed_energy": {
+          "type": "object",
+          "required": [
+            "destination"
+          ],
+          "properties": {
+            "destination": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_route"
+      ],
+      "properties": {
+        "get_route": {
+          "type": "object",
+          "required": [
+            "destination",
+            "source"
+          ],
+          "properties": {
+            "destination": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "price"
+      ],
+      "properties": {
+        "price": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "load"
+      ],
+      "properties": {
+        "load": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "desirable_bandwidth"
+      ],
+      "properties": {
+        "desirable_bandwidth": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "account_bandwidth"
+      ],
+      "properties": {
+        "account_bandwidth": {
+          "type": "object",
+          "required": [
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     }
   ]
 }
