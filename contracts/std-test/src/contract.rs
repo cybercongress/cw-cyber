@@ -105,12 +105,8 @@ pub fn cyberlink(
     let contract = env.contract.address;
     let msg = create_cyberlink_msg(contract.into(), links);
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -122,16 +118,11 @@ pub fn stake(
     amount: Coin,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
-    let res = Response {
-        submessages: vec![],
-        messages: vec![StakingMsg::Delegate {
+    let res = Response::new()
+        .add_message(StakingMsg::Delegate {
             validator: validator.into(),
             amount: amount.clone(),
-        }
-        .into()],
-        attributes: vec![],
-        data: None,
-    };
+        });
     Ok(res)
 }
 
@@ -143,16 +134,11 @@ pub fn unstake(
     amount: Coin,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
-    let res = Response {
-        submessages: vec![],
-        messages: vec![StakingMsg::Undelegate {
+    let res = Response::new()
+        .add_message(StakingMsg::Undelegate {
             validator: validator.into(),
             amount: amount.clone(),
-        }
-        .into()],
-        attributes: vec![],
-        data: None,
-    };
+        });
     Ok(res)
 }
 
@@ -173,12 +159,8 @@ pub fn investmint(
         length.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -196,12 +178,8 @@ pub fn create_energy_route(
         alias.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -220,12 +198,8 @@ pub fn edit_energy_route(
         value.clone(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -243,12 +217,8 @@ pub fn edit_energy_route_alias(
         alias.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -264,12 +234,8 @@ pub fn delete_energy_route(
         destination.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -292,12 +258,8 @@ pub fn add_job(
         cid.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -314,12 +276,8 @@ pub fn remove_job(
         label.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -338,12 +296,8 @@ pub fn change_job_call_data(
         call_data.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -362,12 +316,8 @@ pub fn change_job_period(
         period.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -386,12 +336,8 @@ pub fn change_job_block(
         block.into(),
     );
 
-    let res = Response {
-        submessages: vec![],
-        messages: vec![msg],
-        attributes: vec![],
-        data: None,
-    };
+    let res = Response::new()
+        .add_message(msg);
     Ok(res)
 }
 
@@ -410,12 +356,11 @@ pub fn sudo(
         SudoMsg::MemoryLoop {} => do_memory_loop(),
         SudoMsg::Panic {} => do_panic(),
         SudoMsg::TransferFunds { recipient, amount } => {
-            let msg = BankMsg::Send {
-                to_address: recipient,
-                amount,
-            };
-            let mut response = Response::default();
-            response.add_message(msg);
+            let response = Response::new()
+                .add_message(BankMsg::Send {
+                    to_address: recipient,
+                    amount,
+                });
             Ok(response)
         }
     }
@@ -436,14 +381,14 @@ fn do_release(deps: DepsMut, env: Env) -> Result<Response<CyberMsgWrapper>, Cont
     let to_addr = state.creator;
     let balance = deps.querier.query_all_balances(env.contract.address)?;
 
-    let mut resp = Response::new();
-    resp.add_attribute("action", "release");
-    resp.add_attribute("destination", to_addr.clone());
-    resp.add_message(BankMsg::Send {
-        to_address: to_addr.into(),
-        amount: balance,
-    });
-    resp.set_data(&[0xF0, 0x0B, 0xAA]);
+    let resp = Response::new()
+        .add_attribute("action", "release")
+        .add_attribute("destination", to_addr.clone())
+        .add_message(BankMsg::Send {
+            to_address: to_addr.into(),
+            amount: balance,
+        })
+        .set_data(&[0xF0, 0x0B, 0xAA]);
     Ok(resp)
 }
 
