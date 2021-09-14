@@ -97,13 +97,11 @@ pub enum QueryMsg {
     GetLinksCount {},
     Config {},
     GetJob {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
     },
     GetJobStats {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
     },
     GetLowestFee {},

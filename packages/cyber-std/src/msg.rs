@@ -81,33 +81,28 @@ pub enum CyberMsg {
         destination: String,
     },
     AddJob {
-        creator: String,
-        contract: String,
+        program: String,
         trigger: Trigger,
         load: Load,
         label: String,
         cid: String,
     },
     RemoveJob {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
     },
     ChangeJobCallData {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
         call_data: String,
     },
     ChangeJobPeriod {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
         period: u64,
     },
     ChangeJobBlock {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
         block: u64,
     }
@@ -208,8 +203,7 @@ pub fn create_delete_energy_route_msg(
 }
 
 pub fn create_add_job_msg(
-    creator: String,
-    contract: String,
+    program: String,
     trigger: Trigger,
     load: Load,
     label: String,
@@ -218,8 +212,7 @@ pub fn create_add_job_msg(
     CyberMsgWrapper {
         route: CyberRoute::Cron,
         msg_data: CyberMsg::AddJob {
-            creator,
-            contract,
+            program,
             trigger,
             load,
             label,
@@ -230,15 +223,13 @@ pub fn create_add_job_msg(
 }
 
 pub fn create_remove_job_msg(
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Cron,
         msg_data: CyberMsg::RemoveJob {
-            creator,
-            contract,
+            program,
             label,
         },
     }
@@ -246,16 +237,14 @@ pub fn create_remove_job_msg(
 }
 
 pub fn create_change_job_call_data_msg(
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
     call_data: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Cron,
         msg_data: CyberMsg::ChangeJobCallData {
-            creator,
-            contract,
+            program,
             label,
             call_data,
         },
@@ -264,16 +253,14 @@ pub fn create_change_job_call_data_msg(
 }
 
 pub fn create_change_job_period_msg(
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
     period: u64,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Cron,
         msg_data: CyberMsg::ChangeJobPeriod {
-            creator,
-            contract,
+            program,
             label,
             period,
         },
@@ -282,16 +269,14 @@ pub fn create_change_job_period_msg(
 }
 
 pub fn create_change_job_block_msg(
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
     block: u64,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Cron,
         msg_data: CyberMsg::ChangeJobBlock {
-            creator,
-            contract,
+            program,
             label,
             block,
         },

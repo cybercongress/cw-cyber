@@ -5,10 +5,10 @@
     {
       "type": "object",
       "required": [
-        "rank_value_by_cid"
+        "get_rank_value_by_cid"
       ],
       "properties": {
-        "rank_value_by_cid": {
+        "get_rank_value_by_cid": {
           "type": "object",
           "required": [
             "cid"
@@ -25,10 +25,10 @@
     {
       "type": "object",
       "required": [
-        "cids_count"
+        "get_cids_count"
       ],
       "properties": {
-        "cids_count": {
+        "get_cids_count": {
           "type": "object"
         }
       },
@@ -37,10 +37,10 @@
     {
       "type": "object",
       "required": [
-        "links_count"
+        "get_links_count"
       ],
       "properties": {
-        "links_count": {
+        "get_links_count": {
           "type": "object"
         }
       },
@@ -67,18 +67,14 @@
         "get_job": {
           "type": "object",
           "required": [
-            "contract",
-            "creator",
-            "label"
+            "label",
+            "program"
           ],
           "properties": {
-            "contract": {
-              "type": "string"
-            },
-            "creator": {
-              "type": "string"
-            },
             "label": {
+              "type": "string"
+            },
+            "program": {
               "type": "string"
             }
           }
@@ -95,21 +91,29 @@
         "get_job_stats": {
           "type": "object",
           "required": [
-            "contract",
-            "creator",
-            "label"
+            "label",
+            "program"
           ],
           "properties": {
-            "contract": {
-              "type": "string"
-            },
-            "creator": {
-              "type": "string"
-            },
             "label": {
+              "type": "string"
+            },
+            "program": {
               "type": "string"
             }
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_lowest_fee"
+      ],
+      "properties": {
+        "get_lowest_fee": {
+          "type": "object"
         }
       },
       "additionalProperties": false
@@ -201,10 +205,10 @@
     {
       "type": "object",
       "required": [
-        "price"
+        "get_price"
       ],
       "properties": {
-        "price": {
+        "get_price": {
           "type": "object"
         }
       },
@@ -213,10 +217,10 @@
     {
       "type": "object",
       "required": [
-        "load"
+        "get_load"
       ],
       "properties": {
-        "load": {
+        "get_load": {
           "type": "object"
         }
       },
@@ -225,10 +229,10 @@
     {
       "type": "object",
       "required": [
-        "desirable_bandwidth"
+        "get_desirable_bandwidth"
       ],
       "properties": {
-        "desirable_bandwidth": {
+        "get_desirable_bandwidth": {
           "type": "object"
         }
       },
@@ -237,10 +241,10 @@
     {
       "type": "object",
       "required": [
-        "account_bandwidth"
+        "get_account_bandwidth"
       ],
       "properties": {
-        "account_bandwidth": {
+        "get_account_bandwidth": {
           "type": "object",
           "required": [
             "address"

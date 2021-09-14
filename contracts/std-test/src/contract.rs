@@ -250,7 +250,6 @@ pub fn add_job(
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
     let msg = create_add_job_msg(
-        contract.clone().into(),
         contract.into(),
         trigger.into(),
         load.into(),
@@ -271,7 +270,6 @@ pub fn remove_job(
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
     let msg = create_remove_job_msg(
-        contract.clone().into(),
         contract.into(),
         label.into(),
     );
@@ -290,7 +288,6 @@ pub fn change_job_call_data(
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_job_call_data_msg(
-        contract.clone().into(),
         contract.into(),
         label.into(),
         call_data.into(),
@@ -310,7 +307,6 @@ pub fn change_job_period(
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_job_period_msg(
-        contract.clone().into(),
         contract.into(),
         label.into(),
         period.into(),
@@ -330,7 +326,6 @@ pub fn change_job_block(
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_job_block_msg(
-        contract.clone().into(),
         contract.into(),
         label.into(),
         block.into(),
@@ -435,15 +430,13 @@ pub fn query(
         QueryMsg::GetLinksCount {} => to_binary(&query_links_count(deps)?),
         QueryMsg::Config {} => to_binary(&config_read(deps.storage).load()?),
         QueryMsg::GetJob {
-            creator,
-            contract,
+            program,
             label,
-        } => to_binary(&query_job(deps, creator, contract, label)?),
+        } => to_binary(&query_job(deps, program, label)?),
         QueryMsg::GetJobStats {
-            creator,
-            contract,
+            program,
             label,
-        } => to_binary(&query_job_stats(deps, creator, contract, label)?),
+        } => to_binary(&query_job_stats(deps, program, label)?),
         QueryMsg::GetLowestFee {} => to_binary(&query_lowest_fee(deps)?),
         QueryMsg::GetSourceRoutes {
             source,
@@ -497,24 +490,22 @@ pub fn query_links_count(
 
 pub fn query_job(
     deps: Deps,
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
 ) -> StdResult<JobResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: JobResponse = querier.query_job(creator, contract, label)?;
+    let res: JobResponse = querier.query_job(program, label)?;
 
     Ok(res)
 }
 
 pub fn query_job_stats(
     deps: Deps,
-    creator: String,
-    contract: String,
+    program: String,
     label: String,
 ) -> StdResult<JobStatsResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: JobStatsResponse = querier.query_job_stats(creator, contract, label)?;
+    let res: JobStatsResponse = querier.query_job_stats(program, label)?;
 
     Ok(res)
 }

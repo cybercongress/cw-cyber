@@ -24,13 +24,11 @@ pub enum CyberQuery {
     GetCidsCount {},
     GetLinksCount {},
     GetJob {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
     },
     GetJobStats {
-        creator: String,
-        contract: String,
+        program: String,
         label: String,
     },
     GetLowestFee {},
@@ -74,8 +72,7 @@ pub struct LinksCountResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct JobResponse {
-    pub creator: String,
-    pub contract: String,
+    pub program: String,
     pub trigger: Trigger,
     pub load: Load,
     pub label: String,
@@ -84,8 +81,7 @@ pub struct JobResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct JobStatsResponse {
-    pub creator: String,
-    pub contract: String,
+    pub program: String,
     pub label: String,
     pub calls: u64,
     pub fees: u64,

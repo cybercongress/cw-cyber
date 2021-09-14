@@ -68,15 +68,13 @@ impl<'a> CyberQuerier<'a> {
 
     pub fn query_job<T: Into<String>>(
         &self,
-        creator: T,
-        contract: T,
+        program: T,
         label: T,
     ) -> StdResult<JobResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Cron,
             query_data: CyberQuery::GetJob {
-                creator: creator.into(),
-                contract: contract.into(),
+                program: program.into(),
                 label: label.into(),
             },
         };
@@ -86,15 +84,13 @@ impl<'a> CyberQuerier<'a> {
 
     pub fn query_job_stats<T: Into<String>>(
         &self,
-        creator: T,
-        contract: T,
+        program: T,
         label: T,
     ) -> StdResult<JobStatsResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Cron,
             query_data: CyberQuery::GetJobStats {
-                creator: creator.into(),
-                contract: contract.into(),
+                program: program.into(),
                 label: label.into(),
             },
         };

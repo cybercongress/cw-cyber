@@ -4,9 +4,9 @@ version = "0.1.0"
 authors = ["Valery Litvin <litvintech@gmail.com>"]
 edition = "2018"
 description = "simple tester for cyber-std bindings"
-license = ""
 repository = "https://github.com/cybercongress/cw-cyber"
-homepage = "https://cyber.page"
+homepage = "https://cyb.ai"
+license = ""
 
 [lib]
 crate-type = ["cdylib", "rlib"]

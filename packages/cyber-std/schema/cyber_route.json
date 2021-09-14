@@ -5,6 +5,10 @@
   "type": "string",
   "enum": [
     "rank",
-    "graph"
+    "graph",
+    "resources",
+    "energy",
+    "cron",
+    "bandwidth"
   ]
 }

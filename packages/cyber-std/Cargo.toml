@@ -3,8 +3,9 @@ name = "cyber-std"
 version = "0.1.0"
 authors = ["Valery Litvin <litvintech@gmail.com>"]
 edition = "2018"
-description = "Bindings for CosmWasm contracts to call into custom modules of Cyber"
+description = "Bindings for CosmWasm contracts to call into modules of Cyber"
 repository = "https://github.com/cybercongress/cw-cyber"
+homepage = "https://cyb.ai"
 license = ""
 readme = "README.md"
 

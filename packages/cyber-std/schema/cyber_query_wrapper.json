@@ -20,31 +20,10 @@
         {
           "type": "object",
           "required": [
-            "rank_value_by_id"
+            "get_rank_value_by_cid"
           ],
           "properties": {
-            "rank_value_by_id": {
-              "type": "object",
-              "required": [
-                "cid_number"
-              ],
-              "properties": {
-                "cid_number": {
-                  "type": "integer",
-                  "format": "uint64",
-                  "minimum": 0.0
-                }
-              }
-            }
-          }
-        },
-        {
-          "type": "object",
-          "required": [
-            "rank_value_by_cid"
-          ],
-          "properties": {
-            "rank_value_by_cid": {
+            "get_rank_value_by_cid": {
               "type": "object",
               "required": [
                 "cid"
@@ -55,29 +34,232 @@
                 }
               }
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "type": "object",
           "required": [
-            "cids_count"
+            "get_cids_count"
           ],
           "properties": {
-            "cids_count": {
+            "get_cids_count": {
               "type": "object"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "type": "object",
           "required": [
-            "links_count"
+            "get_links_count"
           ],
           "properties": {
-            "links_count": {
+            "get_links_count": {
               "type": "object"
             }
-          }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_job"
+          ],
+          "properties": {
+            "get_job": {
+              "type": "object",
+              "required": [
+                "label",
+                "program"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "program": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_job_stats"
+          ],
+          "properties": {
+            "get_job_stats": {
+              "type": "object",
+              "required": [
+                "label",
+                "program"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "program": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_lowest_fee"
+          ],
+          "properties": {
+            "get_lowest_fee": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_source_routes"
+          ],
+          "properties": {
+            "get_source_routes": {
+              "type": "object",
+              "required": [
+                "source"
+              ],
+              "properties": {
+                "source": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_source_routed_energy"
+          ],
+          "properties": {
+            "get_source_routed_energy": {
+              "type": "object",
+              "required": [
+                "source"
+              ],
+              "properties": {
+                "source": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_destination_routed_energy"
+          ],
+          "properties": {
+            "get_destination_routed_energy": {
+              "type": "object",
+              "required": [
+                "destination"
+              ],
+              "properties": {
+                "destination": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_route"
+          ],
+          "properties": {
+            "get_route": {
+              "type": "object",
+              "required": [
+                "destination",
+                "source"
+              ],
+              "properties": {
+                "destination": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_price"
+          ],
+          "properties": {
+            "get_price": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_load"
+          ],
+          "properties": {
+            "get_load": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_desirable_bandwidth"
+          ],
+          "properties": {
+            "get_desirable_bandwidth": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "get_account_bandwidth"
+          ],
+          "properties": {
+            "get_account_bandwidth": {
+              "type": "object",
+              "required": [
+                "address"
+              ],
+              "properties": {
+                "address": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },
@@ -86,7 +268,11 @@
       "type": "string",
       "enum": [
         "rank",
-        "graph"
+        "graph",
+        "resources",
+        "energy",
+        "cron",
+        "bandwidth"
       ]
     }
   }

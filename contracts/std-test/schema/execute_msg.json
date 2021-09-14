@@ -83,14 +83,14 @@
           "type": "object",
           "required": [
             "amount",
-            "end_time",
+            "length",
             "resource"
           ],
           "properties": {
             "amount": {
               "$ref": "#/definitions/Coin"
             },
-            "end_time": {
+            "length": {
               "type": "integer",
               "format": "uint64",
               "minimum": 0.0

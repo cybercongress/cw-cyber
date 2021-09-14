@@ -16,7 +16,7 @@
           ],
           "properties": {
             "address": {
-              "$ref": "#/definitions/HumanAddr"
+              "type": "string"
             },
             "links": {
               "type": "array",
@@ -26,12 +26,315 @@
             }
           }
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "investmint"
+      ],
+      "properties": {
+        "investmint": {
+          "type": "object",
+          "required": [
+            "agent",
+            "amount",
+            "length",
+            "resource"
+          ],
+          "properties": {
+            "agent": {
+              "type": "string"
+            },
+            "amount": {
+              "$ref": "#/definitions/Coin"
+            },
+            "length": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "resource": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "create_energy_route"
+      ],
+      "properties": {
+        "create_energy_route": {
+          "type": "object",
+          "required": [
+            "alias",
+            "destination",
+            "source"
+          ],
+          "properties": {
+            "alias": {
+              "type": "string"
+            },
+            "destination": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "edit_energy_route"
+      ],
+      "properties": {
+        "edit_energy_route": {
+          "type": "object",
+          "required": [
+            "destination",
+            "source",
+            "value"
+          ],
+          "properties": {
+            "destination": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "value": {
+              "$ref": "#/definitions/Coin"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "edit_energy_route_alias"
+      ],
+      "properties": {
+        "edit_energy_route_alias": {
+          "type": "object",
+          "required": [
+            "alias",
+            "destination",
+            "source"
+          ],
+          "properties": {
+            "alias": {
+              "type": "string"
+            },
+            "destination": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "delete_energy_route"
+      ],
+      "properties": {
+        "delete_energy_route": {
+          "type": "object",
+          "required": [
+            "destination",
+            "source"
+          ],
+          "properties": {
+            "destination": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "add_job"
+      ],
+      "properties": {
+        "add_job": {
+          "type": "object",
+          "required": [
+            "cid",
+            "label",
+            "load",
+            "program",
+            "trigger"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "load": {
+              "$ref": "#/definitions/Load"
+            },
+            "program": {
+              "type": "string"
+            },
+            "trigger": {
+              "$ref": "#/definitions/Trigger"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "remove_job"
+      ],
+      "properties": {
+        "remove_job": {
+          "type": "object",
+          "required": [
+            "label",
+            "program"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "program": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "change_job_call_data"
+      ],
+      "properties": {
+        "change_job_call_data": {
+          "type": "object",
+          "required": [
+            "call_data",
+            "label",
+            "program"
+          ],
+          "properties": {
+            "call_data": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "program": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "change_job_period"
+      ],
+      "properties": {
+        "change_job_period": {
+          "type": "object",
+          "required": [
+            "label",
+            "period",
+            "program"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "period": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "program": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "change_job_block"
+      ],
+      "properties": {
+        "change_job_block": {
+          "type": "object",
+          "required": [
+            "block",
+            "label",
+            "program"
+          ],
+          "properties": {
+            "block": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "label": {
+              "type": "string"
+            },
+            "program": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     }
   ],
   "definitions": {
-    "HumanAddr": {
-      "type": "string"
+    "Coin": {
+      "type": "object",
+      "required": [
+        "amount",
+        "denom"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Uint128"
+        },
+        "denom": {
+          "type": "string"
+        }
+      }
     },
     "Link": {
       "type": "object",
@@ -47,6 +350,44 @@
           "type": "string"
         }
       }
+    },
+    "Load": {
+      "type": "object",
+      "required": [
+        "call_data",
+        "gas_price"
+      ],
+      "properties": {
+        "call_data": {
+          "type": "string"
+        },
+        "gas_price": {
+          "$ref": "#/definitions/Coin"
+        }
+      }
+    },
+    "Trigger": {
+      "type": "object",
+      "required": [
+        "block",
+        "period"
+      ],
+      "properties": {
+        "block": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "period": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "Uint128": {
+      "description": "A thin wrapper around u128 that is using strings for JSON encoding/decoding, such that the full u128 range can be used for clients that convert JSON numbers to floats, like JavaScript and jq.\n\n# Examples\n\nUse `from` to create instances of this and `u128` to get the value out:\n\n``` # use cosmwasm_std::Uint128; let a = Uint128::from(123u128); assert_eq!(a.u128(), 123);\n\nlet b = Uint128::from(42u64); assert_eq!(b.u128(), 42);\n\nlet c = Uint128::from(70u32); assert_eq!(c.u128(), 70); ```",
+      "type": "string"
     }
   }
 }
