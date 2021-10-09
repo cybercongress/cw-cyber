@@ -9,7 +9,7 @@ pub enum CyberRoute {
     Rank,
     Graph,
     Resources,
-    Energy,
-    Cron,
+    Grid,
+    Dmn,
     Bandwidth,
 }

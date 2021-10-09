@@ -9,24 +9,24 @@ Currently, the Cyber bindings include:
 
 - Query support for:
   - Graph
-    - CidsCount
-    - LinksCount
+    - ParticlesAmount
+    - CyberlinksAmount
   - Bandwidth
-    - Price
-    - Load
-    - DesirableBandwidth
-    - AccountBandwidth
+    - BandwidthPrice
+    - BandwidthLoad
+    - BandwidthTotal
+    - NeuronBandwidth
   - Rank
-    - RankValueByCid
+    - ParticleRank
   - Energy
     - SourceRoutes
     - SourceRoutedEnergy
     - DestinationRoutedEnergy
     - Route
-  - Cron
-    - Job
-    - JobStats
-    - GetLowestFee
+  - DMN
+    - Thought
+    - ThoughtStats
+    - LowestFee
 - Messages
   - Graph 
     - MsgCyberlink
@@ -37,12 +37,15 @@ Currently, the Cyber bindings include:
     - MsgEditRoute
     - MsgEditRouteAlias
     - MsgDeleteRoute
-  - Cron
-    - MsgAddJob
-    - MsgRemoveJob
-    - MsgChangeJobCallData
-    - MsgChangeJobPeriod
-    - MsgChangeJobBlock
+  - DMN
+    - MsgCreateThought
+    - MsgForgetThought
+    - MsgChangeThoughtCallData
+    - MsgChangeThoughtPeriod
+    - MsgChangeThoughtBlock
+    - MsgChangeThoughtGasPrice
+    - MsgChangeThoughtParticle
+    - MsgChangeThoughtName
 
 ## Usage
 

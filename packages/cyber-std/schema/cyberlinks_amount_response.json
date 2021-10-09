@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "LinksCountResponse",
+  "title": "CyberlinksAmountResponse",
   "type": "object",
   "required": [
-    "links_count"
+    "cyberlinks_amount"
   ],
   "properties": {
-    "links_count": {
+    "cyberlinks_amount": {
       "type": "integer",
       "format": "uint64",
       "minimum": 0.0

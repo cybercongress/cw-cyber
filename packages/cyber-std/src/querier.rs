@@ -3,10 +3,10 @@ use cosmwasm_std::{QuerierWrapper, StdResult};
 use crate::route::CyberRoute;
 use crate::query::{
     CyberQuery, CyberQueryWrapper,
-    RankValueResponse, CidsCountResponse, LinksCountResponse,
-    JobResponse, JobStatsResponse, LowestFeeResponse,
+    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
+    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
     RoutesResponse, RouteResponse, RoutedEnergyResponse,
-    PriceResponse, LoadResponse, DesirableBandwidthResponse, AccountBandwidthResponse
+    BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse
 };
 
 pub struct CyberQuerier<'a> {
@@ -18,90 +18,75 @@ impl<'a> CyberQuerier<'a> {
         CyberQuerier { querier }
     }
 
-    // pub fn query_rank_value_by_id<T: Into<u64>>(
-    //     &self,
-    //     cid_number: T,
-    // ) -> StdResult<RankValueResponse> {
-    //     let request = CyberQueryWrapper {
-    //         route: CyberRoute::Rank,
-    //         query_data: CyberQuery::RankValueById {
-    //             cid_number: cid_number.into(),
-    //         },
-    //     };
-    //
-    //     let res: RankValueResponse = self.querier.custom_query(&request.into())?;
-    //     Ok(res)
-    // }
-
-    pub fn query_rank_value_by_cid<T: Into<String>>(
+    pub fn query_particle_rank<T: Into<String>>(
         &self,
-        cid: T,
-    ) -> StdResult<RankValueResponse> {
+        particle: T,
+    ) -> StdResult<ParticleRankResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Rank,
-            query_data: CyberQuery::GetRankValueByCid {
-                cid: cid.into(),
+            query_data: CyberQuery::ParticleRank {
+                particle: particle.into(),
             },
         };
 
-        let res: RankValueResponse = self.querier.custom_query(&request.into())?;
+        let res: ParticleRankResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_cids_count(&self) -> StdResult<CidsCountResponse> {
+    pub fn query_particles_amount(&self) -> StdResult<ParticlesAmountResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Graph,
-            query_data: CyberQuery::GetCidsCount {},
+            query_data: CyberQuery::ParticlesAmount {},
         };
-        let res: CidsCountResponse = self.querier.custom_query(&request.into())?;
+        let res: ParticlesAmountResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_links_count(&self) -> StdResult<LinksCountResponse> {
+    pub fn query_cyberlinks_amount(&self) -> StdResult<CyberlinksAmountResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Graph,
-            query_data: CyberQuery::GetLinksCount {},
+            query_data: CyberQuery::CyberlinksAmount {},
         };
-        let res: LinksCountResponse = self.querier.custom_query(&request.into())?;
+        let res: CyberlinksAmountResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_job<T: Into<String>>(
+    pub fn query_thought<T: Into<String>>(
         &self,
         program: T,
-        label: T,
-    ) -> StdResult<JobResponse> {
+        name: T,
+    ) -> StdResult<ThoughtResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Cron,
-            query_data: CyberQuery::GetJob {
+            route: CyberRoute::Dmn,
+            query_data: CyberQuery::Thought {
                 program: program.into(),
-                label: label.into(),
+                name: name.into(),
             },
         };
-        let res: JobResponse = self.querier.custom_query(&request.into())?;
+        let res: ThoughtResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_job_stats<T: Into<String>>(
+    pub fn query_thought_stats<T: Into<String>>(
         &self,
         program: T,
-        label: T,
-    ) -> StdResult<JobStatsResponse> {
+        name: T,
+    ) -> StdResult<ThoughtStatsResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Cron,
-            query_data: CyberQuery::GetJobStats {
+            route: CyberRoute::Dmn,
+            query_data: CyberQuery::ThoughtStats {
                 program: program.into(),
-                label: label.into(),
+                name: name.into(),
             },
         };
-        let res: JobStatsResponse = self.querier.custom_query(&request.into())?;
+        let res: ThoughtStatsResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
     pub fn query_lowest_fee(&self) -> StdResult<LowestFeeResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Cron,
-            query_data: CyberQuery::GetLowestFee {},
+            route: CyberRoute::Dmn,
+            query_data: CyberQuery::LowestFee {},
         };
         let res: LowestFeeResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
@@ -112,8 +97,8 @@ impl<'a> CyberQuerier<'a> {
         source: T,
     ) -> StdResult<RoutesResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Energy,
-            query_data: CyberQuery::GetSourceRoutes {
+            route: CyberRoute::Grid,
+            query_data: CyberQuery::SourceRoutes {
                 source: source.into(),
             },
         };
@@ -126,8 +111,8 @@ impl<'a> CyberQuerier<'a> {
         source: T,
     ) -> StdResult<RoutedEnergyResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Energy,
-            query_data: CyberQuery::GetSourceRoutedEnergy {
+            route: CyberRoute::Grid,
+            query_data: CyberQuery::SourceRoutedEnergy {
                 source: source.into(),
             },
         };
@@ -140,8 +125,8 @@ impl<'a> CyberQuerier<'a> {
         destination: T,
     ) -> StdResult<RoutedEnergyResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Energy,
-            query_data: CyberQuery::GetDestinationRoutedEnergy {
+            route: CyberRoute::Grid,
+            query_data: CyberQuery::DestinationRoutedEnergy {
                 destination: destination.into(),
             },
         };
@@ -155,8 +140,8 @@ impl<'a> CyberQuerier<'a> {
         destination: T,
     ) -> StdResult<RouteResponse> {
         let request = CyberQueryWrapper {
-            route: CyberRoute::Energy,
-            query_data: CyberQuery::GetRoute {
+            route: CyberRoute::Grid,
+            query_data: CyberQuery::Route {
                 source: source.into(),
                 destination: destination.into(),
             },
@@ -165,44 +150,44 @@ impl<'a> CyberQuerier<'a> {
         Ok(res)
     }
 
-    pub fn query_price(&self) -> StdResult<PriceResponse> {
+    pub fn query_bandwidth_price(&self) -> StdResult<BandwidthPriceResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Bandwidth,
-            query_data: CyberQuery::GetPrice {},
+            query_data: CyberQuery::BandwidthPrice {},
         };
-        let res: PriceResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthPriceResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_load(&self) -> StdResult<LoadResponse> {
+    pub fn query_bandwidth_load(&self) -> StdResult<BandwidthLoadResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Bandwidth,
-            query_data: CyberQuery::GetLoad {},
+            query_data: CyberQuery::BandwidthLoad {},
         };
-        let res: LoadResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthLoadResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_desirable_bandwidth(&self) -> StdResult<DesirableBandwidthResponse> {
+    pub fn query_bandwidth_total(&self) -> StdResult<BandwidthTotalResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Bandwidth,
-            query_data: CyberQuery::GetDesirableBandwidth {},
+            query_data: CyberQuery::BandwidthTotal {},
         };
-        let res: DesirableBandwidthResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthTotalResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_account_bandwidth<T: Into<String>>(
+    pub fn query_neuron_bandwidth<T: Into<String>>(
         &self,
         address: T,
-    ) -> StdResult<AccountBandwidthResponse> {
+    ) -> StdResult<NeuronBandwidthResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Bandwidth,
-            query_data: CyberQuery::GetAccountBandwidth {
-                address: address.into(),
+            query_data: CyberQuery::NeuronBandwidth {
+                neuron: address.into(),
             },
         };
-        let res: AccountBandwidthResponse = self.querier.custom_query(&request.into())?;
+        let res: NeuronBandwidthResponse = self.querier.custom_query(&request.into())?;
         Ok(res)
     }
 }

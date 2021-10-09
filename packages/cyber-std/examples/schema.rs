@@ -5,7 +5,7 @@ use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
 use cyber_std::{
     CyberMsg, CyberMsgWrapper, CyberQuery, CyberQueryWrapper, CyberRoute,
-    RankValueResponse, CidsCountResponse, LinksCountResponse,
+    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
 };
 
 fn main() {
@@ -19,7 +19,7 @@ fn main() {
     export_schema(&schema_for!(CyberQueryWrapper), &out_dir);
     export_schema(&schema_for!(CyberQuery), &out_dir);
     export_schema(&schema_for!(CyberRoute), &out_dir);
-    export_schema(&schema_for!(RankValueResponse), &out_dir);
-    export_schema(&schema_for!(CidsCountResponse), &out_dir);
-    export_schema(&schema_for!(LinksCountResponse), &out_dir);
+    export_schema(&schema_for!(ParticleRankResponse), &out_dir);
+    export_schema(&schema_for!(ParticlesAmountResponse), &out_dir);
+    export_schema(&schema_for!(CyberlinksAmountResponse), &out_dir);
 }

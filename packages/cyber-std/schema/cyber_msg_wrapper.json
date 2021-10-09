@@ -42,18 +42,18 @@
             "cyberlink": {
               "type": "object",
               "required": [
-                "address",
-                "links"
+                "links",
+                "neuron"
               ],
               "properties": {
-                "address": {
-                  "type": "string"
-                },
                 "links": {
                   "type": "array",
                   "items": {
                     "$ref": "#/definitions/Link"
                   }
+                },
+                "neuron": {
+                  "type": "string"
                 }
               }
             }
@@ -69,15 +69,12 @@
             "investmint": {
               "type": "object",
               "required": [
-                "agent",
                 "amount",
                 "length",
+                "neuron",
                 "resource"
               ],
               "properties": {
-                "agent": {
-                  "type": "string"
-                },
                 "amount": {
                   "$ref": "#/definitions/Coin"
                 },
@@ -85,6 +82,9 @@
                   "type": "integer",
                   "format": "uint64",
                   "minimum": 0.0
+                },
+                "neuron": {
+                  "type": "string"
                 },
                 "resource": {
                   "type": "string"
@@ -205,27 +205,27 @@
         {
           "type": "object",
           "required": [
-            "add_job"
+            "create_thought"
           ],
           "properties": {
-            "add_job": {
+            "create_thought": {
               "type": "object",
               "required": [
-                "cid",
-                "label",
                 "load",
+                "name",
+                "particle",
                 "program",
                 "trigger"
               ],
               "properties": {
-                "cid": {
-                  "type": "string"
-                },
-                "label": {
-                  "type": "string"
-                },
                 "load": {
                   "$ref": "#/definitions/Load"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "particle": {
+                  "type": "string"
                 },
                 "program": {
                   "type": "string"
@@ -241,17 +241,17 @@
         {
           "type": "object",
           "required": [
-            "remove_job"
+            "forget_thought"
           ],
           "properties": {
-            "remove_job": {
+            "forget_thought": {
               "type": "object",
               "required": [
-                "label",
+                "name",
                 "program"
               ],
               "properties": {
-                "label": {
+                "name": {
                   "type": "string"
                 },
                 "program": {
@@ -265,21 +265,21 @@
         {
           "type": "object",
           "required": [
-            "change_job_call_data"
+            "change_thought_call_data"
           ],
           "properties": {
-            "change_job_call_data": {
+            "change_thought_call_data": {
               "type": "object",
               "required": [
                 "call_data",
-                "label",
+                "name",
                 "program"
               ],
               "properties": {
                 "call_data": {
                   "type": "string"
                 },
-                "label": {
+                "name": {
                   "type": "string"
                 },
                 "program": {
@@ -293,18 +293,18 @@
         {
           "type": "object",
           "required": [
-            "change_job_period"
+            "change_thought_period"
           ],
           "properties": {
-            "change_job_period": {
+            "change_thought_period": {
               "type": "object",
               "required": [
-                "label",
+                "name",
                 "period",
                 "program"
               ],
               "properties": {
-                "label": {
+                "name": {
                   "type": "string"
                 },
                 "period": {
@@ -323,14 +323,14 @@
         {
           "type": "object",
           "required": [
-            "change_job_block"
+            "change_thought_block"
           ],
           "properties": {
-            "change_job_block": {
+            "change_thought_block": {
               "type": "object",
               "required": [
                 "block",
-                "label",
+                "name",
                 "program"
               ],
               "properties": {
@@ -339,7 +339,7 @@
                   "format": "uint64",
                   "minimum": 0.0
                 },
-                "label": {
+                "name": {
                   "type": "string"
                 },
                 "program": {
@@ -359,8 +359,8 @@
         "rank",
         "graph",
         "resources",
-        "energy",
-        "cron",
+        "grid",
+        "dmn",
         "bandwidth"
       ]
     },

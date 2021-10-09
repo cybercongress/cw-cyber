@@ -64,25 +64,25 @@ pub enum ExecuteMsg {
     DeleteEnergyRoute {
         destination: String,
     },
-    AddJob {
+    CreateThought {
         trigger: Trigger,
         load: Load,
-        label: String,
-        cid: String,
+        name: String,
+        particle: String,
     },
-    RemoveJob {
-        label: String,
+    ForgetThought {
+        name: String,
     },
-    ChangeJobCallData {
-        label: String,
+    ChangeThoughtCallData {
+        name: String,
         call_data: String,
     },
-    ChangeJobPeriod {
-        label: String,
+    ChangeThoughtPeriod {
+        name: String,
         period: u64,
     },
-    ChangeJobBlock {
-        label: String,
+    ChangeThoughtBlock {
+        name: String,
         block: u64,
     }
 }
@@ -90,38 +90,38 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetRankValueByCid {
-        cid: String,
+    ParticleRank {
+        particle: String,
     },
-    GetCidsCount {},
-    GetLinksCount {},
+    CyberlinksAmount {},
+    ParticlesAmount {},
     Config {},
-    GetJob {
+    Thought {
         program: String,
-        label: String,
+        name: String,
     },
-    GetJobStats {
+    ThoughtStats {
         program: String,
-        label: String,
+        name: String,
     },
-    GetLowestFee {},
-    GetSourceRoutes {
+    DmnLowestFee {},
+    SourceRoutes {
         source: String,
     },
-    GetSourceRoutedEnergy {
+    SourceRoutedEnergy {
         source: String,
     },
-    GetDestinationRoutedEnergy {
+    DestinationRoutedEnergy {
         destination: String,
     },
-    GetRoute {
+    Route {
         source: String,
         destination: String,
     },
-    GetPrice {},
-    GetLoad {},
-    GetDesirableBandwidth {},
-    GetAccountBandwidth {
-        address: String,
+    BandwidthPrice {},
+    BandwidthLoad {},
+    BandwidthTotal {},
+    NeuronBandwidth {
+        neuron: String,
     }
 }

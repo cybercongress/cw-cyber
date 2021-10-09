@@ -9,15 +9,15 @@ pub use msg::{
     create_cyberlink_msg, create_investmint_msg,
     create_create_energy_route_msg, create_edit_energy_route_msg,
     create_edit_energy_route_alias_msg, create_delete_energy_route_msg,
-    create_add_job_msg, create_remove_job_msg, create_change_job_call_data_msg,
-    create_change_job_period_msg, create_change_job_block_msg,
+    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_call_data_msg,
+    create_change_thought_period_msg, create_change_thought_block_msg,
 };
 pub use query::{
     CyberQuery, CyberQueryWrapper,
-    RankValueResponse, CidsCountResponse, LinksCountResponse,
-    JobResponse, JobStatsResponse, LowestFeeResponse,
+    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
+    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
     RouteResponse, RoutesResponse, RoutedEnergyResponse,
-    PriceResponse, LoadResponse, AccountBandwidthResponse, DesirableBandwidthResponse,
+    BandwidthPriceResponse, BandwidthLoadResponse, NeuronBandwidthResponse, BandwidthTotalResponse,
 };
 pub use querier::CyberQuerier;
 pub use route::CyberRoute;

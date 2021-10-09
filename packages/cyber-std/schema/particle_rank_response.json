@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "CidsCountResponse",
+  "title": "ParticleRankResponse",
   "type": "object",
   "required": [
-    "cids_count"
+    "rank"
   ],
   "properties": {
-    "cids_count": {
+    "rank": {
       "type": "integer",
       "format": "uint64",
       "minimum": 0.0

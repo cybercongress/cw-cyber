@@ -15,74 +15,71 @@ pub struct CyberQueryWrapper {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum CyberQuery {
-    // RankValueById {
-    //     cid_number: u64,
-    // },
-    GetRankValueByCid {
-        cid: String,
+    ParticleRank {
+        particle: String,
     },
-    GetCidsCount {},
-    GetLinksCount {},
-    GetJob {
+    ParticlesAmount {},
+    CyberlinksAmount {},
+    Thought {
         program: String,
-        label: String,
+        name: String,
     },
-    GetJobStats {
+    ThoughtStats {
         program: String,
-        label: String,
+        name: String,
     },
-    GetLowestFee {},
-    GetSourceRoutes {
+    LowestFee {},
+    SourceRoutes {
         source: String,
     },
-    GetSourceRoutedEnergy {
+    SourceRoutedEnergy {
         source: String,
     },
-    GetDestinationRoutedEnergy {
+    DestinationRoutedEnergy {
         destination: String,
     },
-    GetRoute {
+    Route {
         source: String,
         destination: String,
     },
-    GetPrice {},
-    GetLoad {},
-    GetDesirableBandwidth {},
-    GetAccountBandwidth {
-        address: String,
+    BandwidthPrice {},
+    BandwidthLoad {},
+    BandwidthTotal {},
+    NeuronBandwidth {
+        neuron: String,
     }
 }
 
 impl CustomQuery for CyberQueryWrapper {}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct RankValueResponse {
-    pub rank_value: u64,
+pub struct ParticleRankResponse {
+    pub rank: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct CidsCountResponse {
-    pub cids_count: u64,
+pub struct ParticlesAmountResponse {
+    pub particles_amount: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct LinksCountResponse {
-    pub links_count: u64,
+pub struct CyberlinksAmountResponse {
+    pub cyberlinks_amount: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct JobResponse {
+pub struct ThoughtResponse {
     pub program: String,
     pub trigger: Trigger,
     pub load: Load,
-    pub label: String,
-    pub cid: String,
+    pub name: String,
+    pub particle: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct JobStatsResponse {
+pub struct ThoughtStatsResponse {
     pub program: String,
-    pub label: String,
+    pub name: String,
     pub calls: u64,
     pub fees: u64,
     pub gas: u64,
@@ -111,23 +108,23 @@ pub struct RouteResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct PriceResponse {
+pub struct BandwidthPriceResponse {
     pub price: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct LoadResponse {
+pub struct BandwidthLoadResponse {
     pub load: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct DesirableBandwidthResponse {
-    pub desirable_bandwidth: u64,
+pub struct BandwidthTotalResponse {
+    pub total: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct AccountBandwidthResponse {
-    pub address: String,
+pub struct NeuronBandwidthResponse {
+    pub neuron: String,
     pub remained_value: u64,
     pub last_updated_block: u64,
     pub max_value: u64,

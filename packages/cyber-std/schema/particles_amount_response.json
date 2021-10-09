@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RankValueResponse",
+  "title": "ParticlesAmountResponse",
   "type": "object",
   "required": [
-    "rank_value"
+    "particles_amount"
   ],
   "properties": {
-    "rank_value": {
+    "particles_amount": {
       "type": "integer",
       "format": "uint64",
       "minimum": 0.0

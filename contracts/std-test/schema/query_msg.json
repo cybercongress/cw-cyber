@@ -5,16 +5,16 @@
     {
       "type": "object",
       "required": [
-        "get_rank_value_by_cid"
+        "particle_rank"
       ],
       "properties": {
-        "get_rank_value_by_cid": {
+        "particle_rank": {
           "type": "object",
           "required": [
-            "cid"
+            "particle"
           ],
           "properties": {
-            "cid": {
+            "particle": {
               "type": "string"
             }
           }
@@ -25,10 +25,10 @@
     {
       "type": "object",
       "required": [
-        "get_cids_count"
+        "cyberlinks_amount"
       ],
       "properties": {
-        "get_cids_count": {
+        "cyberlinks_amount": {
           "type": "object"
         }
       },
@@ -37,10 +37,10 @@
     {
       "type": "object",
       "required": [
-        "get_links_count"
+        "particles_amount"
       ],
       "properties": {
-        "get_links_count": {
+        "particles_amount": {
           "type": "object"
         }
       },
@@ -61,17 +61,17 @@
     {
       "type": "object",
       "required": [
-        "get_job"
+        "thought"
       ],
       "properties": {
-        "get_job": {
+        "thought": {
           "type": "object",
           "required": [
-            "label",
+            "name",
             "program"
           ],
           "properties": {
-            "label": {
+            "name": {
               "type": "string"
             },
             "program": {
@@ -85,17 +85,17 @@
     {
       "type": "object",
       "required": [
-        "get_job_stats"
+        "thought_stats"
       ],
       "properties": {
-        "get_job_stats": {
+        "thought_stats": {
           "type": "object",
           "required": [
-            "label",
+            "name",
             "program"
           ],
           "properties": {
-            "label": {
+            "name": {
               "type": "string"
             },
             "program": {
@@ -109,10 +109,10 @@
     {
       "type": "object",
       "required": [
-        "get_lowest_fee"
+        "dmn_lowest_fee"
       ],
       "properties": {
-        "get_lowest_fee": {
+        "dmn_lowest_fee": {
           "type": "object"
         }
       },
@@ -121,10 +121,10 @@
     {
       "type": "object",
       "required": [
-        "get_source_routes"
+        "source_routes"
       ],
       "properties": {
-        "get_source_routes": {
+        "source_routes": {
           "type": "object",
           "required": [
             "source"
@@ -141,10 +141,10 @@
     {
       "type": "object",
       "required": [
-        "get_source_routed_energy"
+        "source_routed_energy"
       ],
       "properties": {
-        "get_source_routed_energy": {
+        "source_routed_energy": {
           "type": "object",
           "required": [
             "source"
@@ -161,10 +161,10 @@
     {
       "type": "object",
       "required": [
-        "get_destination_routed_energy"
+        "destination_routed_energy"
       ],
       "properties": {
-        "get_destination_routed_energy": {
+        "destination_routed_energy": {
           "type": "object",
           "required": [
             "destination"
@@ -181,10 +181,10 @@
     {
       "type": "object",
       "required": [
-        "get_route"
+        "route"
       ],
       "properties": {
-        "get_route": {
+        "route": {
           "type": "object",
           "required": [
             "destination",
@@ -205,10 +205,10 @@
     {
       "type": "object",
       "required": [
-        "get_price"
+        "bandwidth_price"
       ],
       "properties": {
-        "get_price": {
+        "bandwidth_price": {
           "type": "object"
         }
       },
@@ -217,10 +217,10 @@
     {
       "type": "object",
       "required": [
-        "get_load"
+        "bandwidth_load"
       ],
       "properties": {
-        "get_load": {
+        "bandwidth_load": {
           "type": "object"
         }
       },
@@ -229,10 +229,10 @@
     {
       "type": "object",
       "required": [
-        "get_desirable_bandwidth"
+        "bandwidth_total"
       ],
       "properties": {
-        "get_desirable_bandwidth": {
+        "bandwidth_total": {
           "type": "object"
         }
       },
@@ -241,16 +241,16 @@
     {
       "type": "object",
       "required": [
-        "get_account_bandwidth"
+        "neuron_bandwidth"
       ],
       "properties": {
-        "get_account_bandwidth": {
+        "neuron_bandwidth": {
           "type": "object",
           "required": [
-            "address"
+            "neuron"
           ],
           "properties": {
-            "address": {
+            "neuron": {
               "type": "string"
             }
           }

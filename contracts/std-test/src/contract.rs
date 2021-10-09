@@ -12,12 +12,12 @@ use cyber_std::{
     create_cyberlink_msg, create_investmint_msg,
     create_create_energy_route_msg, create_edit_energy_route_msg,
     create_edit_energy_route_alias_msg, create_delete_energy_route_msg,
-    create_add_job_msg, create_remove_job_msg, create_change_job_call_data_msg,
-    create_change_job_period_msg, create_change_job_block_msg,
-    RankValueResponse, CidsCountResponse, LinksCountResponse,
-    JobResponse, JobStatsResponse, LowestFeeResponse,
+    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_call_data_msg,
+    create_change_thought_period_msg, create_change_thought_block_msg,
+    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
+    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
     RouteResponse, RoutesResponse, RoutedEnergyResponse,
-    PriceResponse, LoadResponse, DesirableBandwidthResponse, AccountBandwidthResponse,
+    BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse,
 };
 
 #[entry_point]
@@ -73,27 +73,27 @@ pub fn execute(
         ExecuteMsg::DeleteEnergyRoute {
             destination,
         } => delete_energy_route(deps, env, info, destination),
-        ExecuteMsg::AddJob {
+        ExecuteMsg::CreateThought {
             trigger,
             load,
-            label,
-            cid,
-        } => add_job(deps, env, info, trigger, load, label, cid),
-        ExecuteMsg::RemoveJob {
-            label,
-        } => remove_job(deps, env, info, label),
-        ExecuteMsg::ChangeJobCallData {
-            label,
+            name,
+            particle,
+        } => create_thought(deps, env, info, trigger, load, name, particle),
+        ExecuteMsg::ForgetThought {
+            name,
+        } => forget_thought(deps, env, info, name),
+        ExecuteMsg::ChangeThoughtCallData {
+            name,
             call_data,
-        } => change_job_call_data(deps, env, info, label, call_data),
-        ExecuteMsg::ChangeJobPeriod {
-            label,
+        } => change_thought_call_data(deps, env, info, name, call_data),
+        ExecuteMsg::ChangeThoughtPeriod {
+            name,
             period,
-        } => change_job_period(deps, env, info, label, period),
-        ExecuteMsg::ChangeJobBlock {
-            label,
+        } => change_thought_period(deps, env, info, name, period),
+        ExecuteMsg::ChangeThoughtBlock {
+            name,
             block,
-        } => change_job_block(deps, env, info, label, block),
+        } => change_thought_block(deps, env, info, name, block),
     }
 }
 
@@ -239,22 +239,22 @@ pub fn delete_energy_route(
     Ok(res)
 }
 
-pub fn add_job(
+pub fn create_thought(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
     trigger: Trigger,
     load: Load,
-    label: String,
-    cid: String,
+    name: String,
+    particle: String,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
-    let msg = create_add_job_msg(
+    let msg = create_creat_thought_msg(
         contract.into(),
         trigger.into(),
         load.into(),
-        label.into(),
-        cid.into(),
+        name.into(),
+        particle.into(),
     );
 
     let res = Response::new()
@@ -262,16 +262,16 @@ pub fn add_job(
     Ok(res)
 }
 
-pub fn remove_job(
+pub fn forget_thought(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
-    label: String,
+    name: String,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
-    let msg = create_remove_job_msg(
+    let msg = create_forget_thought_msg(
         contract.into(),
-        label.into(),
+        name.into(),
     );
 
     let res = Response::new()
@@ -279,17 +279,17 @@ pub fn remove_job(
     Ok(res)
 }
 
-pub fn change_job_call_data(
+pub fn change_thought_call_data(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
-    label: String,
+    name: String,
     call_data: String,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_job_call_data_msg(
+    let msg = create_change_thought_call_data_msg(
         contract.into(),
-        label.into(),
+        name.into(),
         call_data.into(),
     );
 
@@ -298,17 +298,17 @@ pub fn change_job_call_data(
     Ok(res)
 }
 
-pub fn change_job_period(
+pub fn change_thought_period(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
-    label: String,
+    name: String,
     period: u64,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_job_period_msg(
+    let msg = create_change_thought_period_msg(
         contract.into(),
-        label.into(),
+        name.into(),
         period.into(),
     );
 
@@ -317,17 +317,17 @@ pub fn change_job_period(
     Ok(res)
 }
 
-pub fn change_job_block(
+pub fn change_thought_block(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
-    label: String,
+    name: String,
     block: u64,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_job_block_msg(
+    let msg = create_change_thought_block_msg(
         contract.into(),
-        label.into(),
+        name.into(),
         block.into(),
     );
 
@@ -425,87 +425,89 @@ pub fn query(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetRankValueByCid { cid } => to_binary(&query_rank_value_by_cid(deps, cid)?),
-        QueryMsg::GetCidsCount {} => to_binary(&query_cids_count(deps)?),
-        QueryMsg::GetLinksCount {} => to_binary(&query_links_count(deps)?),
+        QueryMsg::ParticleRank {
+            particle
+        } => to_binary(&query_particle_rank(deps, particle)?),
+        QueryMsg::ParticlesAmount {} => to_binary(&query_particles_amount(deps)?),
+        QueryMsg::CyberlinksAmount {} => to_binary(&query_cyberlinks_amount(deps)?),
         QueryMsg::Config {} => to_binary(&config_read(deps.storage).load()?),
-        QueryMsg::GetJob {
+        QueryMsg::Thought {
             program,
-            label,
-        } => to_binary(&query_job(deps, program, label)?),
-        QueryMsg::GetJobStats {
+            name,
+        } => to_binary(&query_thought(deps, program, name)?),
+        QueryMsg::ThoughtStats {
             program,
-            label,
-        } => to_binary(&query_job_stats(deps, program, label)?),
-        QueryMsg::GetLowestFee {} => to_binary(&query_lowest_fee(deps)?),
-        QueryMsg::GetSourceRoutes {
+            name,
+        } => to_binary(&query_thought_stats(deps, program, name)?),
+        QueryMsg::DmnLowestFee {} => to_binary(&query_lowest_fee(deps)?),
+        QueryMsg::SourceRoutes {
             source,
         } => to_binary(&query_source_routes(deps, source)?),
-        QueryMsg::GetSourceRoutedEnergy {
+        QueryMsg::SourceRoutedEnergy {
             source,
         } => to_binary(&query_source_routed_energy(deps, source)?),
-        QueryMsg::GetDestinationRoutedEnergy {
+        QueryMsg::DestinationRoutedEnergy {
             destination,
         } => to_binary(&query_destination_routed_energy(deps,destination)?),
-        QueryMsg::GetRoute {
+        QueryMsg::Route {
             source,
             destination,
         } => to_binary(&query_route(deps, source, destination)?),
-        QueryMsg::GetPrice {} => to_binary(&query_price(deps)?),
-        QueryMsg::GetLoad {} => to_binary(&query_load(deps)?),
-        QueryMsg::GetDesirableBandwidth {} => to_binary(&query_desirable_bandwidth(deps)?),
-        QueryMsg::GetAccountBandwidth {
-            address,
-        } => to_binary(&query_account_bandwidth(deps, address)?),
+        QueryMsg::BandwidthPrice {} => to_binary(&query_price(deps)?),
+        QueryMsg::BandwidthLoad {} => to_binary(&query_load(deps)?),
+        QueryMsg::BandwidthTotal {} => to_binary(&query_desirable_bandwidth(deps)?),
+        QueryMsg::NeuronBandwidth {
+            neuron,
+        } => to_binary(&query_neuron_bandwidth(deps, neuron)?),
     }
 }
 
-pub fn query_rank_value_by_cid(
+pub fn query_particle_rank(
     deps: Deps,
-    cid: String,
-) -> StdResult<RankValueResponse> {
+    particle: String,
+) -> StdResult<ParticleRankResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: RankValueResponse = querier.query_rank_value_by_cid(cid)?;
+    let res: ParticleRankResponse = querier.query_particle_rank(particle)?;
 
     Ok(res)
 }
 
-pub fn query_cids_count(
+pub fn query_particles_amount(
     deps: Deps,
-) -> StdResult<CidsCountResponse> {
+) -> StdResult<ParticlesAmountResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: CidsCountResponse = querier.query_cids_count()?;
+    let res: ParticlesAmountResponse = querier.query_particles_amount()?;
 
     Ok(res)
 }
 
-pub fn query_links_count(
+pub fn query_cyberlinks_amount(
     deps: Deps,
-) -> StdResult<LinksCountResponse> {
+) -> StdResult<CyberlinksAmountResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: LinksCountResponse = querier.query_links_count()?;
+    let res: CyberlinksAmountResponse = querier.query_cyberlinks_amount()?;
 
     Ok(res)
 }
 
-pub fn query_job(
+pub fn query_thought(
     deps: Deps,
     program: String,
-    label: String,
-) -> StdResult<JobResponse> {
+    name: String,
+) -> StdResult<ThoughtResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: JobResponse = querier.query_job(program, label)?;
+    let res: ThoughtResponse = querier.query_thought(program, name)?;
 
     Ok(res)
 }
 
-pub fn query_job_stats(
+pub fn query_thought_stats(
     deps: Deps,
     program: String,
-    label: String,
-) -> StdResult<JobStatsResponse> {
+    name: String,
+) -> StdResult<ThoughtStatsResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: JobStatsResponse = querier.query_job_stats(program, label)?;
+    let res: ThoughtStatsResponse = querier.query_thought_stats(program, name)?;
 
     Ok(res)
 }
@@ -562,37 +564,37 @@ pub fn query_route(
 
 pub fn query_price(
     deps: Deps,
-) -> StdResult<PriceResponse> {
+) -> StdResult<BandwidthPriceResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: PriceResponse = querier.query_price()?;
+    let res: BandwidthPriceResponse = querier.query_bandwidth_price()?;
 
     Ok(res)
 }
 
 pub fn query_load(
     deps: Deps,
-) -> StdResult<LoadResponse> {
+) -> StdResult<BandwidthLoadResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: LoadResponse = querier.query_load()?;
+    let res: BandwidthLoadResponse = querier.query_bandwidth_load()?;
 
     Ok(res)
 }
 
 pub fn query_desirable_bandwidth(
     deps: Deps,
-) -> StdResult<DesirableBandwidthResponse> {
+) -> StdResult<BandwidthTotalResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: DesirableBandwidthResponse = querier.query_desirable_bandwidth()?;
+    let res: BandwidthTotalResponse = querier.query_bandwidth_total()?;
 
     Ok(res)
 }
 
-pub fn query_account_bandwidth(
+pub fn query_neuron_bandwidth(
     deps: Deps,
     address: String
-) -> StdResult<AccountBandwidthResponse> {
+) -> StdResult<NeuronBandwidthResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: AccountBandwidthResponse = querier.query_account_bandwidth(address)?;
+    let res: NeuronBandwidthResponse = querier.query_neuron_bandwidth(address)?;
 
     Ok(res)
 }

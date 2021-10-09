@@ -52,11 +52,11 @@ impl Into<CosmosMsg<CyberMsgWrapper>> for CyberMsgWrapper {
 #[serde(rename_all = "snake_case")]
 pub enum CyberMsg {
     Cyberlink {
-        address: String,
+        neuron: String,
         links: Vec<Link>,
     },
     Investmint {
-        agent: String,
+        neuron: String,
         amount: Coin,
         resource: String,
         length: u64,
@@ -80,42 +80,42 @@ pub enum CyberMsg {
         source: String,
         destination: String,
     },
-    AddJob {
+    CreateThought {
         program: String,
         trigger: Trigger,
         load: Load,
-        label: String,
-        cid: String,
+        name: String,
+        particle: String,
     },
-    RemoveJob {
+    ForgetThought {
         program: String,
-        label: String,
+        name: String,
     },
-    ChangeJobCallData {
+    ChangeThoughtCallData {
         program: String,
-        label: String,
+        name: String,
         call_data: String,
     },
-    ChangeJobPeriod {
+    ChangeThoughtPeriod {
         program: String,
-        label: String,
+        name: String,
         period: u64,
     },
-    ChangeJobBlock {
+    ChangeThoughtBlock {
         program: String,
-        label: String,
+        name: String,
         block: u64,
     }
 }
 
 pub fn create_cyberlink_msg(
-    address: String,
+    neuron: String,
     links: Vec<Link>,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Graph,
         msg_data: CyberMsg::Cyberlink {
-            address,
+            neuron,
             links,
         },
     }
@@ -123,7 +123,7 @@ pub fn create_cyberlink_msg(
 }
 
 pub fn create_investmint_msg(
-    agent: String,
+    neuron: String,
     amount: Coin,
     resource: String,
     length: u64,
@@ -131,7 +131,7 @@ pub fn create_investmint_msg(
     CyberMsgWrapper {
         route: CyberRoute::Resources,
         msg_data: CyberMsg::Investmint {
-            agent,
+            neuron,
             amount,
             resource,
             length,
@@ -146,7 +146,7 @@ pub fn create_create_energy_route_msg(
     alias: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Energy,
+        route: CyberRoute::Grid,
         msg_data: CyberMsg::CreateEnergyRoute {
             source,
             destination,
@@ -162,7 +162,7 @@ pub fn create_edit_energy_route_msg(
     value: Coin,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Energy,
+        route: CyberRoute::Grid,
         msg_data: CyberMsg::EditEnergyRoute {
             source,
             destination,
@@ -178,7 +178,7 @@ pub fn create_edit_energy_route_alias_msg(
     alias: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Energy,
+        route: CyberRoute::Grid,
         msg_data: CyberMsg::EditEnergyRouteAlias {
             source,
             destination,
@@ -193,7 +193,7 @@ pub fn create_delete_energy_route_msg(
     destination: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Energy,
+        route: CyberRoute::Grid,
         msg_data: CyberMsg::DeleteEnergyRoute {
             source,
             destination,
@@ -202,82 +202,82 @@ pub fn create_delete_energy_route_msg(
     .into()
 }
 
-pub fn create_add_job_msg(
+pub fn create_creat_thought_msg(
     program: String,
     trigger: Trigger,
     load: Load,
-    label: String,
-    cid: String,
+    name: String,
+    particle: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Cron,
-        msg_data: CyberMsg::AddJob {
+        route: CyberRoute::Dmn,
+        msg_data: CyberMsg::CreateThought {
             program,
             trigger,
             load,
-            label,
-            cid,
+            name,
+            particle,
         },
     }
     .into()
 }
 
-pub fn create_remove_job_msg(
+pub fn create_forget_thought_msg(
     program: String,
-    label: String,
+    name: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Cron,
-        msg_data: CyberMsg::RemoveJob {
+        route: CyberRoute::Dmn,
+        msg_data: CyberMsg::ForgetThought {
             program,
-            label,
+            name,
         },
     }
     .into()
 }
 
-pub fn create_change_job_call_data_msg(
+pub fn create_change_thought_call_data_msg(
     program: String,
-    label: String,
+    name: String,
     call_data: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Cron,
-        msg_data: CyberMsg::ChangeJobCallData {
+        route: CyberRoute::Dmn,
+        msg_data: CyberMsg::ChangeThoughtCallData {
             program,
-            label,
+            name,
             call_data,
         },
     }
     .into()
 }
 
-pub fn create_change_job_period_msg(
+pub fn create_change_thought_period_msg(
     program: String,
-    label: String,
+    name: String,
     period: u64,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Cron,
-        msg_data: CyberMsg::ChangeJobPeriod {
+        route: CyberRoute::Dmn,
+        msg_data: CyberMsg::ChangeThoughtPeriod {
             program,
-            label,
+            name,
             period,
         },
     }
     .into()
 }
 
-pub fn create_change_job_block_msg(
+pub fn create_change_thought_block_msg(
     program: String,
-    label: String,
+    name: String,
     block: u64,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
-        route: CyberRoute::Cron,
-        msg_data: CyberMsg::ChangeJobBlock {
+        route: CyberRoute::Dmn,
+        msg_data: CyberMsg::ChangeThoughtBlock {
             program,
-            label,
+            name,
             block,
         },
     }
