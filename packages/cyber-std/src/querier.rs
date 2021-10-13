@@ -1,20 +1,19 @@
 use cosmwasm_std::{QuerierWrapper, StdResult};
 
-use crate::route::CyberRoute;
 use crate::query::{
-    CyberQuery, CyberQueryWrapper,
-    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
-    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
-    RoutesResponse, RouteResponse, RoutedEnergyResponse,
-    BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse
+    BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberQuery,
+    CyberQueryWrapper, CyberlinksAmountResponse, LowestFeeResponse, NeuronBandwidthResponse,
+    ParticleRankResponse, ParticlesAmountResponse, RouteResponse, RoutedEnergyResponse,
+    RoutesResponse, ThoughtResponse, ThoughtStatsResponse,
 };
+use crate::route::CyberRoute;
 
 pub struct CyberQuerier<'a> {
-    querier: &'a QuerierWrapper<'a>,
+    querier: &'a QuerierWrapper<'a, CyberQueryWrapper>,
 }
 
 impl<'a> CyberQuerier<'a> {
-    pub fn new(querier: &'a QuerierWrapper) -> Self {
+    pub fn new(querier: &'a QuerierWrapper<CyberQueryWrapper>) -> Self {
         CyberQuerier { querier }
     }
 
@@ -29,7 +28,7 @@ impl<'a> CyberQuerier<'a> {
             },
         };
 
-        let res: ParticleRankResponse = self.querier.custom_query(&request.into())?;
+        let res: ParticleRankResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -38,7 +37,7 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Graph,
             query_data: CyberQuery::ParticlesAmount {},
         };
-        let res: ParticlesAmountResponse = self.querier.custom_query(&request.into())?;
+        let res: ParticlesAmountResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -47,7 +46,7 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Graph,
             query_data: CyberQuery::CyberlinksAmount {},
         };
-        let res: CyberlinksAmountResponse = self.querier.custom_query(&request.into())?;
+        let res: CyberlinksAmountResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -63,7 +62,7 @@ impl<'a> CyberQuerier<'a> {
                 name: name.into(),
             },
         };
-        let res: ThoughtResponse = self.querier.custom_query(&request.into())?;
+        let res: ThoughtResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -79,7 +78,7 @@ impl<'a> CyberQuerier<'a> {
                 name: name.into(),
             },
         };
-        let res: ThoughtStatsResponse = self.querier.custom_query(&request.into())?;
+        let res: ThoughtStatsResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -88,21 +87,18 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Dmn,
             query_data: CyberQuery::LowestFee {},
         };
-        let res: LowestFeeResponse = self.querier.custom_query(&request.into())?;
+        let res: LowestFeeResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
-    pub fn query_source_routes<T: Into<String>>(
-        &self,
-        source: T,
-    ) -> StdResult<RoutesResponse> {
+    pub fn query_source_routes<T: Into<String>>(&self, source: T) -> StdResult<RoutesResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Grid,
             query_data: CyberQuery::SourceRoutes {
                 source: source.into(),
             },
         };
-        let res: RoutesResponse = self.querier.custom_query(&request.into())?;
+        let res: RoutesResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -116,7 +112,7 @@ impl<'a> CyberQuerier<'a> {
                 source: source.into(),
             },
         };
-        let res: RoutedEnergyResponse = self.querier.custom_query(&request.into())?;
+        let res: RoutedEnergyResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -130,7 +126,7 @@ impl<'a> CyberQuerier<'a> {
                 destination: destination.into(),
             },
         };
-        let res: RoutedEnergyResponse = self.querier.custom_query(&request.into())?;
+        let res: RoutedEnergyResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -146,7 +142,7 @@ impl<'a> CyberQuerier<'a> {
                 destination: destination.into(),
             },
         };
-        let res: RouteResponse = self.querier.custom_query(&request.into())?;
+        let res: RouteResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -155,7 +151,7 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Bandwidth,
             query_data: CyberQuery::BandwidthPrice {},
         };
-        let res: BandwidthPriceResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthPriceResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -164,7 +160,7 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Bandwidth,
             query_data: CyberQuery::BandwidthLoad {},
         };
-        let res: BandwidthLoadResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthLoadResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -173,7 +169,7 @@ impl<'a> CyberQuerier<'a> {
             route: CyberRoute::Bandwidth,
             query_data: CyberQuery::BandwidthTotal {},
         };
-        let res: BandwidthTotalResponse = self.querier.custom_query(&request.into())?;
+        let res: BandwidthTotalResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -187,7 +183,7 @@ impl<'a> CyberQuerier<'a> {
                 neuron: address.into(),
             },
         };
-        let res: NeuronBandwidthResponse = self.querier.custom_query(&request.into())?;
+        let res: NeuronBandwidthResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 }
