@@ -1,5 +1,5 @@
 
-use cosmwasm_std::{Addr, Storage, Uint128};
+use cosmwasm_std::{Storage};
 use cosmwasm_storage::{
     singleton, singleton_read, ReadonlySingleton, Singleton,
 };

@@ -10,11 +10,11 @@ use crate::query::{
 };
 
 pub struct CyberQuerier<'a> {
-    querier: &'a QuerierWrapper<'a>,
+    querier: &'a QuerierWrapper<'a, CyberQueryWrapper>,
 }
 
 impl<'a> CyberQuerier<'a> {
-    pub fn new(querier: &'a QuerierWrapper) -> Self {
+    pub fn new(querier: &'a QuerierWrapper<'a, CyberQueryWrapper>) -> Self {
         CyberQuerier { querier }
     }
 

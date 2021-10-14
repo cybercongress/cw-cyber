@@ -1,14 +1,13 @@
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
-    Uint64, Coin, StakingMsg, attr, BankMsg, from_slice, coin
+    entry_point, to_binary, Binary, Env, MessageInfo, StdError, StdResult,
+    Coin, StakingMsg, BankMsg, coin
 };
-use schemars::JsonSchema;
 use crate::error::ContractError;
 use crate::msg::{InstantiateMsg, ExecuteMsg, SudoMsg, QueryMsg};
 use crate::state::{State, config,config_read};
 use cyber_std::{
-    CyberMsgWrapper, CyberQuerier,
-    Link, Trigger, Load, Route,
+    CyberMsgWrapper, CyberQuerier, CyberQueryWrapper,
+    Link, Trigger, Load,
     create_cyberlink_msg, create_investmint_msg,
     create_create_energy_route_msg, create_edit_energy_route_msg,
     create_edit_energy_route_alias_msg, create_delete_energy_route_msg,
@@ -19,6 +18,10 @@ use cyber_std::{
     RouteResponse, RoutesResponse, RoutedEnergyResponse,
     BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse,
 };
+
+type Deps<'a> = cosmwasm_std::Deps<'a, CyberQueryWrapper>;
+type DepsMut<'a> = cosmwasm_std::DepsMut<'a, CyberQueryWrapper>;
+type Response = cosmwasm_std::Response<CyberMsgWrapper>;
 
 #[entry_point]
 pub fn instantiate(
@@ -42,7 +45,7 @@ pub fn execute(
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Cyberlink { links } => cyberlink(deps, env, links),
         ExecuteMsg::Stake {
@@ -101,7 +104,7 @@ pub fn cyberlink(
     _deps: DepsMut,
     env: Env,
     links: Vec<Link>
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_cyberlink_msg(contract.into(), links);
 
@@ -116,7 +119,7 @@ pub fn stake(
     _info: MessageInfo,
     validator: String,
     amount: Coin,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
     let res = Response::new()
         .add_message(StakingMsg::Delegate {
@@ -132,7 +135,7 @@ pub fn unstake(
     _info: MessageInfo,
     validator: String,
     amount: Coin,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
     let res = Response::new()
         .add_message(StakingMsg::Undelegate {
@@ -149,7 +152,7 @@ pub fn investmint(
     amount: Coin,
     resource: String,
     length: u64,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
     let agent = env.contract.address;
     let msg = create_investmint_msg(
@@ -170,7 +173,7 @@ pub fn create_energy_route(
     _info: MessageInfo,
     destination: String,
     alias: String,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_create_energy_route_msg(
         contract.into(),
@@ -189,7 +192,7 @@ pub fn edit_energy_route(
     _info: MessageInfo,
     destination: String,
     value: Coin
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let value = coin(u128::from(value.amount), value.denom);
     let msg = create_edit_energy_route_msg(
@@ -209,7 +212,7 @@ pub fn edit_energy_route_alias(
     _info: MessageInfo,
     destination: String,
     alias: String
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_edit_energy_route_alias_msg(
         contract.into(),
@@ -227,7 +230,7 @@ pub fn delete_energy_route(
     env: Env,
     _info: MessageInfo,
     destination: String,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_delete_energy_route_msg(
         contract.into(),
@@ -247,7 +250,7 @@ pub fn create_thought(
     load: Load,
     name: String,
     particle: String,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_creat_thought_msg(
         contract.into(),
@@ -267,7 +270,7 @@ pub fn forget_thought(
     env: Env,
     _info: MessageInfo,
     name: String,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_forget_thought_msg(
         contract.into(),
@@ -285,7 +288,7 @@ pub fn change_thought_call_data(
     _info: MessageInfo,
     name: String,
     call_data: String,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_thought_call_data_msg(
         contract.into(),
@@ -304,7 +307,7 @@ pub fn change_thought_period(
     _info: MessageInfo,
     name: String,
     period: u64,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_thought_period_msg(
         contract.into(),
@@ -323,7 +326,7 @@ pub fn change_thought_block(
     _info: MessageInfo,
     name: String,
     block: u64,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_change_thought_block_msg(
         contract.into(),
@@ -341,7 +344,7 @@ pub fn sudo(
     deps: DepsMut,
     env: Env,
     msg: SudoMsg
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     match msg {
         SudoMsg::Heartbeat { beats } => do_beat(deps, env, beats),
         SudoMsg::Cyberlink { links } => cyberlink(deps, env, links),
@@ -361,7 +364,7 @@ pub fn sudo(
     }
 }
 
-fn do_beat(deps: DepsMut, _env: Env, beats: u64) -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_beat(deps: DepsMut, _env: Env, beats: u64) -> Result<Response, ContractError> {
     let mut state = config(deps.storage).load()?;
 
     state.beats = state.beats + beats;
@@ -370,7 +373,7 @@ fn do_beat(deps: DepsMut, _env: Env, beats: u64) -> Result<Response<CyberMsgWrap
     Ok(Response::default())
 }
 
-fn do_release(deps: DepsMut, env: Env) -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_release(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
     let state = config(deps.storage).load()?;
 
     let to_addr = state.creator;
@@ -387,7 +390,7 @@ fn do_release(deps: DepsMut, env: Env) -> Result<Response<CyberMsgWrapper>, Cont
     Ok(resp)
 }
 
-fn do_cpu_loop() -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_cpu_loop() -> Result<Response, ContractError> {
     let mut counter = 0u64;
     loop {
         counter += 1;
@@ -397,7 +400,7 @@ fn do_cpu_loop() -> Result<Response<CyberMsgWrapper>, ContractError> {
     }
 }
 
-fn do_storage_loop(deps: DepsMut) -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_storage_loop(deps: DepsMut) -> Result<Response, ContractError> {
     let mut test_case = 0u64;
     loop {
         deps.storage
@@ -406,7 +409,7 @@ fn do_storage_loop(deps: DepsMut) -> Result<Response<CyberMsgWrapper>, ContractE
     }
 }
 
-fn do_memory_loop() -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_memory_loop() -> Result<Response, ContractError> {
     let mut data = vec![1usize];
     loop {
         // add one element
@@ -414,7 +417,7 @@ fn do_memory_loop() -> Result<Response<CyberMsgWrapper>, ContractError> {
     }
 }
 
-fn do_panic() -> Result<Response<CyberMsgWrapper>, ContractError> {
+fn do_panic() -> Result<Response, ContractError> {
     panic!("This page intentionally faulted");
 }
 

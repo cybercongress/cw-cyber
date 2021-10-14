@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CosmosMsg, Coin};
+use cosmwasm_std::{CosmosMsg, Coin, CustomMsg};
 use crate::route::CyberRoute;
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq, JsonSchema)]
@@ -36,7 +36,6 @@ pub struct Route {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-/// CyberMsgWrapper is an override of CosmosMsg::Custom to show this works and can be extended in the contract
 pub struct CyberMsgWrapper {
     pub route: CyberRoute,
     pub msg_data: CyberMsg,
@@ -47,6 +46,8 @@ impl Into<CosmosMsg<CyberMsgWrapper>> for CyberMsgWrapper {
         CosmosMsg::Custom(self)
     }
 }
+
+impl CustomMsg for CyberMsgWrapper{}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]

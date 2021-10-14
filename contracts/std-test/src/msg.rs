@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::Coin;
-use cyber_std::{Link, Trigger, Load, Route};
+use cyber_std::{Link, Trigger, Load};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct  InstantiateMsg {
