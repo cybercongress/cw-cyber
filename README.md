@@ -37,12 +37,12 @@ Currently, the Cyber bindings include:
   - Grid
     - MsgCreateRoute
     - MsgEditRoute
-    - MsgEditRouteAlias
+    - MsgEditRouteName
     - MsgDeleteRoute
   - DMN
     - MsgCreateThought
     - MsgForgetThought
-    - MsgChangeThoughtCallData
+    - MsgChangeThoughtInput
     - MsgChangeThoughtPeriod
     - MsgChangeThoughtBlock
     - MsgChangeThoughtGasPrice

@@ -35,12 +35,12 @@ Currently, the Cyber bindings include:
   - Energy
     - MsgCreateRoute
     - MsgEditRoute
-    - MsgEditRouteAlias
+    - MsgEditRouteName
     - MsgDeleteRoute
   - DMN
     - MsgCreateThought
     - MsgForgetThought
-    - MsgChangeThoughtCallData
+    - MsgChangeThoughtInput
     - MsgChangeThoughtPeriod
     - MsgChangeThoughtBlock
     - MsgChangeThoughtGasPrice
@@ -64,11 +64,11 @@ use cyber_std::{ CyberQuerier, RankValueResponse };
 pub fn try_something(
     deps: Deps,
     _env: Env,
-    cid: String,
+    particle: String,
     ...
-) -> StdResult<RankValueResponse> {
+) -> StdResult<ParticleRankResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let rank_value: RankValueResponse = querier.query_rank_value_by_cid(cid)?;
+    let res: ParticleRankResponse = querier.query_particle_rank(particle)?;
     ...
     Ok(res)
 }
@@ -91,7 +91,7 @@ pub fn try_something(
     env: Env,
     links: Vec<Link>,
     ...
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     ...
     let contract_addr = env.contract.address;
     let msg: CosmosMsg<CyberMsgWrapper> = create_cyberlink_msg(contract_addr.into(), links);

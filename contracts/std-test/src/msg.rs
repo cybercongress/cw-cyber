@@ -51,15 +51,15 @@ pub enum ExecuteMsg {
     },
     CreateEnergyRoute {
         destination: String,
-        alias: String,
+        name: String,
     },
     EditEnergyRoute {
         destination: String,
         value: Coin,
     },
-    EditEnergyRouteAlias {
+    EditEnergyRouteName {
         destination: String,
-        alias: String,
+        name: String,
     },
     DeleteEnergyRoute {
         destination: String,
@@ -73,9 +73,9 @@ pub enum ExecuteMsg {
     ForgetThought {
         name: String,
     },
-    ChangeThoughtCallData {
+    ChangeThoughtInput {
         name: String,
-        call_data: String,
+        input: String,
     },
     ChangeThoughtPeriod {
         name: String,

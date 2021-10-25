@@ -21,7 +21,7 @@ pub struct Trigger {
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct Load {
-    pub call_data: String,
+    pub input: String,
     pub gas_price: Coin,
 }
 
@@ -30,7 +30,7 @@ pub struct Load {
 pub struct Route {
     pub source: String,
     pub destination: String,
-    pub alias: String,
+    pub name: String,
     pub value: Vec<Coin>,
 }
 
@@ -65,17 +65,17 @@ pub enum CyberMsg {
     CreateEnergyRoute {
         source: String,
         destination: String,
-        alias: String,
+        name: String,
     },
     EditEnergyRoute {
         source: String,
         destination: String,
         value: Coin,
     },
-    EditEnergyRouteAlias {
+    EditEnergyRouteName {
         source: String,
         destination: String,
-        alias: String,
+        name: String,
     },
     DeleteEnergyRoute {
         source: String,
@@ -92,10 +92,10 @@ pub enum CyberMsg {
         program: String,
         name: String,
     },
-    ChangeThoughtCallData {
+    ChangeThoughtInput {
         program: String,
         name: String,
-        call_data: String,
+        input: String,
     },
     ChangeThoughtPeriod {
         program: String,
@@ -144,14 +144,14 @@ pub fn create_investmint_msg(
 pub fn create_create_energy_route_msg(
     source: String,
     destination: String,
-    alias: String,
+    name: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Grid,
         msg_data: CyberMsg::CreateEnergyRoute {
             source,
             destination,
-            alias,
+            name,
         },
     }
     .into()
@@ -173,17 +173,17 @@ pub fn create_edit_energy_route_msg(
     .into()
 }
 
-pub fn create_edit_energy_route_alias_msg(
+pub fn create_edit_energy_route_name_msg(
     source: String,
     destination: String,
-    alias: String,
+    name: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Grid,
-        msg_data: CyberMsg::EditEnergyRouteAlias {
+        msg_data: CyberMsg::EditEnergyRouteName {
             source,
             destination,
-            alias,
+            name: name,
         },
     }
     .into()
@@ -237,17 +237,17 @@ pub fn create_forget_thought_msg(
     .into()
 }
 
-pub fn create_change_thought_call_data_msg(
+pub fn create_change_thought_input_msg(
     program: String,
     name: String,
-    call_data: String,
+    input: String,
 ) -> CosmosMsg<CyberMsgWrapper> {
     CyberMsgWrapper {
         route: CyberRoute::Dmn,
-        msg_data: CyberMsg::ChangeThoughtCallData {
+        msg_data: CyberMsg::ChangeThoughtInput {
             program,
             name,
-            call_data,
+            input,
         },
     }
     .into()

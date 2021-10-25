@@ -8,8 +8,8 @@ pub use msg::{
     Link, Trigger, Load, Route,
     create_cyberlink_msg, create_investmint_msg,
     create_create_energy_route_msg, create_edit_energy_route_msg,
-    create_edit_energy_route_alias_msg, create_delete_energy_route_msg,
-    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_call_data_msg,
+    create_edit_energy_route_name_msg, create_delete_energy_route_msg,
+    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_input_msg,
     create_change_thought_period_msg, create_change_thought_block_msg,
 };
 pub use query::{

@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CyberMsgWrapper",
-  "description": "CyberMsgWrapper is an override of CosmosMsg::Custom to show this works and can be extended in the contract",
   "type": "object",
   "required": [
     "msg_data",
@@ -32,7 +31,7 @@
       }
     },
     "CyberMsg": {
-      "anyOf": [
+      "oneOf": [
         {
           "type": "object",
           "required": [
@@ -103,15 +102,15 @@
             "create_energy_route": {
               "type": "object",
               "required": [
-                "alias",
                 "destination",
+                "name",
                 "source"
               ],
               "properties": {
-                "alias": {
+                "destination": {
                   "type": "string"
                 },
-                "destination": {
+                "name": {
                   "type": "string"
                 },
                 "source": {
@@ -153,21 +152,21 @@
         {
           "type": "object",
           "required": [
-            "edit_energy_route_alias"
+            "edit_energy_route_name"
           ],
           "properties": {
-            "edit_energy_route_alias": {
+            "edit_energy_route_name": {
               "type": "object",
               "required": [
-                "alias",
                 "destination",
+                "name",
                 "source"
               ],
               "properties": {
-                "alias": {
+                "destination": {
                   "type": "string"
                 },
-                "destination": {
+                "name": {
                   "type": "string"
                 },
                 "source": {
@@ -265,18 +264,18 @@
         {
           "type": "object",
           "required": [
-            "change_thought_call_data"
+            "change_thought_input"
           ],
           "properties": {
-            "change_thought_call_data": {
+            "change_thought_input": {
               "type": "object",
               "required": [
-                "call_data",
+                "input",
                 "name",
                 "program"
               ],
               "properties": {
-                "call_data": {
+                "input": {
                   "type": "string"
                 },
                 "name": {
@@ -382,15 +381,15 @@
     "Load": {
       "type": "object",
       "required": [
-        "call_data",
-        "gas_price"
+        "gas_price",
+        "input"
       ],
       "properties": {
-        "call_data": {
-          "type": "string"
-        },
         "gas_price": {
           "$ref": "#/definitions/Coin"
+        },
+        "input": {
+          "type": "string"
         }
       }
     },

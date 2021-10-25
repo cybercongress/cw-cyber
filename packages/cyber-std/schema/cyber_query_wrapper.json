@@ -16,7 +16,7 @@
   },
   "definitions": {
     "CyberQuery": {
-      "anyOf": [
+      "oneOf": [
         {
           "type": "object",
           "required": [

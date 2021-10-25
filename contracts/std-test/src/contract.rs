@@ -10,8 +10,8 @@ use cyber_std::{
     Link, Trigger, Load,
     create_cyberlink_msg, create_investmint_msg,
     create_create_energy_route_msg, create_edit_energy_route_msg,
-    create_edit_energy_route_alias_msg, create_delete_energy_route_msg,
-    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_call_data_msg,
+    create_edit_energy_route_name_msg, create_delete_energy_route_msg,
+    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_input_msg,
     create_change_thought_period_msg, create_change_thought_block_msg,
     ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
     ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
@@ -63,16 +63,16 @@ pub fn execute(
         } => investmint(deps, env, info, amount, resource, length),
         ExecuteMsg::CreateEnergyRoute {
             destination,
-            alias,
-        } => create_energy_route(deps, env, info, destination, alias),
+            name,
+        } => create_energy_route(deps, env, info, destination, name),
         ExecuteMsg::EditEnergyRoute {
             destination,
             value,
         } => edit_energy_route(deps, env, info, destination, value),
-        ExecuteMsg::EditEnergyRouteAlias {
+        ExecuteMsg::EditEnergyRouteName {
             destination,
-            alias,
-        } => edit_energy_route_alias(deps, env, info, destination, alias),
+            name,
+        } => edit_energy_route_name(deps, env, info, destination, name),
         ExecuteMsg::DeleteEnergyRoute {
             destination,
         } => delete_energy_route(deps, env, info, destination),
@@ -85,10 +85,10 @@ pub fn execute(
         ExecuteMsg::ForgetThought {
             name,
         } => forget_thought(deps, env, info, name),
-        ExecuteMsg::ChangeThoughtCallData {
+        ExecuteMsg::ChangeThoughtInput {
             name,
-            call_data,
-        } => change_thought_call_data(deps, env, info, name, call_data),
+            input,
+        } => change_thought_input(deps, env, info, name, input),
         ExecuteMsg::ChangeThoughtPeriod {
             name,
             period,
@@ -172,13 +172,13 @@ pub fn create_energy_route(
     env: Env,
     _info: MessageInfo,
     destination: String,
-    alias: String,
+    name: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_create_energy_route_msg(
         contract.into(),
         destination.into(),
-        alias.into(),
+        name.into(),
     );
 
     let res = Response::new()
@@ -206,18 +206,18 @@ pub fn edit_energy_route(
     Ok(res)
 }
 
-pub fn edit_energy_route_alias(
+pub fn edit_energy_route_name(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
     destination: String,
-    alias: String
+    name: String
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_edit_energy_route_alias_msg(
+    let msg = create_edit_energy_route_name_msg(
         contract.into(),
         destination.into(),
-        alias.into(),
+        name.into(),
     );
 
     let res = Response::new()
@@ -282,18 +282,18 @@ pub fn forget_thought(
     Ok(res)
 }
 
-pub fn change_thought_call_data(
+pub fn change_thought_input(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
     name: String,
-    call_data: String,
+    input: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_thought_call_data_msg(
+    let msg = create_change_thought_input_msg(
         contract.into(),
         name.into(),
-        call_data.into(),
+        input.into(),
     );
 
     let res = Response::new()
