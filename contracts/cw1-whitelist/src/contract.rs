@@ -1,11 +1,7 @@
-use schemars::JsonSchema;
-use std::fmt;
-
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response,
-    StdResult,
+    to_binary, Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 };
 
 use cw1::CanExecuteResponse;
@@ -26,7 +22,7 @@ pub fn instantiate(
     _env: Env,
     _info: MessageInfo,
     msg: InstantiateMsg,
-) -> StdResult<Response> {
+) -> StdResult<Response<CyberMsgWrapper>> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     let cfg = AdminList {
         admins: map_validate(deps.api, &msg.admins)?,
@@ -50,36 +46,33 @@ pub fn execute(
     msg: ExecuteMsg<CyberMsgWrapper>,
 ) -> Result<Response<CyberMsgWrapper>, ContractError> {
     match msg {
-        ExecuteMsg::Execute { msgs } => execute_execute::<CyberMsgWrapper>(deps, env, info, msgs),
-        // ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
-        // ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
+        ExecuteMsg::Execute { msgs } => execute_execute(deps, env, info, msgs),
+        ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
+        ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
     }
 }
 
-pub fn execute_execute<T>(
+pub fn execute_execute(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    msgs: Vec<CosmosMsg<T>>,
-) -> Result<Response<T>, ContractError>
-where
-    T: Clone + fmt::Debug + PartialEq + JsonSchema,
-{
-    if !can_execute(deps.as_ref(), info.sender.as_ref())? {
-        Err(ContractError::Unauthorized {})
-    } else {
-        let res = Response::new()
-            .add_messages(msgs)
-            .add_attribute("action", "execute");
-        Ok(res)
+    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
+) -> Result<Response<CyberMsgWrapper>, ContractError> {
+    let mut res = Response::new().add_attribute("action", "execute");
+
+    for msg in msgs {
+        if can_execute(deps.as_ref(), info.sender.as_ref(), msg.clone())? {
+            res = res.add_message(msg)
+        }
     }
+    Ok(res)
 }
 
 pub fn execute_freeze(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-) -> Result<Response, ContractError> {
+) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let mut cfg = ADMIN_LIST.load(deps.storage)?;
     if !cfg.can_modify(info.sender.as_ref()) {
         Err(ContractError::Unauthorized {})
@@ -97,7 +90,7 @@ pub fn execute_update_admins(
     _env: Env,
     info: MessageInfo,
     admins: Vec<String>,
-) -> Result<Response, ContractError> {
+) -> Result<Response<CyberMsgWrapper>, ContractError> {
     let mut cfg = ADMIN_LIST.load(deps.storage)?;
     if !cfg.can_modify(info.sender.as_ref()) {
         Err(ContractError::Unauthorized {})
@@ -110,21 +103,39 @@ pub fn execute_update_admins(
     }
 }
 
-fn can_execute(deps: Deps, sender: &str) -> StdResult<bool> {
+fn can_execute(
+    deps: Deps,
+    sender: &str,
+    msg: CosmosMsg<CyberMsgWrapper>,
+) -> Result<bool, ContractError> {
     let cfg = ADMIN_LIST.load(deps.storage)?;
-    let can = cfg.is_admin(&sender);
-    Ok(can)
+    let authorized = cfg.is_admin(sender);
+    if !authorized {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    match msg {
+        CosmosMsg::Custom(_msg) => {}
+        _ => {}
+    }
+
+    Ok(true)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(
+    deps: Deps,
+    _env: Env,
+    msg: QueryMsg<CyberMsgWrapper>,
+) -> Result<Binary, ContractError> {
     match msg {
         QueryMsg::AdminList {} => to_binary(&query_admin_list(deps)?),
         QueryMsg::CanExecute { sender, msg } => to_binary(&query_can_execute(deps, sender, msg)?),
     }
+    .map_err(ContractError::Std)
 }
 
-pub fn query_admin_list(deps: Deps) -> StdResult<AdminListResponse> {
+pub fn query_admin_list(deps: Deps) -> Result<AdminListResponse, ContractError> {
     let cfg = ADMIN_LIST.load(deps.storage)?;
     Ok(AdminListResponse {
         admins: cfg.admins.into_iter().map(|a| a.into()).collect(),
@@ -135,10 +146,10 @@ pub fn query_admin_list(deps: Deps) -> StdResult<AdminListResponse> {
 pub fn query_can_execute(
     deps: Deps,
     sender: String,
-    _msg: CosmosMsg,
-) -> StdResult<CanExecuteResponse> {
+    msg: CosmosMsg<CyberMsgWrapper>,
+) -> Result<CanExecuteResponse, ContractError> {
     Ok(CanExecuteResponse {
-        can_execute: can_execute(deps, &sender)?,
+        can_execute: can_execute(deps, &sender, msg).is_ok(),
     })
 }
 
@@ -234,7 +245,7 @@ mod tests {
         let info = mock_info(&bob, &[]);
         instantiate(deps.as_mut(), mock_env(), info, instantiate_msg).unwrap();
 
-        let freeze: ExecuteMsg<Empty> = ExecuteMsg::Freeze {};
+        let freeze: ExecuteMsg<CyberMsgWrapper> = ExecuteMsg::Freeze {};
         let msgs = vec![
             BankMsg::Send {
                 to_address: bob.to_string(),

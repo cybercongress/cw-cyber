@@ -1,17 +1,20 @@
+/*
+
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use anyhow::{anyhow, Result};
 use assert_matches::assert_matches;
-use cosmwasm_std::{to_binary, Addr, CosmosMsg, Empty, QueryRequest, StdError, WasmMsg, WasmQuery};
+use cosmwasm_std::{to_binary, Addr, CosmosMsg, QueryRequest, StdError, WasmMsg, WasmQuery};
 use cw1::Cw1Contract;
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 use derivative::Derivative;
 use serde::{de::DeserializeOwned, Serialize};
+use cyber_std::CyberMsgWrapper;
 
 fn mock_app() -> App {
     App::default()
 }
 
-fn contract_cw1() -> Box<dyn Contract<Empty>> {
+fn contract_cw1() -> Box<dyn Contract<CyberMsgWrapper>> {
     let contract = ContractWrapper::new(
         crate::contract::execute,
         crate::contract::instantiate,
@@ -56,14 +59,12 @@ impl Suite {
         Cw1Contract(contract)
     }
 
-    pub fn execute<M>(
+    pub fn execute(
         &mut self,
         sender_contract: Addr,
         target_contract: &Addr,
-        msg: M,
+        msg: CyberMsgWrapper,
     ) -> Result<AppResponse>
-    where
-        M: Serialize + DeserializeOwned,
     {
         let execute: ExecuteMsg = ExecuteMsg::Execute {
             msgs: vec![CosmosMsg::Wasm(WasmMsg::Execute {
@@ -82,9 +83,7 @@ impl Suite {
             .map_err(|err| anyhow!(err))
     }
 
-    pub fn query<M>(&self, target_contract: Addr, msg: M) -> Result<AdminListResponse, StdError>
-    where
-        M: Serialize + DeserializeOwned,
+    pub fn query(&self, target_contract: Addr, msg: CyberMsgWrapper) -> Result<AdminListResponse, StdError>
     {
         self.app.wrap().query(&QueryRequest::Wasm(WasmQuery::Smart {
             contract_addr: target_contract.to_string(),
@@ -118,3 +117,6 @@ fn proxy_freeze_message() {
             }) if !mutable
     );
 }
+
+
+ */

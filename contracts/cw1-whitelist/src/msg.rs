@@ -19,12 +19,16 @@ where
     /// Execute requests the contract to re-dispatch all these messages with the
     /// contract's address as sender. Every implementation has it's own logic to
     /// determine in
-    Execute { msgs: Vec<CosmosMsg<T>> },
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    },
     // /// Freeze will make a mutable contract immutable, must be called by an admin
-    // Freeze {},
+    Freeze {},
     // /// UpdateAdmins will change the admin set of the contract, must be called by an existing admin,
     // /// and only works if the contract is mutable
-    // UpdateAdmins { admins: Vec<String> },
+    UpdateAdmins {
+        admins: Vec<String>,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
