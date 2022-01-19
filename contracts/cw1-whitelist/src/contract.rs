@@ -10,6 +10,7 @@ use cosmwasm_std::{
 
 use cw1::CanExecuteResponse;
 use cw2::set_contract_version;
+use cyber_std::CyberMsgWrapper;
 
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
@@ -46,12 +47,12 @@ pub fn execute(
     info: MessageInfo,
     // Note: implement this function with different type to add support for custom messages
     // and then import the rest of this contract code.
-    msg: ExecuteMsg<Empty>,
-) -> Result<Response<Empty>, ContractError> {
+    msg: ExecuteMsg<CyberMsgWrapper>,
+) -> Result<Response<CyberMsgWrapper>, ContractError> {
     match msg {
-        ExecuteMsg::Execute { msgs } => execute_execute(deps, env, info, msgs),
-        ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
-        ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
+        ExecuteMsg::Execute { msgs } => execute_execute::<CyberMsgWrapper>(deps, env, info, msgs),
+        // ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
+        // ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
     }
 }
 
