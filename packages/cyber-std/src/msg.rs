@@ -2,6 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{CosmosMsg, Coin, CustomMsg};
+use cw721::{CustomMsg as Cw721CustomMsg};
 use crate::route::CyberRoute;
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq, JsonSchema)]
@@ -47,6 +48,7 @@ impl Into<CosmosMsg<CyberMsgWrapper>> for CyberMsgWrapper {
     }
 }
 
+impl Cw721CustomMsg for CyberMsgWrapper{}
 impl CustomMsg for CyberMsgWrapper{}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
