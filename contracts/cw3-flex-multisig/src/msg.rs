@@ -1,3 +1,4 @@
+use std::fmt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -14,14 +15,16 @@ pub struct InstantiateMsg {
     pub max_voting_period: Duration,
 }
 
-// TODO: add some T variants? Maybe good enough as fixed Empty for now
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum ExecuteMsg {
+pub enum ExecuteMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
     Propose {
         title: String,
         description: String,
-        msgs: Vec<CosmosMsg<Empty>>,
+        msgs: Vec<CosmosMsg<T>>,
         // note: we ignore API-spec'd earliest if passed, always opens immediately
         latest: Option<Expiration>,
     },
@@ -37,6 +40,17 @@ pub enum ExecuteMsg {
     },
     /// Handles update hook messages from the group contract
     MemberChangedHook(MemberChangedHookMsg),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SudoMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    }
 }
 
 // We can also add this as a cw3 extension

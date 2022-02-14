@@ -1,3 +1,4 @@
+use std::fmt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -6,6 +7,7 @@ use cosmwasm_std::{Addr, BlockInfo, CosmosMsg, Decimal, Empty, StdResult, Storag
 use cw3::{Status, Vote};
 use cw_storage_plus::{Item, Map};
 use cw_utils::{Duration, Expiration, Threshold};
+use cyber_std::CyberMsgWrapper;
 
 // we multiply by this when calculating needed_votes in order to round up properly
 // Note: `10u128.pow(9)` fails as "u128::pow` is not yet stable as a const fn"
@@ -24,7 +26,7 @@ pub struct Proposal {
     pub description: String,
     pub start_height: u64,
     pub expires: Expiration,
-    pub msgs: Vec<CosmosMsg<Empty>>,
+    pub msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
     pub status: Status,
     /// pass requirements
     pub threshold: Threshold,

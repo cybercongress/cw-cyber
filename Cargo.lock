@@ -313,22 +313,7 @@ dependencies = [
  "cw20",
  "cw20-base",
  "cw3",
- "schemars",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "cw3-fixed-multisig"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2970e92f08780f47b8387fd9d55e538899b611f6fc993b21ff22b3846cac7f1b"
-dependencies = [
- "cosmwasm-std",
- "cw-storage-plus",
- "cw-utils",
- "cw2",
- "cw3",
+ "cyber-std",
  "schemars",
  "serde",
  "thiserror",
@@ -345,9 +330,10 @@ dependencies = [
  "cw-utils",
  "cw2",
  "cw3",
- "cw3-fixed-multisig 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cw3-fixed-multisig",
  "cw4",
  "cw4-group",
+ "cyber-std",
  "schemars",
  "serde",
  "thiserror",

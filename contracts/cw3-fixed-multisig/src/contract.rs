@@ -1,23 +1,30 @@
 use std::cmp::Ordering;
+use std::fmt;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, Binary, BlockInfo, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Order,
-    Response, StdResult,
+    StdResult,
 };
 
 use cw2::set_contract_version;
 use cw3::{
-    ProposalListResponse, ProposalResponse, Status, Vote, VoteInfo, VoteListResponse, VoteResponse,
+    ProposalResponse, Status, Vote, VoteInfo, VoteListResponse, VoteResponse,
     VoterDetail, VoterListResponse, VoterResponse,
 };
 use cw_storage_plus::Bound;
 use cw_utils::{Expiration, ThresholdResponse};
+use schemars::JsonSchema;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{next_id, Ballot, Config, Proposal, Votes, BALLOTS, CONFIG, PROPOSALS, VOTERS};
+
+use serde::{Deserialize, Serialize};
+
+use cyber_std::CyberMsgWrapper;
+type Response = cosmwasm_std::Response<CyberMsgWrapper>;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw3-fixed-multisig";
@@ -59,8 +66,8 @@ pub fn execute(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    msg: ExecuteMsg,
-) -> Result<Response<Empty>, ContractError> {
+    msg: ExecuteMsg<CyberMsgWrapper>,
+) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Propose {
             title,
@@ -80,10 +87,10 @@ pub fn execute_propose(
     info: MessageInfo,
     title: String,
     description: String,
-    msgs: Vec<CosmosMsg>,
+    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
     // we ignore earliest
     latest: Option<Expiration>,
-) -> Result<Response<Empty>, ContractError> {
+) -> Result<Response, ContractError> {
     // only members of the multisig can create a proposal
     let vote_power = VOTERS
         .may_load(deps.storage, &info.sender)?
@@ -137,7 +144,7 @@ pub fn execute_vote(
     info: MessageInfo,
     proposal_id: u64,
     vote: Vote,
-) -> Result<Response<Empty>, ContractError> {
+) -> Result<Response, ContractError> {
     // only members of the multisig with weight >= 1 can vote
     let voter_power = VOTERS.may_load(deps.storage, &info.sender)?;
     let vote_power = match voter_power {
@@ -207,7 +214,7 @@ pub fn execute_close(
     env: Env,
     info: MessageInfo,
     proposal_id: u64,
-) -> Result<Response<Empty>, ContractError> {
+) -> Result<Response, ContractError> {
     // anyone can trigger this if the vote passed
 
     let mut prop = PROPOSALS.load(deps.storage, proposal_id)?;
@@ -261,7 +268,7 @@ fn query_threshold(deps: Deps) -> StdResult<ThresholdResponse> {
     Ok(cfg.threshold.to_response(cfg.total_weight))
 }
 
-fn query_proposal(deps: Deps, env: Env, id: u64) -> StdResult<ProposalResponse> {
+fn query_proposal(deps: Deps, env: Env, id: u64) -> StdResult<ProposalResponse<CyberMsgWrapper>> {
     let prop = PROPOSALS.load(deps.storage, id)?;
     let status = prop.current_status(&env.block);
     let threshold = prop.threshold.to_response(prop.total_weight);
@@ -285,7 +292,7 @@ fn list_proposals(
     env: Env,
     start_after: Option<u64>,
     limit: Option<u32>,
-) -> StdResult<ProposalListResponse> {
+) -> StdResult<ProposalListResponse<CyberMsgWrapper>> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
     let start = start_after.map(Bound::exclusive_int);
     let proposals = PROPOSALS
@@ -302,7 +309,7 @@ fn reverse_proposals(
     env: Env,
     start_before: Option<u64>,
     limit: Option<u32>,
-) -> StdResult<ProposalListResponse> {
+) -> StdResult<ProposalListResponse<CyberMsgWrapper>> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
     let end = start_before.map(Bound::exclusive_int);
     let props: StdResult<Vec<_>> = PROPOSALS
@@ -314,10 +321,17 @@ fn reverse_proposals(
     Ok(ProposalListResponse { proposals: props? })
 }
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct ProposalListResponse<T = Empty>
+where
+    T: Clone + fmt::Debug + PartialEq + JsonSchema {
+    pub proposals: Vec<ProposalResponse<T>>,
+}
+
 fn map_proposal(
     block: &BlockInfo,
     item: StdResult<(u64, Proposal)>,
-) -> StdResult<ProposalResponse> {
+) -> StdResult<ProposalResponse<CyberMsgWrapper>> {
     item.map(|(id, prop)| {
         let status = prop.current_status(block);
         let threshold = prop.threshold.to_response(prop.total_weight);
@@ -444,7 +458,7 @@ mod tests {
         info: MessageInfo,
         threshold: Threshold,
         max_voting_period: Duration,
-    ) -> Result<Response<Empty>, ContractError> {
+    ) -> Result<Response, ContractError> {
         // Instantiate a contract with voters
         let voters = vec![
             voter(&info.sender, 1),

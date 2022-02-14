@@ -1,5 +1,6 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 use cosmwasm_std::{CosmosMsg, Empty};
 use cw3::Vote;
@@ -18,14 +19,16 @@ pub struct Voter {
     pub weight: u64,
 }
 
-// TODO: add some T variants? Maybe good enough as fixed Empty for now
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum ExecuteMsg {
+pub enum ExecuteMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
     Propose {
         title: String,
         description: String,
-        msgs: Vec<CosmosMsg<Empty>>,
+        msgs: Vec<CosmosMsg<T>>,
         // note: we ignore API-spec'd earliest if passed, always opens immediately
         latest: Option<Expiration>,
     },
@@ -39,6 +42,17 @@ pub enum ExecuteMsg {
     Close {
         proposal_id: u64,
     },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SudoMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    }
 }
 
 // We can also add this as a cw3 extension
