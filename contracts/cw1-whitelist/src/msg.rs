@@ -33,6 +33,17 @@ where
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
+pub enum SudoMsg<T = Empty>
+where
+    T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum QueryMsg<T = Empty>
 where
     T: Clone + fmt::Debug + PartialEq + JsonSchema,

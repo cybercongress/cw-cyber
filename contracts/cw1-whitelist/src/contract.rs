@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+    to_binary, Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, StdResult,
 };
 
 use cw1::CanExecuteResponse;
@@ -9,12 +9,14 @@ use cw2::set_contract_version;
 use cyber_std::CyberMsgWrapper;
 
 use crate::error::ContractError;
-use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg};
 use crate::state::{AdminList, ADMIN_LIST};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+type Response = cosmwasm_std::Response<CyberMsgWrapper>;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -22,7 +24,7 @@ pub fn instantiate(
     _env: Env,
     _info: MessageInfo,
     msg: InstantiateMsg,
-) -> StdResult<Response<CyberMsgWrapper>> {
+) -> StdResult<Response> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     let cfg = AdminList {
         admins: map_validate(deps.api, &msg.admins)?,
@@ -44,11 +46,22 @@ pub fn execute(
     // Note: implement this function with different type to add support for custom messages
     // and then import the rest of this contract code.
     msg: ExecuteMsg<CyberMsgWrapper>,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Execute { msgs } => execute_execute(deps, env, info, msgs),
         ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
         ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
+    }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn sudo(
+    _deps: DepsMut,
+    _env: Env,
+    msg: SudoMsg<CyberMsgWrapper>
+) -> Result<Response, ContractError> {
+    match msg {
+        SudoMsg::Execute { msgs } => execute_execute_sudo(msgs),
     }
 }
 
@@ -57,7 +70,7 @@ pub fn execute_execute(
     _env: Env,
     info: MessageInfo,
     msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let mut res = Response::new().add_attribute("action", "execute");
 
     for msg in msgs {
@@ -68,11 +81,20 @@ pub fn execute_execute(
     Ok(res)
 }
 
+pub fn execute_execute_sudo(
+    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
+) -> Result<Response, ContractError> {
+    Ok(Response::new()
+        .add_attribute("action", "sudo")
+        .add_messages(msgs)
+    )
+}
+
 pub fn execute_freeze(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let mut cfg = ADMIN_LIST.load(deps.storage)?;
     if !cfg.can_modify(info.sender.as_ref()) {
         Err(ContractError::Unauthorized {})
@@ -90,7 +112,7 @@ pub fn execute_update_admins(
     _env: Env,
     info: MessageInfo,
     admins: Vec<String>,
-) -> Result<Response<CyberMsgWrapper>, ContractError> {
+) -> Result<Response, ContractError> {
     let mut cfg = ADMIN_LIST.load(deps.storage)?;
     if !cfg.can_modify(info.sender.as_ref()) {
         Err(ContractError::Unauthorized {})
