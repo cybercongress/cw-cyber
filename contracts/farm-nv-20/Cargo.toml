@@ -1,0 +1,47 @@
+[package]
+name = "farm-nv-20"
+version = "0.1.0"
+authors = ["CyberHead"]
+edition = "2018"
+description = "A Staking contract for Cyber - distribute rewards to stakers"
+
+exclude = [
+  # Those files are rust-optimizer artifacts. You might want to commit them for convenience but they should not be part of the source code publication.
+  "contract.wasm",
+  "hash.txt",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+incremental = false
+overflow-checks = true
+
+[features]
+# for quicker tests, cargo test --lib
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+
+[dependencies]
+cw20 = { version = "0.11.1" }
+cw20-base = { version = "0.11.1" }
+cw-storage-plus = { version = "0.11.1" }
+cosmwasm-std = { version = "1.0.0-beta", features = ["iterator"] }
+cosmwasm-storage = { version = "1.0.0-beta", features = ["iterator"] }
+schemars = "0.8.1"
+serde = { version = "1.0.103", default-features = false, features = ["derive"] }
+thiserror = { version = "1.0.26" }
+cw-utils = { version = "0.11.1" }
+
+[dev-dependencies]
+cosmwasm-schema = "1.0.0-beta"
