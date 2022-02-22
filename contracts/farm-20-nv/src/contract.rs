@@ -11,7 +11,8 @@ use crate::{
         read_config, store_config, store_state, Config, State,
     },
     execute::{
-        execute_add_distribution_periods, execute_migrate_staking, execute_receive, execute_withdraw
+        execute_add_distribution_periods, execute_migrate_staking, execute_receive, execute_withdraw,
+        execute_change_distribution_account
     },
     query::{
         query_config, query_staker_info, query_state
@@ -40,7 +41,6 @@ pub fn instantiate(
             staking_token: deps.api.addr_validate(&msg.staking_token)?,
             distribution_schedule: msg.distribution_schedule,
             lp_token: None,
-            treasure_account: deps.api.addr_validate(&msg.treasure_account)?,
         },
     )?;
 
@@ -92,6 +92,9 @@ pub fn execute(
         ExecuteMsg::MigrateStaking {
             new_staking_contract,
         } => execute_migrate_staking(deps, env, info, new_staking_contract),
+        ExecuteMsg::ChangeDistributionAccount { new_account } => {
+            execute_change_distribution_account(deps, env, info, new_account)
+        }
     }
 }
 

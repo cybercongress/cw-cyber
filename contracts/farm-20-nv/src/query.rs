@@ -18,7 +18,6 @@ pub fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
         staking_token: cfg.staking_token.to_string(),
         lp_token: cfg.lp_token.unwrap().to_string(),
         distribution_schedule: cfg.distribution_schedule,
-        treasure_account: cfg.treasure_account.to_string(),
     };
 
     Ok(resp)

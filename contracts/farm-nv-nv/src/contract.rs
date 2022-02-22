@@ -11,7 +11,8 @@ use crate::{
         read_config, store_config, store_state, Config, State,
     },
     execute::{
-        execute_add_distribution_periods, execute_migrate_staking, execute_receive, execute_withdraw
+        execute_add_distribution_periods, execute_migrate_staking, execute_receive, execute_withdraw,
+        execute_change_distribution_account, execute_bond
     },
     query::{
         query_config, query_staker_info, query_state
@@ -21,7 +22,6 @@ use crate::{
 
 use cw20::{MinterResponse};
 use cw20_base::msg::{InstantiateMsg as Cw20InstantiateMsg};
-use crate::execute::execute_bond;
 use cw_utils::parse_reply_instantiate_data;
 
 pub const MSG_REPLY_ID_TOKEN_INSTANT: u64 = 1;
@@ -41,7 +41,6 @@ pub fn instantiate(
             staking_denom: msg.staking_denom,
             distribution_schedule: msg.distribution_schedule,
             lp_token: None,
-            treasure_account: deps.api.addr_validate(&msg.treasure_account)?,
         },
     )?;
 
@@ -95,6 +94,9 @@ pub fn execute(
         ExecuteMsg::MigrateStaking {
             new_staking_contract,
         } => execute_migrate_staking(deps, env, info, new_staking_contract),
+        ExecuteMsg::ChangeDistributionAccount { new_account } => {
+            execute_change_distribution_account(deps, env, info, new_account)
+        }
     }
 }
 

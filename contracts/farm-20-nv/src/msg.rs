@@ -12,7 +12,6 @@ pub struct InstantiateMsg {
     pub distribution_schedule: Vec<(u64, u64, Uint128)>,
     pub token_code_id: u64,
     pub pool_name: String,
-    pub treasure_account: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -29,6 +28,10 @@ pub enum ExecuteMsg {
     /// Add a list of distribution periods.
     AddDistributionPeriods {
         periods: Vec<(u64, u64, Uint128)>,
+    },
+    /// Change the distribution account.
+    ChangeDistributionAccount {
+        new_account: String,
     },
 }
 
@@ -64,7 +67,6 @@ pub struct ConfigResponse {
     pub staking_token: String,
     pub lp_token: String,
     pub distribution_schedule: Vec<(u64, u64, Uint128)>,
-    pub treasure_account: String,
 }
 
 // We define a custom struct for each query response

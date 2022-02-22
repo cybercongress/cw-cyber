@@ -30,6 +30,10 @@ pub enum ExecuteMsg {
     AddDistributionPeriods {
         periods: Vec<(u64, u64, Uint128)>,
     },
+    /// Change the distribution account.
+    ChangeDistributionAccount {
+        new_account: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

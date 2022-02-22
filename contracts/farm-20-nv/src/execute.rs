@@ -1,4 +1,4 @@
-use cosmwasm_std::{from_binary, to_binary, Addr, CosmosMsg, Decimal, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, WasmMsg, Empty, Coin, BankMsg};
+use cosmwasm_std::{from_binary, to_binary, Addr, CosmosMsg, Decimal, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, WasmMsg, Coin, BankMsg};
 
 use crate::{
     msg::{
@@ -11,7 +11,6 @@ use crate::{
 };
 
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg};
-use cw1_subkeys::msg::{ExecuteMsg as Cw1ExecuteMsg};
 use crate::error::ContractError;
 
 pub fn execute_add_distribution_periods(
@@ -190,24 +189,19 @@ pub fn execute_withdraw(
     store_state(deps.storage, &state)?;
 
     Ok(Response::new()
-        .add_message(CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr: config.treasure_account.to_string(),
-            msg: to_binary(&Cw1ExecuteMsg::Execute::<Empty> {
-                msgs: vec![CosmosMsg::Bank(BankMsg::Send {
-                    to_address: info.sender.to_string(),
-                    amount: vec![Coin {
-                        denom: config.reward_denom.to_string(),
-                        amount,
-                    }],
-                })],
-            })?,
-            funds: vec![]
+        .add_message(CosmosMsg::Bank(BankMsg::Send {
+            to_address: info.sender.to_string(),
+            amount: vec![Coin {
+                denom: config.reward_denom.to_string(),
+                amount,
+            }],
         }))
         .add_attributes(vec![
             ("action", "withdraw"),
             ("owner", info.sender.as_str()),
             ("amount", amount.to_string().as_str()),
         ]))
+
 }
 
 pub fn execute_migrate_staking(
@@ -266,24 +260,36 @@ pub fn execute_migrate_staking(
     let remaining_anc = total_distribution_amount.checked_sub(distributed_amount)?;
 
     Ok(Response::new()
-        .add_message(CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr: config.treasure_account.to_string(),
-            msg: to_binary(&Cw1ExecuteMsg::Execute::<Empty> {
-                msgs: vec![CosmosMsg::Bank(BankMsg::Send {
-                    to_address: new_staking_contract,
-                    amount: vec![Coin {
-                        denom: config.reward_denom.to_string(),
-                        amount: remaining_anc
-                    }],
-                })],
-            })?,
-            funds: vec![]
+        .add_message(CosmosMsg::Bank(BankMsg::Send {
+            to_address: new_staking_contract.to_string(),
+            amount: vec![Coin {
+                denom: config.reward_denom.to_string(),
+                amount: remaining_anc,
+            }],
         }))
         .add_attributes(vec![
             ("action", "migrate_staking"),
             ("distributed_amount", &distributed_amount.to_string()),
             ("remaining_amount", &remaining_anc.to_string()),
         ]))
+}
+
+pub fn execute_change_distribution_account(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_account: String,
+) -> Result<Response, ContractError> {
+    let mut config: Config = read_config(deps.storage)?;
+
+    if info.sender != config.distribution_account {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    config.distribution_account = deps.api.addr_validate(&new_account)?;
+    store_config(deps.storage, &config)?;
+
+    Ok(Response::default())
 }
 
 fn increase_bond_amount(state: &mut State, staker_info: &mut StakerInfo, amount: Uint128) {

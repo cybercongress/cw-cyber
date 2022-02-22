@@ -11,7 +11,6 @@ pub struct Config {
     pub staking_denom: String,
     pub lp_token: Option<Addr>,
     pub distribution_schedule: Vec<(u64, u64, Uint128)>,
-    pub treasure_account: Addr,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");

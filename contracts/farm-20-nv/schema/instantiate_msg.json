@@ -8,8 +8,7 @@
     "pool_name",
     "reward_denom",
     "staking_token",
-    "token_code_id",
-    "treasure_account"
+    "token_code_id"
   ],
   "properties": {
     "distribution_account": {
@@ -51,9 +50,6 @@
       "type": "integer",
       "format": "uint64",
       "minimum": 0.0
-    },
-    "treasure_account": {
-      "type": "string"
     }
   },
   "definitions": {

@@ -274,6 +274,24 @@ pub fn execute_migrate_staking(
         ]))
 }
 
+pub fn execute_change_distribution_account(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_account: String,
+) -> Result<Response, ContractError> {
+    let mut config: Config = read_config(deps.storage)?;
+
+    if info.sender != config.distribution_account {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    config.distribution_account = deps.api.addr_validate(&new_account)?;
+    store_config(deps.storage, &config)?;
+
+    Ok(Response::default())
+}
+
 fn increase_bond_amount(state: &mut State, staker_info: &mut StakerInfo, amount: Uint128) {
     state.total_bond_amount += amount;
     staker_info.bond_amount += amount;

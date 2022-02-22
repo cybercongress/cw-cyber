@@ -88,6 +88,27 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "description": "Change the distribution account.",
+      "type": "object",
+      "required": [
+        "change_distribution_account"
+      ],
+      "properties": {
+        "change_distribution_account": {
+          "type": "object",
+          "required": [
+            "new_account"
+          ],
+          "properties": {
+            "new_account": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     }
   ],
   "definitions": {

@@ -35,7 +35,6 @@ backtraces = ["cosmwasm-std/backtraces"]
 [dependencies]
 cw20 = { version = "0.11.1" }
 cw20-base = { version = "0.11.1" }
-cw1-subkeys = { version = "0.11.1" }
 cw-storage-plus = { version = "0.11.1" }
 cosmwasm-std = { version = "1.0.0-beta", features = ["iterator"] }
 cosmwasm-storage = { version = "1.0.0-beta", features = ["iterator"] }

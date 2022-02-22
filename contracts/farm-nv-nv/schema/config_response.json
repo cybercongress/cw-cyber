@@ -7,8 +7,7 @@
     "distribution_schedule",
     "lp_token",
     "reward_denom",
-    "staking_denom",
-    "treasure_account"
+    "staking_denom"
   ],
   "properties": {
     "distribution_account": {
@@ -44,9 +43,6 @@
       "type": "string"
     },
     "staking_denom": {
-      "type": "string"
-    },
-    "treasure_account": {
       "type": "string"
     }
   },
