@@ -1,20 +1,19 @@
 use cosmwasm_std::{QuerierWrapper, StdResult};
 
-use crate::route::CyberRoute;
 use crate::query::{
-    CyberQuery, CyberQueryWrapper,
-    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
-    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
-    RoutesResponse, RouteResponse, RoutedEnergyResponse,
-    BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse
+    BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberQuery,
+    CyberQueryWrapper, CyberlinksAmountResponse, LowestFeeResponse, NeuronBandwidthResponse,
+    ParticleRankResponse, ParticlesAmountResponse, RouteResponse, RoutedEnergyResponse,
+    RoutesResponse, ThoughtResponse, ThoughtStatsResponse,
 };
+use crate::route::CyberRoute;
 
 pub struct CyberQuerier<'a> {
     querier: &'a QuerierWrapper<'a, CyberQueryWrapper>,
 }
 
 impl<'a> CyberQuerier<'a> {
-    pub fn new(querier: &'a QuerierWrapper<'a, CyberQueryWrapper>) -> Self {
+    pub fn new(querier: &'a QuerierWrapper<CyberQueryWrapper>) -> Self {
         CyberQuerier { querier }
     }
 
@@ -92,10 +91,7 @@ impl<'a> CyberQuerier<'a> {
         Ok(res)
     }
 
-    pub fn query_source_routes<T: Into<String>>(
-        &self,
-        source: T,
-    ) -> StdResult<RoutesResponse> {
+    pub fn query_source_routes<T: Into<String>>(&self, source: T) -> StdResult<RoutesResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Grid,
             query_data: CyberQuery::SourceRoutes {

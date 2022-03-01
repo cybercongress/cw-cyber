@@ -1,27 +1,21 @@
-use cosmwasm_std::{
-    entry_point, to_binary, Binary, Env, MessageInfo, StdError, StdResult,
-    Coin, StakingMsg, BankMsg, coin
-};
 use crate::error::ContractError;
-use crate::msg::{InstantiateMsg, ExecuteMsg, SudoMsg, QueryMsg};
-use crate::state::{State, config,config_read};
-use cyber_std::{
-    CyberMsgWrapper, CyberQuerier, CyberQueryWrapper,
-    Link, Trigger, Load,
-    create_cyberlink_msg, create_investmint_msg,
-    create_create_energy_route_msg, create_edit_energy_route_msg,
-    create_edit_energy_route_name_msg, create_delete_energy_route_msg,
-    create_creat_thought_msg, create_forget_thought_msg, create_change_thought_input_msg,
-    create_change_thought_period_msg, create_change_thought_block_msg,
-    ParticleRankResponse, ParticlesAmountResponse, CyberlinksAmountResponse,
-    ThoughtResponse, ThoughtStatsResponse, LowestFeeResponse,
-    RouteResponse, RoutesResponse, RoutedEnergyResponse,
-    BandwidthPriceResponse, BandwidthLoadResponse, BandwidthTotalResponse, NeuronBandwidthResponse,
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg};
+use crate::state::{config, config_read, State};
+use cosmwasm_std::{
+    attr, coin, entry_point, from_slice, to_binary, BankMsg, Binary, Coin, Env,
+    MessageInfo, StakingMsg, StdError, StdResult, Uint64,
 };
-
-type Deps<'a> = cosmwasm_std::Deps<'a, CyberQueryWrapper>;
-type DepsMut<'a> = cosmwasm_std::DepsMut<'a, CyberQueryWrapper>;
-type Response = cosmwasm_std::Response<CyberMsgWrapper>;
+use cyber_std::{
+    create_change_thought_block_msg, create_change_thought_input_msg,
+    create_change_thought_period_msg, create_creat_thought_msg, create_create_energy_route_msg,
+    create_cyberlink_msg, create_delete_energy_route_msg, create_edit_energy_route_name_msg,
+    create_edit_energy_route_msg, create_forget_thought_msg, create_investmint_msg,
+    BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberMsgWrapper,
+    CyberQuerier, CyberQueryWrapper, CyberlinksAmountResponse, Link, Load, LowestFeeResponse,
+    NeuronBandwidthResponse, ParticleRankResponse, ParticlesAmountResponse, Route, RouteResponse,
+    RoutedEnergyResponse, RoutesResponse, ThoughtResponse, ThoughtStatsResponse, Trigger,
+    Deps, DepsMut, Response,
+};
 
 #[entry_point]
 pub fn instantiate(
@@ -48,68 +42,53 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Cyberlink { links } => cyberlink(deps, env, links),
-        ExecuteMsg::Stake {
-            validator,
-            amount
-        } => stake(deps, env, info, validator, amount),
-        ExecuteMsg::Unstake {
-            validator,
-            amount
-        } => unstake(deps, env, info, validator, amount),
+        ExecuteMsg::Stake { validator, amount } => stake(deps, env, info, validator, amount),
+        ExecuteMsg::Unstake { validator, amount } => unstake(deps, env, info, validator, amount),
         ExecuteMsg::Investmint {
             amount,
             resource,
             length,
         } => investmint(deps, env, info, amount, resource, length),
-        ExecuteMsg::CreateEnergyRoute {
-            destination,
-            name,
-        } => create_energy_route(deps, env, info, destination, name),
-        ExecuteMsg::EditEnergyRoute {
-            destination,
-            value,
-        } => edit_energy_route(deps, env, info, destination, value),
-        ExecuteMsg::EditEnergyRouteName {
-            destination,
-            name,
-        } => edit_energy_route_name(deps, env, info, destination, name),
-        ExecuteMsg::DeleteEnergyRoute {
-            destination,
-        } => delete_energy_route(deps, env, info, destination),
+        ExecuteMsg::CreateEnergyRoute { destination, name } => {
+            create_energy_route(deps, env, info, destination, name)
+        }
+        ExecuteMsg::EditEnergyRoute { destination, value } => {
+            edit_energy_route(deps, env, info, destination, value)
+        }
+        ExecuteMsg::EditEnergyRouteName { destination, name } => {
+            edit_energy_route_name(deps, env, info, destination, name)
+        }
+        ExecuteMsg::DeleteEnergyRoute { destination } => {
+            delete_energy_route(deps, env, info, destination)
+        }
         ExecuteMsg::CreateThought {
             trigger,
             load,
             name,
             particle,
         } => create_thought(deps, env, info, trigger, load, name, particle),
-        ExecuteMsg::ForgetThought {
-            name,
-        } => forget_thought(deps, env, info, name),
-        ExecuteMsg::ChangeThoughtInput {
-            name,
-            input,
-        } => change_thought_input(deps, env, info, name, input),
-        ExecuteMsg::ChangeThoughtPeriod {
-            name,
-            period,
-        } => change_thought_period(deps, env, info, name, period),
-        ExecuteMsg::ChangeThoughtBlock {
-            name,
-            block,
-        } => change_thought_block(deps, env, info, name, block),
+        ExecuteMsg::ForgetThought { name } => forget_thought(deps, env, info, name),
+        ExecuteMsg::ChangeThoughtInput { name, input } => {
+            change_thought_call_data(deps, env, info, name, input)
+        }
+        ExecuteMsg::ChangeThoughtPeriod { name, period } => {
+            change_thought_period(deps, env, info, name, period)
+        }
+        ExecuteMsg::ChangeThoughtBlock { name, block } => {
+            change_thought_block(deps, env, info, name, block)
+        }
     }
 }
 
 pub fn cyberlink(
     _deps: DepsMut,
     env: Env,
-    links: Vec<Link>
+    links: Vec<Link>,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let msg = create_cyberlink_msg(contract.into(), links);
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -121,11 +100,10 @@ pub fn stake(
     amount: Coin,
 ) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
-    let res = Response::new()
-        .add_message(StakingMsg::Delegate {
-            validator: validator.into(),
-            amount: amount.clone(),
-        });
+    let res = Response::new().add_message(StakingMsg::Delegate {
+        validator: validator.into(),
+        amount: amount.clone(),
+    });
     Ok(res)
 }
 
@@ -137,11 +115,10 @@ pub fn unstake(
     amount: Coin,
 ) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
-    let res = Response::new()
-        .add_message(StakingMsg::Undelegate {
-            validator: validator.into(),
-            amount: amount.clone(),
-        });
+    let res = Response::new().add_message(StakingMsg::Undelegate {
+        validator: validator.into(),
+        amount: amount.clone(),
+    });
     Ok(res)
 }
 
@@ -155,15 +132,9 @@ pub fn investmint(
 ) -> Result<Response, ContractError> {
     let amount = coin(u128::from(amount.amount), amount.denom);
     let agent = env.contract.address;
-    let msg = create_investmint_msg(
-        agent.into(),
-        amount.clone(),
-        resource.into(),
-        length.into(),
-    );
+    let msg = create_investmint_msg(agent.into(), amount.clone(), resource.into(), length.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -175,14 +146,9 @@ pub fn create_energy_route(
     name: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_create_energy_route_msg(
-        contract.into(),
-        destination.into(),
-        name.into(),
-    );
+    let msg = create_create_energy_route_msg(contract.into(), destination.into(), name.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -191,18 +157,13 @@ pub fn edit_energy_route(
     env: Env,
     _info: MessageInfo,
     destination: String,
-    value: Coin
+    value: Coin,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
     let value = coin(u128::from(value.amount), value.denom);
-    let msg = create_edit_energy_route_msg(
-        contract.into(),
-        destination.into(),
-        value.clone(),
-    );
+    let msg = create_edit_energy_route_msg(contract.into(), destination.into(), value.clone());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -211,17 +172,12 @@ pub fn edit_energy_route_name(
     env: Env,
     _info: MessageInfo,
     destination: String,
-    name: String
+    name: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_edit_energy_route_name_msg(
-        contract.into(),
-        destination.into(),
-        name.into(),
-    );
+    let msg = create_edit_energy_route_name_msg(contract.into(), destination.into(), name.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -232,13 +188,9 @@ pub fn delete_energy_route(
     destination: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_delete_energy_route_msg(
-        contract.into(),
-        destination.into(),
-    );
+    let msg = create_delete_energy_route_msg(contract.into(), destination.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -260,8 +212,7 @@ pub fn create_thought(
         particle.into(),
     );
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -272,17 +223,13 @@ pub fn forget_thought(
     name: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_forget_thought_msg(
-        contract.into(),
-        name.into(),
-    );
+    let msg = create_forget_thought_msg(contract.into(), name.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
-pub fn change_thought_input(
+pub fn change_thought_call_data(
     _deps: DepsMut,
     env: Env,
     _info: MessageInfo,
@@ -290,14 +237,9 @@ pub fn change_thought_input(
     input: String,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_thought_input_msg(
-        contract.into(),
-        name.into(),
-        input.into(),
-    );
+    let msg = create_change_thought_input_msg(contract.into(), name.into(), input.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -309,14 +251,9 @@ pub fn change_thought_period(
     period: u64,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_thought_period_msg(
-        contract.into(),
-        name.into(),
-        period.into(),
-    );
+    let msg = create_change_thought_period_msg(contract.into(), name.into(), period.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -328,14 +265,9 @@ pub fn change_thought_block(
     block: u64,
 ) -> Result<Response, ContractError> {
     let contract = env.contract.address;
-    let msg = create_change_thought_block_msg(
-        contract.into(),
-        name.into(),
-        block.into(),
-    );
+    let msg = create_change_thought_block_msg(contract.into(), name.into(), block.into());
 
-    let res = Response::new()
-        .add_message(msg);
+    let res = Response::new().add_message(msg);
     Ok(res)
 }
 
@@ -343,7 +275,7 @@ pub fn change_thought_block(
 pub fn sudo(
     deps: DepsMut,
     env: Env,
-    msg: SudoMsg
+    msg: SudoMsg,
 ) -> Result<Response, ContractError> {
     match msg {
         SudoMsg::Heartbeat { beats } => do_beat(deps, env, beats),
@@ -354,17 +286,20 @@ pub fn sudo(
         SudoMsg::MemoryLoop {} => do_memory_loop(),
         SudoMsg::Panic {} => do_panic(),
         SudoMsg::TransferFunds { recipient, amount } => {
-            let response = Response::new()
-                .add_message(BankMsg::Send {
-                    to_address: recipient,
-                    amount,
-                });
+            let response = Response::new().add_message(BankMsg::Send {
+                to_address: recipient,
+                amount,
+            });
             Ok(response)
         }
     }
 }
 
-fn do_beat(deps: DepsMut, _env: Env, beats: u64) -> Result<Response, ContractError> {
+fn do_beat(
+    deps: DepsMut,
+    _env: Env,
+    beats: u64,
+) -> Result<Response, ContractError> {
     let mut state = config(deps.storage).load()?;
 
     state.beats = state.beats + beats;
@@ -373,7 +308,10 @@ fn do_beat(deps: DepsMut, _env: Env, beats: u64) -> Result<Response, ContractErr
     Ok(Response::default())
 }
 
-fn do_release(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
+fn do_release(
+    deps: DepsMut,
+    env: Env,
+) -> Result<Response, ContractError> {
     let state = config(deps.storage).load()?;
 
     let to_addr = state.creator;
@@ -400,7 +338,9 @@ fn do_cpu_loop() -> Result<Response, ContractError> {
     }
 }
 
-fn do_storage_loop(deps: DepsMut) -> Result<Response, ContractError> {
+fn do_storage_loop(
+    deps: DepsMut,
+) -> Result<Response, ContractError> {
     let mut test_case = 0u64;
     loop {
         deps.storage
@@ -422,36 +362,24 @@ fn do_panic() -> Result<Response, ContractError> {
 }
 
 #[entry_point]
-pub fn query(
-    deps: Deps,
-    _env: Env,
-    msg: QueryMsg,
-) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::ParticleRank {
-            particle
-        } => to_binary(&query_particle_rank(deps, particle)?),
+        QueryMsg::ParticleRank { particle } => to_binary(&query_particle_rank(deps, particle)?),
         QueryMsg::ParticlesAmount {} => to_binary(&query_particles_amount(deps)?),
         QueryMsg::CyberlinksAmount {} => to_binary(&query_cyberlinks_amount(deps)?),
         QueryMsg::Config {} => to_binary(&config_read(deps.storage).load()?),
-        QueryMsg::Thought {
-            program,
-            name,
-        } => to_binary(&query_thought(deps, program, name)?),
-        QueryMsg::ThoughtStats {
-            program,
-            name,
-        } => to_binary(&query_thought_stats(deps, program, name)?),
+        QueryMsg::Thought { program, name } => to_binary(&query_thought(deps, program, name)?),
+        QueryMsg::ThoughtStats { program, name } => {
+            to_binary(&query_thought_stats(deps, program, name)?)
+        }
         QueryMsg::DmnLowestFee {} => to_binary(&query_lowest_fee(deps)?),
-        QueryMsg::SourceRoutes {
-            source,
-        } => to_binary(&query_source_routes(deps, source)?),
-        QueryMsg::SourceRoutedEnergy {
-            source,
-        } => to_binary(&query_source_routed_energy(deps, source)?),
-        QueryMsg::DestinationRoutedEnergy {
-            destination,
-        } => to_binary(&query_destination_routed_energy(deps,destination)?),
+        QueryMsg::SourceRoutes { source } => to_binary(&query_source_routes(deps, source)?),
+        QueryMsg::SourceRoutedEnergy { source } => {
+            to_binary(&query_source_routed_energy(deps, source)?)
+        }
+        QueryMsg::DestinationRoutedEnergy { destination } => {
+            to_binary(&query_destination_routed_energy(deps, destination)?)
+        }
         QueryMsg::Route {
             source,
             destination,
@@ -459,9 +387,7 @@ pub fn query(
         QueryMsg::BandwidthPrice {} => to_binary(&query_price(deps)?),
         QueryMsg::BandwidthLoad {} => to_binary(&query_load(deps)?),
         QueryMsg::BandwidthTotal {} => to_binary(&query_desirable_bandwidth(deps)?),
-        QueryMsg::NeuronBandwidth {
-            neuron,
-        } => to_binary(&query_neuron_bandwidth(deps, neuron)?),
+        QueryMsg::NeuronBandwidth { neuron } => to_binary(&query_neuron_bandwidth(deps, neuron)?),
     }
 }
 
@@ -475,9 +401,7 @@ pub fn query_particle_rank(
     Ok(res)
 }
 
-pub fn query_particles_amount(
-    deps: Deps,
-) -> StdResult<ParticlesAmountResponse> {
+pub fn query_particles_amount(deps: Deps) -> StdResult<ParticlesAmountResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: ParticlesAmountResponse = querier.query_particles_amount()?;
 
@@ -515,9 +439,7 @@ pub fn query_thought_stats(
     Ok(res)
 }
 
-pub fn query_lowest_fee(
-    deps: Deps,
-) -> StdResult<LowestFeeResponse> {
+pub fn query_lowest_fee(deps: Deps) -> StdResult<LowestFeeResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: LowestFeeResponse = querier.query_lowest_fee()?;
 
@@ -565,18 +487,14 @@ pub fn query_route(
     Ok(res)
 }
 
-pub fn query_price(
-    deps: Deps,
-) -> StdResult<BandwidthPriceResponse> {
+pub fn query_price(deps: Deps) -> StdResult<BandwidthPriceResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: BandwidthPriceResponse = querier.query_bandwidth_price()?;
 
     Ok(res)
 }
 
-pub fn query_load(
-    deps: Deps,
-) -> StdResult<BandwidthLoadResponse> {
+pub fn query_load(deps: Deps) -> StdResult<BandwidthLoadResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: BandwidthLoadResponse = querier.query_bandwidth_load()?;
 
@@ -594,7 +512,7 @@ pub fn query_desirable_bandwidth(
 
 pub fn query_neuron_bandwidth(
     deps: Deps,
-    address: String
+    address: String,
 ) -> StdResult<NeuronBandwidthResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: NeuronBandwidthResponse = querier.query_neuron_bandwidth(address)?;
