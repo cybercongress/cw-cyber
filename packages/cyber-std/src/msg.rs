@@ -48,6 +48,7 @@ impl Into<CosmosMsg<CyberMsgWrapper>> for CyberMsgWrapper {
     }
 }
 
+// TODO remove Cw721CustomMsg as it will be merged into cosmwasm-std
 impl Cw721CustomMsg for CyberMsgWrapper{}
 impl CustomMsg for CyberMsgWrapper{}
 

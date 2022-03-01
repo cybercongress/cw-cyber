@@ -2,6 +2,7 @@ pub mod msg;
 pub mod querier;
 pub mod query;
 pub mod route;
+pub mod utils;
 
 pub use msg::{
     CyberMsg, CyberMsgWrapper,
