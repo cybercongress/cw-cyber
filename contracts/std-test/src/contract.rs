@@ -1,21 +1,8 @@
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg};
 use crate::state::{config, config_read, State};
-use cosmwasm_std::{
-    attr, coin, entry_point, from_slice, to_binary, BankMsg, Binary, Coin, Env,
-    MessageInfo, StakingMsg, StdError, StdResult, Uint64,
-};
-use cyber_std::{
-    create_change_thought_block_msg, create_change_thought_input_msg,
-    create_change_thought_period_msg, create_creat_thought_msg, create_create_energy_route_msg,
-    create_cyberlink_msg, create_delete_energy_route_msg, create_edit_energy_route_name_msg,
-    create_edit_energy_route_msg, create_forget_thought_msg, create_investmint_msg,
-    BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberMsgWrapper,
-    CyberQuerier, CyberQueryWrapper, CyberlinksAmountResponse, Link, Load, LowestFeeResponse,
-    NeuronBandwidthResponse, ParticleRankResponse, ParticlesAmountResponse, Route, RouteResponse,
-    RoutedEnergyResponse, RoutesResponse, ThoughtResponse, ThoughtStatsResponse, Trigger,
-    Deps, DepsMut, Response,
-};
+use cosmwasm_std::{coin, entry_point, to_binary, BankMsg, Binary, Coin, Env, MessageInfo, StakingMsg, StdError, StdResult, Decimal};
+use cyber_std::{create_change_thought_block_msg, create_change_thought_input_msg, create_change_thought_period_msg, create_creat_thought_msg, create_create_energy_route_msg, create_cyberlink_msg, create_delete_energy_route_msg, create_edit_energy_route_name_msg, create_edit_energy_route_msg, create_forget_thought_msg, create_investmint_msg, BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberQuerier, CyberlinksAmountResponse, Link, Load, ThoughtLowestFeeResponse, NeuronBandwidthResponse, ParticleRankResponse, ParticlesAmountResponse, RouteResponse, RoutedEnergyResponse, RoutesResponse, ThoughtResponse, ThoughtStatsResponse, Trigger, Deps, DepsMut, Response, PoolParamsResponse, PoolLiquidityResponse, PoolSupplyResponse, PoolPriceResponse, PoolAddressResponse, create_create_pool_msg, create_deposit_within_batch_msg, create_withdraw_within_batch_msg, create_swap_within_batch_msg};
 
 #[entry_point]
 pub fn instantiate(
@@ -76,6 +63,35 @@ pub fn execute(
         }
         ExecuteMsg::ChangeThoughtBlock { name, block } => {
             change_thought_block(deps, env, info, name, block)
+        }
+        ExecuteMsg::CreatePool { pool_type_id, deposit_coins } => {
+            create_pool(deps, env, info, pool_type_id, deposit_coins)
+        }
+        ExecuteMsg::DepositWithinBatch { pool_id, deposit_coins } => {
+            deposit_within_batch(deps, env, info, pool_id, deposit_coins)
+        },
+        ExecuteMsg::WithdrawWithinBatch { pool_id, pool_coin } => {
+            withdraw_within_batch(deps, env, info, pool_id, pool_coin)
+        },
+        ExecuteMsg::SwapWithinBatch {
+            pool_id,
+            swap_type_id,
+            offer_coin,
+            demand_coin_denom,
+            offer_coin_fee,
+            order_price
+        } => {
+            swap_within_batch(
+                deps,
+                env,
+                info,
+                pool_id,
+                swap_type_id,
+                offer_coin,
+                demand_coin_denom,
+                offer_coin_fee,
+                order_price
+            )
         }
     }
 }
@@ -271,6 +287,86 @@ pub fn change_thought_block(
     Ok(res)
 }
 
+pub fn create_pool(
+    _deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    pool_type_id: u32,
+    deposit_coins: Vec<Coin>
+) -> Result<Response, ContractError> {
+    let contract = env.contract.address;
+    let msg = create_create_pool_msg(
+        contract.into(),
+        pool_type_id,
+        deposit_coins
+    );
+
+    let res = Response::new().add_message(msg);
+    Ok(res)
+}
+
+pub fn deposit_within_batch(
+    _deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    pool_id: u64,
+    deposit_coins: Vec<Coin>
+) -> Result<Response, ContractError> {
+    let contract = env.contract.address;
+    let msg = create_deposit_within_batch_msg(
+        contract.into(),
+        pool_id,
+        deposit_coins
+    );
+
+    let res = Response::new().add_message(msg);
+    Ok(res)
+}
+
+pub fn withdraw_within_batch(
+    _deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    pool_id: u64,
+    pool_coin: Coin
+) -> Result<Response, ContractError> {
+    let contract = env.contract.address;
+    let msg = create_withdraw_within_batch_msg(
+        contract.into(),
+        pool_id,
+        pool_coin
+    );
+
+    let res = Response::new().add_message(msg);
+    Ok(res)
+}
+
+pub fn swap_within_batch(
+    _deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    pool_id: u64,
+    swap_type_id: u32,
+    offer_coin: Coin,
+    demand_coin_denom: String,
+    offer_coin_fee: Coin,
+    order_price: Decimal
+) -> Result<Response, ContractError> {
+    let contract = env.contract.address;
+    let msg = create_swap_within_batch_msg(
+        contract.into(),
+        pool_id,
+        swap_type_id,
+        offer_coin,
+        demand_coin_denom,
+        offer_coin_fee,
+        order_price
+    );
+
+    let res = Response::new().add_message(msg);
+    Ok(res)
+}
+
 #[entry_point]
 pub fn sudo(
     deps: DepsMut,
@@ -372,7 +468,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::ThoughtStats { program, name } => {
             to_binary(&query_thought_stats(deps, program, name)?)
         }
-        QueryMsg::DmnLowestFee {} => to_binary(&query_lowest_fee(deps)?),
+        QueryMsg::ThoughtLowestFee {} => to_binary(&query_thought_lowest_fee(deps)?),
         QueryMsg::SourceRoutes { source } => to_binary(&query_source_routes(deps, source)?),
         QueryMsg::SourceRoutedEnergy { source } => {
             to_binary(&query_source_routed_energy(deps, source)?)
@@ -388,6 +484,11 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::BandwidthLoad {} => to_binary(&query_load(deps)?),
         QueryMsg::BandwidthTotal {} => to_binary(&query_desirable_bandwidth(deps)?),
         QueryMsg::NeuronBandwidth { neuron } => to_binary(&query_neuron_bandwidth(deps, neuron)?),
+        QueryMsg::PoolParams { pool_id } => to_binary(&query_pool_params(deps, pool_id)?),
+        QueryMsg::PoolLiquidity { pool_id} => to_binary(&query_pool_liquidity(deps, pool_id)?),
+        QueryMsg::PoolSupply { pool_id } => to_binary(&query_pool_supply(deps, pool_id)?),
+        QueryMsg::PoolPrice { pool_id } => to_binary(&query_pool_price(deps, pool_id)?),
+        QueryMsg::PoolAddress { pool_id } => to_binary(&query_pool_address(deps, pool_id)?),
     }
 }
 
@@ -439,9 +540,9 @@ pub fn query_thought_stats(
     Ok(res)
 }
 
-pub fn query_lowest_fee(deps: Deps) -> StdResult<LowestFeeResponse> {
+pub fn query_thought_lowest_fee(deps: Deps) -> StdResult<ThoughtLowestFeeResponse> {
     let querier = CyberQuerier::new(&deps.querier);
-    let res: LowestFeeResponse = querier.query_lowest_fee()?;
+    let res: ThoughtLowestFeeResponse = querier.query_thought_lowest_fee()?;
 
     Ok(res)
 }
@@ -516,6 +617,56 @@ pub fn query_neuron_bandwidth(
 ) -> StdResult<NeuronBandwidthResponse> {
     let querier = CyberQuerier::new(&deps.querier);
     let res: NeuronBandwidthResponse = querier.query_neuron_bandwidth(address)?;
+
+    Ok(res)
+}
+
+pub fn query_pool_params(
+    deps: Deps,
+    pool_id: u64,
+) -> StdResult<PoolParamsResponse> {
+    let querier = CyberQuerier::new(&deps.querier);
+    let res: PoolParamsResponse = querier.query_pool_params(pool_id)?;
+
+    Ok(res)
+}
+
+pub fn query_pool_liquidity(
+    deps: Deps,
+    pool_id: u64,
+) -> StdResult<PoolLiquidityResponse> {
+    let querier = CyberQuerier::new(&deps.querier);
+    let res: PoolLiquidityResponse = querier.query_pool_liquidity(pool_id)?;
+
+    Ok(res)
+}
+
+pub fn query_pool_supply(
+    deps: Deps,
+    pool_id: u64,
+) -> StdResult<PoolSupplyResponse> {
+    let querier = CyberQuerier::new(&deps.querier);
+    let res: PoolSupplyResponse = querier.query_pool_supply(pool_id)?;
+
+    Ok(res)
+}
+
+pub fn query_pool_price(
+    deps: Deps,
+    pool_id: u64,
+) -> StdResult<PoolPriceResponse> {
+    let querier = CyberQuerier::new(&deps.querier);
+    let res: PoolPriceResponse = querier.query_pool_price(pool_id)?;
+
+    Ok(res)
+}
+
+pub fn query_pool_address(
+    deps: Deps,
+    pool_id: u64,
+) -> StdResult<PoolAddressResponse> {
+    let querier = CyberQuerier::new(&deps.querier);
+    let res: PoolAddressResponse = querier.query_pool_address(pool_id)?;
 
     Ok(res)
 }

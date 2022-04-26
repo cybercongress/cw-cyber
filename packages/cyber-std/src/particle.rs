@@ -2,11 +2,11 @@ use std::ops::Add;
 use std::str::FromStr;
 use cid::{Cid, Version};
 use cid::multihash::{Code, MultihashDigest};
-use cosmwasm_std::StdError;
+use thiserror::Error;
 
-pub fn prepare_particle(input: String) -> Result<Cid, StdError> {
+pub fn prepare_particle(input: String) -> Result<Cid, ParticleError> {
     if input.len() == 0 || input.len() > 256 {
-        return Err(StdError::generic_err("invalid data"));
+        return Err(ParticleError::InvalidParticleData {});
     }
 
     // unixfs/dagnode/proto shortcut
@@ -22,17 +22,30 @@ pub fn prepare_particle(input: String) -> Result<Cid, StdError> {
     Ok(particle)
 }
 
-pub fn check_particle(input: String) -> Result<Cid, StdError> {
+pub fn check_particle(input: String) -> Result<Cid, ParticleError> {
     let particle:Cid;
     let try_particle = Cid::from_str(&input.clone());
     if try_particle.is_ok() {
         particle = try_particle.unwrap();
         if particle.version() != Version::V0 {
-            return Err(StdError::generic_err("invalid particle version"));
+            return Err(ParticleError::InvalidParticleVersion {});
         }
     } else {
-        return Err(StdError::generic_err("invalid particle"));
+        return Err(ParticleError::InvalidParticle {});
     }
 
     Ok(particle)
 }
+
+#[derive(Error, Debug, PartialEq)]
+pub enum ParticleError {
+    #[error("Invalid data for the particle")]
+    InvalidParticleData {},
+
+    #[error("Invalid particle")]
+    InvalidParticle {},
+
+    #[error("Invalid particle version")]
+    InvalidParticleVersion {},
+}
+

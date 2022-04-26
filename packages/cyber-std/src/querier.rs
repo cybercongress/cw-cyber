@@ -1,11 +1,6 @@
 use cosmwasm_std::{QuerierWrapper, StdResult};
 
-use crate::query::{
-    BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberQuery,
-    CyberQueryWrapper, CyberlinksAmountResponse, LowestFeeResponse, NeuronBandwidthResponse,
-    ParticleRankResponse, ParticlesAmountResponse, RouteResponse, RoutedEnergyResponse,
-    RoutesResponse, ThoughtResponse, ThoughtStatsResponse,
-};
+use crate::query::{BandwidthLoadResponse, BandwidthPriceResponse, BandwidthTotalResponse, CyberQuery, CyberQueryWrapper, CyberlinksAmountResponse, ThoughtLowestFeeResponse, NeuronBandwidthResponse, ParticleRankResponse, ParticlesAmountResponse, RouteResponse, RoutedEnergyResponse, RoutesResponse, ThoughtResponse, ThoughtStatsResponse, PoolParamsResponse, PoolLiquidityResponse, PoolSupplyResponse, PoolPriceResponse, PoolAddressResponse};
 use crate::route::CyberRoute;
 
 pub struct CyberQuerier<'a> {
@@ -82,12 +77,12 @@ impl<'a> CyberQuerier<'a> {
         Ok(res)
     }
 
-    pub fn query_lowest_fee(&self) -> StdResult<LowestFeeResponse> {
+    pub fn query_thought_lowest_fee(&self) -> StdResult<ThoughtLowestFeeResponse> {
         let request = CyberQueryWrapper {
             route: CyberRoute::Dmn,
-            query_data: CyberQuery::LowestFee {},
+            query_data: CyberQuery::ThoughtLowestFee {},
         };
-        let res: LowestFeeResponse = self.querier.query(&request.into())?;
+        let res: ThoughtLowestFeeResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 
@@ -184,6 +179,66 @@ impl<'a> CyberQuerier<'a> {
             },
         };
         let res: NeuronBandwidthResponse = self.querier.query(&request.into())?;
+        Ok(res)
+    }
+
+    pub fn query_pool_params(
+        &self,
+        pool_id: u64,
+    ) -> StdResult<PoolParamsResponse> {
+        let request = CyberQueryWrapper {
+            route: CyberRoute::Liquidity,
+            query_data: CyberQuery::PoolParams { pool_id: pool_id },
+        };
+        let res: PoolParamsResponse = self.querier.query(&request.into())?;
+        Ok(res)
+    }
+
+    pub fn query_pool_liquidity(
+        &self,
+        pool_id: u64,
+    ) -> StdResult<PoolLiquidityResponse> {
+        let request = CyberQueryWrapper {
+            route: CyberRoute::Liquidity,
+            query_data: CyberQuery::PoolLiquidity { pool_id: pool_id },
+        };
+        let res: PoolLiquidityResponse = self.querier.query(&request.into())?;
+        Ok(res)
+    }
+
+    pub fn query_pool_supply(
+        &self,
+        pool_id: u64,
+    ) -> StdResult<PoolSupplyResponse> {
+        let request = CyberQueryWrapper {
+            route: CyberRoute::Liquidity,
+            query_data: CyberQuery::PoolSupply { pool_id: pool_id },
+        };
+        let res: PoolSupplyResponse = self.querier.query(&request.into())?;
+        Ok(res)
+    }
+
+    pub fn query_pool_price(
+        &self,
+        pool_id: u64,
+    ) -> StdResult<PoolPriceResponse> {
+        let request = CyberQueryWrapper {
+            route: CyberRoute::Liquidity,
+            query_data: CyberQuery::PoolPrice { pool_id: pool_id },
+        };
+        let res: PoolPriceResponse = self.querier.query(&request.into())?;
+        Ok(res)
+    }
+
+    pub fn query_pool_address(
+        &self,
+        pool_id: u64,
+    ) -> StdResult<PoolAddressResponse> {
+        let request = CyberQueryWrapper {
+            route: CyberRoute::Liquidity,
+            query_data: CyberQuery::PoolAddress { pool_id: pool_id },
+        };
+        let res: PoolAddressResponse = self.querier.query(&request.into())?;
         Ok(res)
     }
 }

@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::Coin;
+use cosmwasm_std::{Coin, Decimal};
 use cyber_std::{Link, Trigger, Load};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -84,7 +84,27 @@ pub enum ExecuteMsg {
     ChangeThoughtBlock {
         name: String,
         block: u64,
-    }
+    },
+    CreatePool {
+        pool_type_id: u32,
+        deposit_coins: Vec<Coin>,
+    },
+    DepositWithinBatch {
+        pool_id: u64,
+        deposit_coins: Vec<Coin>,
+    },
+    WithdrawWithinBatch {
+        pool_id: u64,
+        pool_coin: Coin,
+    },
+    SwapWithinBatch {
+        pool_id: u64,
+        swap_type_id: u32,
+        offer_coin: Coin,
+        demand_coin_denom: String,
+        offer_coin_fee: Coin,
+        order_price: Decimal,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -104,7 +124,7 @@ pub enum QueryMsg {
         program: String,
         name: String,
     },
-    DmnLowestFee {},
+    ThoughtLowestFee {},
     SourceRoutes {
         source: String,
     },
@@ -123,5 +143,20 @@ pub enum QueryMsg {
     BandwidthTotal {},
     NeuronBandwidth {
         neuron: String,
-    }
+    },
+    PoolParams {
+        pool_id: u64,
+    },
+    PoolLiquidity {
+        pool_id: u64,
+    },
+    PoolSupply {
+        pool_id: u64,
+    },
+    PoolPrice {
+        pool_id: u64,
+    },
+    PoolAddress {
+        pool_id: u64,
+    },
 }

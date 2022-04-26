@@ -12,4 +12,5 @@ pub enum CyberRoute {
     Grid,
     Dmn,
     Bandwidth,
+    Liquidity
 }
