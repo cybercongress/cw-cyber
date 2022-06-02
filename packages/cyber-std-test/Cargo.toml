@@ -10,8 +10,8 @@ license = "Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-cyber-std = { version = "0.2.0", path = "../cyber-std" }
-cosmwasm-std = { version = "1.0.0-beta8" }
+cyber-std = { version = "0.2.1", path = "../cyber-std" }
+cosmwasm-std = { version = "1.0.0" }
 schemars = "0.8.1"
 serde = { version = "1.0.127", default-features = false, features = ["derive"] }
 cw-multi-test = { version = "0.13.2" }
