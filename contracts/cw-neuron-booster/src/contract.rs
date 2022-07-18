@@ -1,9 +1,10 @@
+use cosmwasm_std::{Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_binary};
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_binary};
 use cw1155::{IsApprovedForAllResponse, TokenInfoResponse};
 use cw2::{get_contract_version, set_contract_version};
 use cw_utils::maybe_addr;
+use semver::Version;
 
 use crate::error::ContractError;
 use crate::execute::{
@@ -14,12 +15,11 @@ use crate::execute::{
 };
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::query::{query_all_approvals, query_all_funds, query_all_funds_for_neuron,
-   query_all_funds_from_neuron, query_all_neuron_vestings, query_all_tokens,
-   query_balance, query_batch_balance, query_spot_price, query_swap_in_out,
-   query_swap_out_in, query_token_state, query_tokens
+                   query_all_funds_from_neuron, query_all_neuron_vestings, query_all_tokens,
+                   query_balance, query_batch_balance, query_fund_price, query_spot_price,
+                   query_swap_in_out, query_swap_out_in, query_token_state, query_tokens
 };
 use crate::state::{MINTER, TOKENS};
-use semver::Version;
 
 const CONTRACT_NAME: &str = "neuron-booster";
 const CONTRACT_VERSION: &str = "1.0.0";
@@ -106,6 +106,10 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::SpotPrice { token_id } => {
             let token = deps.api.addr_validate(&token_id)?;
             to_binary(&query_spot_price(deps, env, token.to_string())?)
+        }
+        QueryMsg::FundPrice { token_id } => {
+            let token = deps.api.addr_validate(&token_id)?;
+            to_binary(&query_fund_price(deps, env, token.to_string())?)
         }
         QueryMsg::FundsByBlock { start_after, limit } => {
             to_binary(&query_all_funds(deps, env, start_after, limit)?)

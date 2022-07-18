@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FundsResponse",
+  "type": "object",
+  "required": [
+    "funds"
+  ],
+  "properties": {
+    "funds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Fund"
+      }
+    }
+  },
+  "definitions": {
+    "Fund": {
+      "type": "object",
+      "required": [
+        "height",
+        "token_id"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "token_id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

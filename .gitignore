@@ -16,4 +16,4 @@ target/
 .cargo-ok
 
 packages/*/schema
-contracts/*/schema
+#contracts/*/schema

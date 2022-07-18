@@ -20,8 +20,8 @@ use crate::state::{
 };
 
 const RESERVE_DENOM: &str = "milliampere";
-const FUND_PERIOD: u64 = 100;
-const VESTING_PERIOD: u64 = 300;
+const FUND_PERIOD: u64 = 250;
+const VESTING_PERIOD: u64 = 500;
 
 // TODO apply fee to buy and sell to self?
 // TODO if reward rounded to 0?
@@ -143,7 +143,6 @@ pub fn execute_claim(
         return Err(ContractError::FundsClaimed {})
     }
 
-    // first claim -> init curve
     if !token_state.funded {
         TOKENS_STATES.update(
             deps.storage,
@@ -154,7 +153,7 @@ pub fn execute_claim(
                 state.reserve = state.funds;
                 state.supply = curve.supply(state.reserve);
                 state.funded = true;
-                state.init_price = curve.spot_price(state.supply);
+                state.init_price = Decimal::from_ratio(state.reserve, state.supply);
                 token_state = state.clone();
                 Ok(state)
             },
@@ -162,9 +161,8 @@ pub fn execute_claim(
     }
 
     let neuron_funds = FUNDS_FROM_NEURONS.load(deps.storage, (&info.sender, &token_id))?;
-    let amount = token_state.init_price
-        .mul(Decimal::new(neuron_funds))
-        .div(Decimal::one())
+    let amount = Decimal::new(neuron_funds)
+        .div(token_state.init_price)
         .atomics();
 
     let sub_info = MessageInfo {

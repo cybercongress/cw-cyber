@@ -1,4 +1,5 @@
 use std::ops::{Add, Mul};
+
 use cosmwasm_std::{Decimal, StdError, Uint128};
 use cosmwasm_std::{
     Addr, Deps, Env, Order, StdResult,
@@ -6,11 +7,8 @@ use cosmwasm_std::{
 use cw1155::{ApprovedForAllResponse, BalanceResponse, BatchBalanceResponse, Expiration, TokensResponse};
 use cw20_bonding::curves::{Curve, decimal, DecimalPlaces, SquareRoot};
 use cw_storage_plus::Bound;
-use crate::msg::{Fund, FundForNeuron, FundFromNeuron, FundsForNeuronResponse,
-    FundsFromNeuronResponse, FundsResponse, NeuronVestingsResponse, SpotPriceResponse,
-    SwapResponse, TokenId, TokenStateResponse, Vesting
-};
 
+use crate::msg::{Fund, FundForNeuron, FundFromNeuron, FundPriceResponse, FundsForNeuronResponse, FundsFromNeuronResponse, FundsResponse, NeuronVestingsResponse, SpotPriceResponse, SwapResponse, TokenId, TokenStateResponse, Vesting};
 use crate::state::{APPROVES, BALANCES, FUNDS_BY_BLOCKS, FUNDS_FOR_NEURONS, FUNDS_FROM_NEURONS, TOKENS, TOKENS_STATES, VESTINGS};
 
 const DEFAULT_LIMIT: u32 = 10;
@@ -45,8 +43,32 @@ pub fn query_spot_price(
         decimal(20u128, 2),
         DecimalPlaces::new(3, 3)
     );
-    let spot_price = curve.spot_price(token_state.supply);
-    Ok(SpotPriceResponse { spot_price })
+    if token_state.funded {
+        let spot_price = curve.spot_price(token_state.supply);
+        Ok(SpotPriceResponse { spot_price })
+    } else {
+        let spot_price = curve.spot_price(curve.supply(token_state.funds));
+        Ok(SpotPriceResponse { spot_price })
+    }
+}
+
+pub fn query_fund_price(
+    deps: Deps,
+    _env: Env,
+    token_id: TokenId,
+) -> StdResult<FundPriceResponse> {
+    let token_state = TOKENS_STATES.load(deps.storage, &token_id)?;
+    if token_state.funded {
+        let fund_price = token_state.init_price;
+        Ok(FundPriceResponse { fund_price })
+    } else {
+        let curve = SquareRoot::new(
+            decimal(20u128, 2),
+            DecimalPlaces::new(3, 3)
+        );
+        let fund_price = Decimal::from_ratio(token_state.funds, curve.supply(token_state.funds));
+        Ok(FundPriceResponse { fund_price })
+    }
 }
 
 pub fn query_balance(

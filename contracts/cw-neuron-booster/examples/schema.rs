@@ -8,10 +8,7 @@ use cw1155::{
     Cw1155ReceiveMsg, IsApprovedForAllResponse,
     TokenInfoResponse, TokensResponse,
 };
-use cw_neuron_booster::msg::{InstantiateMsg, ExecuteMsg, QueryMsg,
-    TokenStateResponse, NeuronVestingsResponse, FundsFromNeuronResponse,
-    FundsForNeuronResponse, SwapResponse, FundsResponse
-};
+use cw_neuron_booster::msg::{InstantiateMsg, ExecuteMsg, QueryMsg, TokenStateResponse, NeuronVestingsResponse, FundsFromNeuronResponse, FundsForNeuronResponse, SwapResponse, FundsResponse, SpotPriceResponse, FundPriceResponse};
 
 fn main() {
     let mut out_dir = current_dir().unwrap();
@@ -36,4 +33,6 @@ fn main() {
     export_schema(&schema_for!(FundsFromNeuronResponse), &out_dir);
     export_schema(&schema_for!(FundsForNeuronResponse), &out_dir);
     export_schema(&schema_for!(SwapResponse), &out_dir);
+    export_schema(&schema_for!(SpotPriceResponse), &out_dir);
+    export_schema(&schema_for!(FundPriceResponse), &out_dir);
 }

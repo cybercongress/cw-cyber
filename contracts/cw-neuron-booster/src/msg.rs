@@ -1,7 +1,7 @@
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use cosmwasm_std::{Binary, Decimal, Uint128};
 use cw_utils::Expiration;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -61,6 +61,7 @@ pub enum ExecuteMsg {
 pub enum QueryMsg {
     TokenState { token_id: TokenId },
     SpotPrice { token_id: TokenId },
+    FundPrice { token_id: TokenId },
     FundsByBlock {
         start_after: Option<u64>,
         limit: Option<u32>
@@ -114,6 +115,11 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct SpotPriceResponse {
     pub spot_price: Decimal,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct FundPriceResponse {
+    pub fund_price: Decimal,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

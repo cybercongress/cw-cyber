@@ -1,22 +1,21 @@
 #[cfg(test)]
 mod tests {
     use std::ops::Add;
-    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+
     use cosmwasm_std::{Addr, BankMsg, coin, coins, Response, Uint128};
+    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+
     use crate::contract::{execute, instantiate};
     use crate::ContractError;
     use crate::msg::{ExecuteMsg, InstantiateMsg};
-    use crate::query::{query_all_funds, query_all_funds_for_neuron, query_all_funds_from_neuron,
-        query_all_neuron_vestings, query_balance, query_batch_balance,
-       query_spot_price, query_swap_in_out, query_swap_out_in
-    };
+    use crate::query::{query_all_funds, query_all_funds_for_neuron, query_all_funds_from_neuron, query_all_neuron_vestings, query_balance, query_batch_balance, query_spot_price, query_swap_in_out, query_swap_out_in, query_token_state};
 
     const RESERVE_DENOM: &str = "milliampere";
-    const FUND_PERIOD: u64 = 100;
-    const VESTING_PERIOD: u64 = 300;
+    const FUND_PERIOD: u64 = 250;
+    const VESTING_PERIOD: u64 = 500;
 
     #[test]
-    fn check_transfers() {
+    fn check_flow() {
         // TODO A long test case that try to cover as many cases as possible.
         // Summary of what it does:
         // mint token1 by neuron1
@@ -48,12 +47,15 @@ mod tests {
         let token1 = "neuron1".to_owned();
         let token2 = "neuron2".to_owned();
         let token3 = "neuron3".to_owned();
+        let token4 = "neuron4".to_owned();
         let neuron1 = String::from("neuron1");
         let neuron2 = String::from("neuron2");
         let neuron3 = String::from("neuron3");
+        let neuron4 = String::from("neuron4");
         let payment1 = 2000u128;
         let payment2 = 2000u128;
         let payment3 = 3000u128;
+        let payment4 = 10000u128;
         let mut mock_env = mock_env();
 
         let mut deps = mock_dependencies();
@@ -157,7 +159,7 @@ mod tests {
             Response::new()
                 .add_attribute("action", "claim")
                 .add_attribute("token_id", &token1)
-                .add_attribute("amount", &1242u128.to_string())
+                .add_attribute("amount", &4827u128.to_string())
         );
 
         let claim_msg = ExecuteMsg::Claim {
@@ -173,8 +175,14 @@ mod tests {
             Response::new()
                 .add_attribute("action", "claim")
                 .add_attribute("token_id", &token1)
-                .add_attribute("amount", &1242u128.to_string())
+                .add_attribute("amount", &4827u128.to_string())
         );
+
+        println!("TOKEN 1 - {:?}", query_token_state(
+            deps.as_ref(),
+            mock_env.clone(),
+            token1.clone()
+        ).unwrap());
 
         let buy_msg = ExecuteMsg::Buy {
             token_id: neuron1.clone(),
@@ -476,7 +484,7 @@ mod tests {
             Response::new()
                 .add_attribute("action", "claim")
                 .add_attribute("token_id", &token2)
-                .add_attribute("amount", &986u128.to_string())
+                .add_attribute("amount", &6082u128.to_string())
         );
 
         let claim_msg_neuron3 = ExecuteMsg::Claim {
@@ -492,7 +500,7 @@ mod tests {
             Response::new()
                 .add_attribute("action", "claim")
                 .add_attribute("token_id", &token3)
-                .add_attribute("amount", &986u128.to_string())
+                .add_attribute("amount", &6082u128.to_string())
         );
 
         let swap_msg_neuron3 = ExecuteMsg::SwapOutIn {
@@ -730,6 +738,62 @@ mod tests {
             deps.as_ref(),
             mock_env.clone(),
             token3.clone(),
+        ).unwrap());
+
+        // DEBUG CASE
+
+        let mint_msg = ExecuteMsg::Mint {
+            reward: 10u64,
+            locked: false,
+            msg: None,
+        };
+        execute(
+            deps.as_mut(),
+            mock_env.clone(),
+            mock_info(neuron4.as_ref(), &[coin(payment4, RESERVE_DENOM)]),
+            mint_msg.clone(),
+        );
+
+        let fund_msg = ExecuteMsg::Fund {
+            token_id: token4.clone(),
+        };
+
+        execute(
+            deps.as_mut(),
+            mock_env.clone(),
+            mock_info(neuron4.as_ref(), &[coin(payment4, RESERVE_DENOM)]),
+            fund_msg.clone(),
+        );
+
+        mock_env.block.height = mock_env.block.height.add(FUND_PERIOD);
+
+        let fail_claim_msg = ExecuteMsg::Claim {
+            token_id: token4.clone(),
+        };
+        execute(
+            deps.as_mut(),
+            mock_env.clone(),
+            mock_info(neuron4.as_ref(), &[coin(0u128, RESERVE_DENOM)]),
+            fail_claim_msg.clone(),
+        );
+
+        println!("TOKEN 4 - {:?}", query_token_state(
+            deps.as_ref(),
+            mock_env.clone(),
+            token4.clone()
+        ).unwrap());
+
+        println!("BALANCE 4 - {:?}", query_balance(
+            deps.as_ref(),
+            mock_env.clone(),
+            Addr::unchecked(neuron4.clone()),
+            neuron4.clone()
+        ).unwrap());
+
+        println!("VESTINGS 4 - {:?}", query_all_neuron_vestings(
+            deps.as_ref(),
+            mock_env.clone(),
+            Addr::unchecked(neuron4.clone())
         ).unwrap());
     }
 }
