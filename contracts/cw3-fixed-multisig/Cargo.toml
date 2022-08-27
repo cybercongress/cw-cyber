@@ -29,7 +29,7 @@ cw-storage-plus = { version = "0.14.0" }
 schemars = "0.8.1"
 serde = { version = "1.0.103", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.23" }
-cyber-std = { version = "0.2.1" }
+cyber-std = { version = "0.2.2" }
 
 [dev-dependencies]
 cw20 = { version = "0.14.0" }

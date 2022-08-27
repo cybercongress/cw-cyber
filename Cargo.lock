@@ -374,7 +374,7 @@ dependencies = [
  "cw-utils 0.14.0",
  "cw1",
  "cw2",
- "cyber-std 0.2.1",
+ "cyber-std 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "derivative",
  "schemars",
  "serde",
@@ -447,7 +447,7 @@ dependencies = [
  "cw20",
  "cw20-base",
  "cw3",
- "cyber-std 0.2.1",
+ "cyber-std 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "schemars",
  "serde",
  "thiserror",
@@ -467,7 +467,7 @@ dependencies = [
  "cw3-fixed-multisig",
  "cw4",
  "cw4-group",
- "cyber-std 0.2.1",
+ "cyber-std 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "schemars",
  "serde",
  "thiserror",
@@ -516,11 +516,10 @@ dependencies = [
 
 [[package]]
 name = "cyber-std"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ba03b7658a0f54674726aafddbe00a73460adbc4dde854bd57b0e60cdeb0e68"
+version = "0.2.2"
 dependencies = [
  "cid",
+ "cosmwasm-schema",
  "cosmwasm-std",
  "cw721",
  "schemars",
@@ -531,9 +530,10 @@ dependencies = [
 [[package]]
 name = "cyber-std"
 version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ac2ed72d2a819bb1c3f9acb68b73d70ec5503206f80d289a24e7c15548f439d"
 dependencies = [
  "cid",
- "cosmwasm-schema",
  "cosmwasm-std",
  "cw721",
  "schemars",
