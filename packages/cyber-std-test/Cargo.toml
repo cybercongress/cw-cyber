@@ -1,24 +1,20 @@
 [package]
-name = "cyber-std"
+name = "cyber-std-test"
 version = "0.2.2"
 authors = ["CyberHead"]
 edition = "2018"
-description = "Bindings for CustomMsg and CustomQuery for the Cyber"
+description = "Multitest (and other test helpers) support for Cyber-specific contracts"
 repository = "https://github.com/cybercongress/cw-cyber"
 homepage = "https://github.com/cybercongress/go-cyber"
 license = "Apache-2.0"
 readme = "README.md"
 
-
 [dependencies]
-cosmwasm-std = { version = "1.0.0", features = ["iterator"] }
+cyber-std = { version = "0.2.2", path = "../cyber-std" }
+cosmwasm-std = { version = "1.0.0" }
 schemars = "0.8.1"
-cw721 = { version = "0.13.4" }
-cid = { version = "0.8.0" }
 serde = { version = "1.0.127", default-features = false, features = ["derive"] }
+cw-multi-test = { version = "0.14.0" }
+cw-storage-plus = { version = "0.14.0" }
+anyhow = { version = "1" }
 thiserror = { version = "1.0.21" }
-
-[dev-dependencies]
-cosmwasm-schema = { version = "1.0.0" }
-
-

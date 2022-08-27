@@ -1,7 +1,8 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CosmosMsg, Coin, CustomMsg};
+use cosmwasm_std::{CosmosMsg, Coin, CustomMsg, Decimal};
+use cw721::{CustomMsg as Cw721CustomMsg};
 use crate::route::CyberRoute;
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq, JsonSchema)]
@@ -47,6 +48,8 @@ impl Into<CosmosMsg<CyberMsgWrapper>> for CyberMsgWrapper {
     }
 }
 
+// TODO remove Cw721CustomMsg as it will be merged into cosmwasm-std
+impl Cw721CustomMsg for CyberMsgWrapper{}
 impl CustomMsg for CyberMsgWrapper{}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -106,7 +109,31 @@ pub enum CyberMsg {
         program: String,
         name: String,
         block: u64,
-    }
+    },
+    CreatePool {
+        pool_creator_address: String,
+        pool_type_id: u32,
+        deposit_coins: Vec<Coin>,
+    },
+    DepositWithinBatch {
+        depositor_address: String,
+        pool_id: u64,
+        deposit_coins: Vec<Coin>,
+    },
+    WithdrawWithinBatch {
+        withdrawer_address: String,
+        pool_id: u64,
+        pool_coin: Coin,
+    },
+    SwapWithinBatch {
+        swap_requester_address: String,
+        pool_id: u64,
+        swap_type_id: u32,
+        offer_coin: Coin,
+        demand_coin_denom: String,
+        offer_coin_fee: Coin,
+        order_price: Decimal,
+    },
 }
 
 pub fn create_cyberlink_msg(
@@ -283,4 +310,75 @@ pub fn create_change_thought_block_msg(
         },
     }
     .into()
+}
+
+pub fn create_create_pool_msg(
+    pool_creator_address: String,
+    pool_type_id: u32,
+    deposit_coins: Vec<Coin>,
+) -> CosmosMsg<CyberMsgWrapper> {
+    CyberMsgWrapper {
+        route: CyberRoute::Liquidity,
+        msg_data: CyberMsg::CreatePool {
+            pool_creator_address,
+            pool_type_id,
+            deposit_coins
+        },
+    }
+    .into()
+}
+
+pub fn create_deposit_within_batch_msg(
+    depositor_address: String,
+    pool_id: u64,
+    deposit_coins: Vec<Coin>,
+) -> CosmosMsg<CyberMsgWrapper> {
+    CyberMsgWrapper {
+        route: CyberRoute::Liquidity,
+        msg_data: CyberMsg::DepositWithinBatch {
+            depositor_address,
+            pool_id,
+            deposit_coins
+        },
+    }
+    .into()
+}
+
+pub fn create_withdraw_within_batch_msg(
+    withdrawer_address: String,
+    pool_id: u64,
+    pool_coin: Coin,
+) -> CosmosMsg<CyberMsgWrapper> {
+    CyberMsgWrapper {
+        route: CyberRoute::Liquidity,
+        msg_data: CyberMsg::WithdrawWithinBatch {
+            withdrawer_address,
+            pool_id,
+            pool_coin
+        },
+    }
+    .into()
+}
+
+pub fn create_swap_within_batch_msg(
+    swap_requester_address: String,
+    pool_id: u64,
+    swap_type_id: u32,
+    offer_coin: Coin,
+    demand_coin_denom: String,
+    offer_coin_fee: Coin,
+    order_price: Decimal,
+) -> CosmosMsg<CyberMsgWrapper> {
+    CyberMsgWrapper {
+        route: CyberRoute::Liquidity,
+        msg_data: CyberMsg::SwapWithinBatch {
+            swap_requester_address,
+            pool_id,
+            swap_type_id,
+            offer_coin,
+            demand_coin_denom,
+            offer_coin_fee,
+            order_price
+        },
+    }.into()
 }

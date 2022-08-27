@@ -1,7 +1,7 @@
 # Cyber Bindings for CosmWasm
 
-Note: not yet published to crates
-
+![Crates.io](https://img.shields.io/crates/v/cyber-std)
+![Crates.io](https://img.shields.io/crates/d/cyber-std)
 
 This crate provides Cyber-specific bindings to enable your CosmWasm smart contracts to interact with the Cyber blockchain by exposing messages and queriers that can be emitted and used from within your contract.
 
@@ -28,7 +28,13 @@ Currently, the Cyber bindings include:
   - DMN
     - Thought
     - ThoughtStats
-    - LowestFee
+    - ThoughtLowestFee
+  - Liquidity
+    - PoolParams
+    - PoolLiquidity
+    - PoolSupply
+    - PoolPrice
+    - PoolAddress
 - Messages support for:
   - Graph
     - MsgCyberlink
@@ -48,3 +54,8 @@ Currently, the Cyber bindings include:
     - MsgChangeThoughtGasPrice
     - MsgChangeThoughtParticle
     - MsgChangeThoughtName
+  - Liquidity
+    - MsgCreatePool
+    - MsgDepositWithinBath
+    - MsgWithdrawWithinBath
+    - MsgSwapWithinBath
