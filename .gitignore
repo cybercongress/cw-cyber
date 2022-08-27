@@ -16,5 +16,5 @@ target/
 .cargo-ok
 
 artifacts
-packages/*/schema
-contracts/*/schema
+packages/*/bin
+contracts/*/bin
