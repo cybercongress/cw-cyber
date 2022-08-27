@@ -25,26 +25,26 @@ use cosmwasm_std::{
     attr, coin, coins, BankMsg, CosmosMsg, Empty, IbcAcknowledgement, IbcBasicResponse, IbcMsg,
     IbcOrder, Response,
 };
-use cosmwasm_vm::testing::{
-    execute, ibc_channel_connect, ibc_channel_open, ibc_packet_ack, instantiate, mock_env,
-    mock_info, mock_instance, query, MockApi, MockQuerier, MockStorage,
-};
-use cosmwasm_vm::{from_slice, Instance};
+use cosmwasm_vm::testing::{execute, ibc_channel_connect, ibc_channel_open, ibc_packet_ack, instantiate, mock_env, mock_info, query, MockApi, MockQuerier, MockStorage, mock_instance_with_options, MockInstanceOptions};
+use cosmwasm_vm::{features_from_csv, from_slice, Instance};
 
-use ibc_reflect_send::ibc::IBC_VERSION;
+use ibc_reflect_send::ibc::IBC_APP_VERSION;
 use ibc_reflect_send::ibc_msg::{AcknowledgementMsg, PacketMsg, WhoAmIResponse};
 use ibc_reflect_send::msg::{AccountResponse, AdminResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 
 // This line will test the output of cargo wasm
 static WASM: &[u8] =
-    include_bytes!("../target/wasm32-unknown-unknown/release/ibc_reflect_send.wasm");
+    include_bytes!("../../../target/wasm32-unknown-unknown/release/ibc_reflect_send.wasm");
 
 const CREATOR: &str = "creator";
 
 const DESERIALIZATION_LIMIT: usize = 20_000;
 
 fn setup() -> Instance<MockApi, MockStorage, MockQuerier> {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
     let msg = InstantiateMsg {};
     let info = mock_info(CREATOR, &[]);
     let res: Response = instantiate(&mut deps, mock_env(), info, msg).unwrap();
@@ -56,22 +56,22 @@ fn setup() -> Instance<MockApi, MockStorage, MockQuerier> {
 // save the account (tested in detail in `proper_handshake_flow`)
 fn connect(deps: &mut Instance<MockApi, MockStorage, MockQuerier>, channel_id: &str) {
     // open packet has no counterparty version, connect does
-    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     // first we try to open with a valid handshake
     ibc_channel_open(deps, mock_env(), handshake_open).unwrap();
 
     // then we connect (with counter-party version set)
     let handshake_connect =
-        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     let res: IbcBasicResponse = ibc_channel_connect(deps, mock_env(), handshake_connect).unwrap();
 
     // this should send a WhoAmI request, which is received some blocks later
     assert_eq!(1, res.messages.len());
     match &res.messages[0].msg {
         CosmosMsg::Ibc(IbcMsg::SendPacket {
-            channel_id: packet_channel,
-            ..
-        }) => assert_eq!(packet_channel.as_str(), channel_id),
+                           channel_id: packet_channel,
+                           ..
+                       }) => assert_eq!(packet_channel.as_str(), channel_id),
         o => panic!("Unexpected message: {:?}", o),
     };
 }
@@ -103,13 +103,14 @@ fn instantiate_works() {
 fn enforce_version_in_handshake() {
     let mut deps = setup();
 
-    let wrong_order = mock_ibc_channel_open_try("channel-12", IbcOrder::Unordered, IBC_VERSION);
+    let wrong_order = mock_ibc_channel_open_try("channel-12", IbcOrder::Unordered, IBC_APP_VERSION);
     ibc_channel_open(&mut deps, mock_env(), wrong_order).unwrap_err();
 
     let wrong_version = mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, "reflect");
     ibc_channel_open(&mut deps, mock_env(), wrong_version).unwrap_err();
 
-    let valid_handshake = mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, IBC_VERSION);
+    let valid_handshake =
+        mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, IBC_APP_VERSION);
     ibc_channel_open(&mut deps, mock_env(), valid_handshake).unwrap();
 }
 
@@ -165,7 +166,7 @@ fn dispatch_message_send_and_ack() {
         to_address: "my-friend".into(),
         amount: coins(123456789, "uatom"),
     }
-    .into()];
+        .into()];
     let execute_msg = ExecuteMsg::SendMsgs {
         channel_id: channel_id.into(),
         msgs: msgs_to_dispatch,
@@ -175,8 +176,8 @@ fn dispatch_message_send_and_ack() {
     assert_eq!(1, res.messages.len());
     let msg = match res.messages.swap_remove(0).msg {
         CosmosMsg::Ibc(IbcMsg::SendPacket {
-            channel_id, data, ..
-        }) => {
+                           channel_id, data, ..
+                       }) => {
             let ack = IbcAcknowledgement::encode_json(&AcknowledgementMsg::Ok(())).unwrap();
             let mut msg = mock_ibc_packet_ack(&channel_id, &1, ack).unwrap();
             msg.original_packet.data = data;
@@ -229,11 +230,11 @@ fn send_remote_funds() {
     assert_eq!(1, res.messages.len());
     match &res.messages[0].msg {
         CosmosMsg::Ibc(IbcMsg::Transfer {
-            channel_id,
-            to_address,
-            amount,
-            timeout,
-        }) => {
+                           channel_id,
+                           to_address,
+                           amount,
+                           timeout,
+                       }) => {
             assert_eq!(transfer_channel_id, channel_id.as_str());
             assert_eq!(remote_addr, to_address.as_str());
             assert_eq!(&coin(12344, "utrgd"), amount);

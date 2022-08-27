@@ -1,8 +1,7 @@
 use cosmwasm_std::{Coin, ContractResult, CosmosMsg};
+use cyber_std::CyberMsgWrapper;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
-use cyber_std::CyberMsgWrapper;
 
 /// This is the message we send over the IBC channel
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

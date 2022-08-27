@@ -1,8 +1,8 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Binary, CosmosMsg, CustomQuery, QueryRequest, SubMsg};
-use cyber_std::CyberMsgWrapper;
+use cosmwasm_std::{Binary, CosmosMsg, QueryRequest, SubMsg};
+use cyber_std::{CyberMsgWrapper, CyberQueryWrapper};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -19,13 +19,9 @@ pub enum ExecuteMsg {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     Owner {},
-    /// This will call out to SpecialQuery::Capitalized
-    Capitalized {
-        text: String,
-    },
     /// Queries the blockchain and returns the result untouched
     Chain {
-        request: QueryRequest<SpecialQuery>,
+        request: QueryRequest<CyberQueryWrapper>,
     },
     /// Queries another contract and returns the data
     Raw {
@@ -47,12 +43,6 @@ pub struct OwnerResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub struct CapitalizedResponse {
-    pub text: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
 pub struct ChainResponse {
     pub data: Binary,
 }
@@ -68,17 +58,7 @@ pub struct RawResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-/// An implementation of QueryRequest::Custom to show this works and can be extended in the contract
-pub enum SpecialQuery {
-    Ping {},
-    Capitalized { text: String },
-}
-
-impl CustomQuery for SpecialQuery {}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-/// The response data for all `SpecialQuery`s
-pub struct SpecialResponse {
+/// The response data for all `CyberQuery`s
+pub struct CyberQueryResponse {
     pub msg: String,
 }

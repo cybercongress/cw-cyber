@@ -19,25 +19,22 @@
 
 use cosmwasm_std::{
     coin, coins, from_binary, BankMsg, Binary, Coin, ContractResult, Event, Reply, Response,
-    StakingMsg, SubMsg, SubMsgExecutionResponse, SystemResult,
+    StakingMsg, SubMsg, SubMsgResponse, SubMsgResult, SystemResult,
 };
-use cosmwasm_vm::{
-    testing::{
-        execute, instantiate, mock_env, mock_info, mock_instance, mock_instance_options, query,
-        reply, MockApi, MockQuerier, MockStorage, MOCK_CONTRACT_ADDR,
-    },
-    Backend, Instance,
-};
-use cyber_std::CyberMsgWrapper;
+use cosmwasm_vm::{testing::{
+    execute, instantiate, mock_env, mock_info, query,
+    reply, MockApi, MockQuerier, MockStorage, MOCK_CONTRACT_ADDR,
+}, Backend, features_from_csv};
+use cosmwasm_vm::testing::{mock_instance_with_options, MockInstanceOptions};
+use cyber_std::{CyberMsgWrapper, CyberQueryWrapper};
 
 use reflect::msg::{
-    CapitalizedResponse, CyberMsgWrapper, ExecuteMsg, InstantiateMsg, OwnerResponse, QueryMsg,
-    SpecialQuery,
+    ExecuteMsg, InstantiateMsg, OwnerResponse, QueryMsg
 };
 use reflect::testing::custom_query_execute;
 
 // This line will test the output of cargo wasm
-static WASM: &[u8] = include_bytes!("../target/wasm32-unknown-unknown/release/reflect.wasm");
+static WASM: &[u8] = include_bytes!("../../../target/wasm32-unknown-unknown/release/reflect.wasm");
 // You can uncomment this line instead to test productionified build from cosmwasm-opt
 // static WASM: &[u8] = include_bytes!("../contract.wasm");
 
@@ -45,8 +42,8 @@ static WASM: &[u8] = include_bytes!("../target/wasm32-unknown-unknown/release/re
 /// that supports SpecialQuery.
 pub fn mock_dependencies_with_custom_querier(
     contract_balance: &[Coin],
-) -> Backend<MockApi, MockStorage, MockQuerier<SpecialQuery>> {
-    let custom_querier: MockQuerier<SpecialQuery> =
+) -> Backend<MockApi, MockStorage, MockQuerier<CyberQueryWrapper>> {
+    let custom_querier: MockQuerier<CyberQueryWrapper> =
         MockQuerier::new(&[(MOCK_CONTRACT_ADDR, contract_balance)])
             .with_custom_handler(|query| SystemResult::Ok(custom_query_execute(query)));
 
@@ -59,7 +56,10 @@ pub fn mock_dependencies_with_custom_querier(
 
 #[test]
 fn proper_initialization() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(1000, "earth"));
@@ -76,7 +76,10 @@ fn proper_initialization() {
 
 #[test]
 fn reflect() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -87,12 +90,12 @@ fn reflect() {
             to_address: String::from("friend"),
             amount: coins(1, "token"),
         }
-        .into(),
+            .into(),
         StakingMsg::Delegate {
             validator: String::from("validator"),
             amount: coin(100, "ustake"),
         }
-        .into(),
+            .into(),
     ];
     let msg = ExecuteMsg::ReflectMsg {
         msgs: payload.clone(),
@@ -107,7 +110,10 @@ fn reflect() {
 
 #[test]
 fn reflect_requires_owner() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -118,7 +124,7 @@ fn reflect_requires_owner() {
         to_address: String::from("friend"),
         amount: coins(1, "token"),
     }
-    .into()];
+        .into()];
     let msg = ExecuteMsg::ReflectMsg { msgs: payload };
 
     let info = mock_info("someone", &[]);
@@ -129,7 +135,10 @@ fn reflect_requires_owner() {
 
 #[test]
 fn transfer() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -149,7 +158,10 @@ fn transfer() {
 
 #[test]
 fn transfer_requires_owner() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -165,29 +177,11 @@ fn transfer_requires_owner() {
 }
 
 #[test]
-fn dispatch_custom_query() {
-    // stub gives us defaults. Consume it and override...
-    let custom = mock_dependencies_with_custom_querier(&[]);
-    // we cannot use mock_instance, so we just copy and modify code from cosmwasm_vm::testing
-    let (instance_options, memory_limit) = mock_instance_options();
-    let mut deps = Instance::from_code(WASM, custom, instance_options, memory_limit).unwrap();
-
-    // we don't even initialize, just trigger a query
-    let res = query(
-        &mut deps,
-        mock_env(),
-        QueryMsg::Capitalized {
-            text: "demo one".to_string(),
-        },
-    )
-    .unwrap();
-    let value: CapitalizedResponse = from_binary(&res).unwrap();
-    assert_eq!(value.text, "DEMO ONE");
-}
-
-#[test]
 fn reflect_subcall() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -215,7 +209,10 @@ fn reflect_subcall() {
 // this mocks out what happens after reflect_subcall
 #[test]
 fn reply_and_query() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {};
     let info = mock_info("creator", &coins(2, "token"));
@@ -224,7 +221,7 @@ fn reply_and_query() {
     let id = 123u64;
     let data = Binary::from(b"foobar");
     let events = vec![Event::new("message").add_attribute("signer", "caller-addr")];
-    let result = ContractResult::Ok(SubMsgExecutionResponse {
+    let result = SubMsgResult::Ok(SubMsgResponse {
         events: events.clone(),
         data: Some(data.clone()),
     });

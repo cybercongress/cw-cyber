@@ -10,17 +10,6 @@ publish = false
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-opt-level = 3
-debug = false
-rpath = false
-lto = true
-debug-assertions = false
-codegen-units = 1
-panic = 'abort'
-incremental = false
-overflow-checks = true
-
 [features]
 # Change this to [] if you don't need Windows support and want faster integration tests.
 default = ["cranelift"]
@@ -40,3 +29,4 @@ cyber-std = { path = "../../packages/cyber-std"}
 [dev-dependencies]
 cosmwasm-vm = { version = "1.0.0-beta", default-features = false, features = ["iterator", "stargate"] }
 cosmwasm-schema = { version = "1.0.0-beta" }
+cw-multi-test = { version = "0.14.0" }

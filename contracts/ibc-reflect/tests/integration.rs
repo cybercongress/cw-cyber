@@ -23,22 +23,19 @@ use cosmwasm_std::testing::{
 };
 use cosmwasm_std::{
     attr, coins, BankMsg, ContractResult, CosmosMsg, Event, IbcBasicResponse, IbcOrder,
-    IbcReceiveResponse, Reply, Response, SubMsgExecutionResponse, WasmMsg,
+    IbcReceiveResponse, Reply, Response, SubMsgResponse, SubMsgResult, WasmMsg,
 };
-use cosmwasm_vm::testing::{
-    ibc_channel_connect, ibc_channel_open, ibc_packet_receive, instantiate, mock_env, mock_info,
-    mock_instance, query, reply, MockApi, MockQuerier, MockStorage,
-};
-use cosmwasm_vm::{from_slice, Instance};
+use cosmwasm_vm::testing::{ibc_channel_connect, ibc_channel_open, ibc_packet_receive, instantiate, mock_env, mock_info, query, reply, MockApi, MockQuerier, MockStorage, mock_instance_with_options, MockInstanceOptions};
+use cosmwasm_vm::{features_from_csv, from_slice, Instance};
 
-use ibc_reflect::contract::{IBC_VERSION, RECEIVE_DISPATCH_ID};
+use ibc_reflect::contract::{IBC_APP_VERSION, RECEIVE_DISPATCH_ID};
 use ibc_reflect::msg::{
     AccountInfo, AccountResponse, AcknowledgementMsg, DispatchResponse, InstantiateMsg,
     ListAccountsResponse, PacketMsg, QueryMsg, ReflectExecuteMsg,
 };
 
 // This line will test the output of cargo wasm
-static WASM: &[u8] = include_bytes!("../target/wasm32-unknown-unknown/release/ibc_reflect.wasm");
+static WASM: &[u8] = include_bytes!("../../../target/wasm32-unknown-unknown/release/ibc_reflect.wasm");
 
 const CREATOR: &str = "creator";
 // code id of the reflect contract
@@ -49,7 +46,10 @@ const REFLECT_ADDR: &str = "reflect-acct-1";
 const DESERIALIZATION_LIMIT: usize = 20_000;
 
 fn setup() -> Instance<MockApi, MockStorage, MockQuerier> {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
     let msg = InstantiateMsg {
         reflect_code_id: REFLECT_ID,
     };
@@ -77,12 +77,12 @@ fn connect(
 ) {
     let account: String = account.into();
     // first we try to open with a valid handshake
-    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     ibc_channel_open(deps, mock_env(), handshake_open).unwrap();
 
     // then we connect (with counter-party version set)
     let handshake_connect =
-        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     let res: IbcBasicResponse = ibc_channel_connect(deps, mock_env(), handshake_connect).unwrap();
     assert_eq!(1, res.messages.len());
     assert_eq!(1, res.events.len());
@@ -95,7 +95,7 @@ fn connect(
     // fake a reply and ensure this works
     let response = Reply {
         id,
-        result: ContractResult::Ok(SubMsgExecutionResponse {
+        result: SubMsgResult::Ok(SubMsgResponse {
             events: fake_events(&account),
             data: None,
         }),
@@ -105,7 +105,10 @@ fn connect(
 
 #[test]
 fn instantiate_works() {
-    let mut deps = mock_instance(WASM, &[]);
+    let mut deps = mock_instance_with_options(WASM, MockInstanceOptions{
+        supported_features: features_from_csv("iterator,staking,stargate,cyber"),
+        ..Default::default()
+    });
 
     let msg = InstantiateMsg {
         reflect_code_id: 17,
@@ -120,13 +123,15 @@ fn instantiate_works() {
 fn enforce_version_in_handshake() {
     let mut deps = setup();
 
-    let wrong_order = mock_ibc_channel_open_try("channel-1234", IbcOrder::Unordered, IBC_VERSION);
+    let wrong_order =
+        mock_ibc_channel_open_try("channel-1234", IbcOrder::Unordered, IBC_APP_VERSION);
     ibc_channel_open(&mut deps, mock_env(), wrong_order).unwrap_err();
 
     let wrong_version = mock_ibc_channel_open_try("channel-1234", IbcOrder::Ordered, "reflect");
     ibc_channel_open(&mut deps, mock_env(), wrong_version).unwrap_err();
 
-    let valid_handshake = mock_ibc_channel_open_try("channel-1234", IbcOrder::Ordered, IBC_VERSION);
+    let valid_handshake =
+        mock_ibc_channel_open_try("channel-1234", IbcOrder::Ordered, IBC_APP_VERSION);
     ibc_channel_open(&mut deps, mock_env(), valid_handshake).unwrap();
 }
 
@@ -136,24 +141,24 @@ fn proper_handshake_flow() {
     let channel_id = "channel-432";
 
     // first we try to open with a valid handshake
-    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+    let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     ibc_channel_open(&mut deps, mock_env(), handshake_open).unwrap();
 
     // then we connect (with counter-party version set)
     let handshake_connect =
-        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
     let res: IbcBasicResponse =
         ibc_channel_connect(&mut deps, mock_env(), handshake_connect).unwrap();
     // and set up a reflect account
     assert_eq!(1, res.messages.len());
     let id = res.messages[0].id;
     if let CosmosMsg::Wasm(WasmMsg::Instantiate {
-        admin,
-        code_id,
-        msg: _,
-        funds,
-        label,
-    }) = &res.messages[0].msg
+                               admin,
+                               code_id,
+                               msg: _,
+                               funds,
+                               label,
+                           }) = &res.messages[0].msg
     {
         assert_eq!(*admin, None);
         assert_eq!(*code_id, REFLECT_ID);
@@ -171,7 +176,7 @@ fn proper_handshake_flow() {
     // we get the callback from reflect
     let response = Reply {
         id,
-        result: ContractResult::Ok(SubMsgExecutionResponse {
+        result: SubMsgResult::Ok(SubMsgResponse {
             events: fake_events(REFLECT_ADDR),
             data: None,
         }),
@@ -199,7 +204,7 @@ fn proper_handshake_flow() {
             channel_id: channel_id.to_string(),
         },
     )
-    .unwrap();
+        .unwrap();
     let res: AccountResponse = from_slice(&raw, DESERIALIZATION_LIMIT).unwrap();
     assert_eq!(res.account.unwrap(), REFLECT_ADDR);
 }
@@ -216,7 +221,7 @@ fn handle_dispatch_packet() {
         to_address: "my-friend".into(),
         amount: coins(123456789, "uatom"),
     }
-    .into()];
+        .into()];
     let ibc_msg = PacketMsg::Dispatch {
         msgs: msgs_to_dispatch.clone(),
     };
@@ -255,10 +260,10 @@ fn handle_dispatch_packet() {
 
     // parse the output, ensuring it matches
     if let CosmosMsg::Wasm(WasmMsg::Execute {
-        contract_addr,
-        msg,
-        funds,
-    }) = &res.messages[0].msg
+                               contract_addr,
+                               msg,
+                               funds,
+                           }) = &res.messages[0].msg
     {
         assert_eq!(account, contract_addr.as_str());
         assert_eq!(0, funds.len());

@@ -1,10 +1,12 @@
 use cosmwasm_std::{
-    entry_point, from_slice, to_binary, wasm_execute, BankMsg, Binary, ContractResult, CosmosMsg,
-    Deps, DepsMut, Empty, Env, Event, IbcBasicResponse, IbcChannelCloseMsg, IbcChannelConnectMsg,
-    IbcChannelOpenMsg, IbcOrder, IbcPacketAckMsg, IbcPacketReceiveMsg, IbcPacketTimeoutMsg,
-    IbcReceiveResponse, MessageInfo, Order, QueryResponse, Reply, StdError, StdResult,
-    SubMsg, SubMsgExecutionResponse, WasmMsg,
+    entry_point, from_slice, to_binary, wasm_execute, BankMsg, Binary, CosmosMsg, Deps, DepsMut,
+    Empty, Env, Event, Ibc3ChannelOpenResponse, IbcBasicResponse, IbcChannelCloseMsg,
+    IbcChannelConnectMsg, IbcChannelOpenMsg, IbcChannelOpenResponse, IbcOrder, IbcPacketAckMsg,
+    IbcPacketReceiveMsg, IbcPacketTimeoutMsg, IbcReceiveResponse, MessageInfo, Order,
+    QueryResponse, Reply, Response, StdError, StdResult, SubMsg, SubMsgResponse, SubMsgResult,
+    WasmMsg,
 };
+use cyber_std::CyberMsgWrapper;
 
 use crate::msg::{
     AccountInfo, AccountResponse, AcknowledgementMsg, BalancesResponse, DispatchResponse,
@@ -12,10 +14,7 @@ use crate::msg::{
 };
 use crate::state::{accounts, accounts_read, config, pending_channel, Config};
 
-use cyber_std::{CyberMsgWrapper};
-type Response = cosmwasm_std::Response<CyberMsgWrapper>;
-
-pub const IBC_VERSION: &str = "ibc-reflect-v1";
+pub const IBC_APP_VERSION: &str = "ibc-reflect-v1";
 pub const RECEIVE_DISPATCH_ID: u64 = 1234;
 pub const INIT_CALLBACK_ID: u64 = 7890;
 
@@ -38,10 +37,10 @@ pub fn instantiate(
 #[entry_point]
 pub fn reply(deps: DepsMut, _env: Env, reply: Reply) -> StdResult<Response> {
     match (reply.id, reply.result) {
-        (RECEIVE_DISPATCH_ID, ContractResult::Err(err)) => {
+        (RECEIVE_DISPATCH_ID, SubMsgResult::Err(err)) => {
             Ok(Response::new().set_data(encode_ibc_error(err)))
         }
-        (INIT_CALLBACK_ID, ContractResult::Ok(response)) => handle_init_callback(deps, response),
+        (INIT_CALLBACK_ID, SubMsgResult::Ok(response)) => handle_init_callback(deps, response),
         _ => Err(StdError::generic_err("invalid reply id or result")),
     }
 }
@@ -59,10 +58,7 @@ fn parse_contract_from_event(events: Vec<Event>) -> Option<String> {
         .map(|a| a.value)
 }
 
-pub fn handle_init_callback(
-    deps: DepsMut,
-    response: SubMsgExecutionResponse,
-) -> StdResult<Response> {
+pub fn handle_init_callback(deps: DepsMut, response: SubMsgResponse) -> StdResult<Response> {
     // we use storage to pass info from the caller to the reply
     let id = pending_channel(deps.storage).load()?;
     pending_channel(deps.storage).remove();
@@ -122,29 +118,32 @@ pub fn query_list_accounts(deps: Deps) -> StdResult<ListAccountsResponse> {
 
 #[entry_point]
 /// enforces ordering and versioing constraints
-pub fn ibc_channel_open(_deps: DepsMut, _env: Env, msg: IbcChannelOpenMsg) -> StdResult<()> {
+pub fn ibc_channel_open(
+    _deps: DepsMut,
+    _env: Env,
+    msg: IbcChannelOpenMsg,
+) -> StdResult<IbcChannelOpenResponse> {
     let channel = msg.channel();
 
     if channel.order != IbcOrder::Ordered {
         return Err(StdError::generic_err("Only supports ordered channels"));
     }
-    if channel.version.as_str() != IBC_VERSION {
-        return Err(StdError::generic_err(format!(
-            "Must set version to `{}`",
-            IBC_VERSION
-        )));
-    }
 
+    // In ibcv3 we don't check the version string passed in the message
+    // and only check the counterparty version.
     if let Some(counter_version) = msg.counterparty_version() {
-        if counter_version != IBC_VERSION {
+        if counter_version != IBC_APP_VERSION {
             return Err(StdError::generic_err(format!(
                 "Counterparty version must be `{}`",
-                IBC_VERSION
+                IBC_APP_VERSION
             )));
         }
     }
 
-    Ok(())
+    // We return the version we need (which could be different than the counterparty version)
+    Ok(Some(Ibc3ChannelOpenResponse {
+        version: IBC_APP_VERSION.to_string(),
+    }))
 }
 
 #[entry_point]
@@ -248,14 +247,14 @@ pub fn ibc_packet_receive(
             PacketMsg::Balances {} => receive_balances(deps, caller),
         }
     })()
-    .or_else(|e| {
-        // we try to capture all app-level errors and convert them into
-        // acknowledgement packets that contain an error code.
-        let acknowledgement = encode_ibc_error(format!("invalid packet: {}", e));
-        Ok(IbcReceiveResponse::new()
-            .set_ack(acknowledgement)
-            .add_event(Event::new("ibc").add_attribute("packet", "receive")))
-    })
+        .or_else(|e| {
+            // we try to capture all app-level errors and convert them into
+            // acknowledgement packets that contain an error code.
+            let acknowledgement = encode_ibc_error(format!("invalid packet: {}", e));
+            Ok(IbcReceiveResponse::new()
+                .set_ack(acknowledgement)
+                .add_event(Event::new("ibc").add_attribute("packet", "receive")))
+        })
 }
 
 // processes PacketMsg::WhoAmI variant
@@ -371,13 +370,14 @@ mod tests {
     fn connect(mut deps: DepsMut, channel_id: &str, account: impl Into<String>) {
         let account: String = account.into();
 
-        let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        let handshake_open =
+            mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
         // first we try to open with a valid handshake
         ibc_channel_open(deps.branch(), mock_env(), handshake_open).unwrap();
 
         // then we connect (with counter-party version set)
         let handshake_connect =
-            mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_VERSION);
+            mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
         let res = ibc_channel_connect(deps.branch(), mock_env(), handshake_connect).unwrap();
         assert_eq!(1, res.messages.len());
         assert_eq!(1, res.events.len());
@@ -390,7 +390,7 @@ mod tests {
         // fake a reply and ensure this works
         let response = Reply {
             id,
-            result: ContractResult::Ok(SubMsgExecutionResponse {
+            result: SubMsgResult::Ok(SubMsgResponse {
                 events: fake_events(&account),
                 data: None,
             }),
@@ -414,14 +414,15 @@ mod tests {
     fn enforce_version_in_handshake() {
         let mut deps = setup();
 
-        let wrong_order = mock_ibc_channel_open_try("channel-12", IbcOrder::Unordered, IBC_VERSION);
+        let wrong_order =
+            mock_ibc_channel_open_try("channel-12", IbcOrder::Unordered, IBC_APP_VERSION);
         ibc_channel_open(deps.as_mut(), mock_env(), wrong_order).unwrap_err();
 
         let wrong_version = mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, "reflect");
         ibc_channel_open(deps.as_mut(), mock_env(), wrong_version).unwrap_err();
 
         let valid_handshake =
-            mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, IBC_VERSION);
+            mock_ibc_channel_open_try("channel-12", IbcOrder::Ordered, IBC_APP_VERSION);
         ibc_channel_open(deps.as_mut(), mock_env(), valid_handshake).unwrap();
     }
 
@@ -431,23 +432,24 @@ mod tests {
         let channel_id = "channel-1234";
 
         // first we try to open with a valid handshake
-        let handshake_open = mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        let handshake_open =
+            mock_ibc_channel_open_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
         ibc_channel_open(deps.as_mut(), mock_env(), handshake_open).unwrap();
 
         // then we connect (with counter-party version set)
         let handshake_connect =
-            mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_VERSION);
+            mock_ibc_channel_connect_ack(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
         let res = ibc_channel_connect(deps.as_mut(), mock_env(), handshake_connect).unwrap();
         // and set up a reflect account
         assert_eq!(1, res.messages.len());
         let id = res.messages[0].id;
         if let CosmosMsg::Wasm(WasmMsg::Instantiate {
-            admin,
-            code_id,
-            msg: _,
-            funds,
-            label,
-        }) = &res.messages[0].msg
+                                   admin,
+                                   code_id,
+                                   msg: _,
+                                   funds,
+                                   label,
+                               }) = &res.messages[0].msg
         {
             assert_eq!(*admin, None);
             assert_eq!(*code_id, REFLECT_ID);
@@ -465,7 +467,7 @@ mod tests {
         // fake a reply and ensure this works
         let response = Reply {
             id,
-            result: ContractResult::Ok(SubMsgExecutionResponse {
+            result: SubMsgResult::Ok(SubMsgResponse {
                 events: fake_events(REFLECT_ADDR),
                 data: None,
             }),
@@ -492,7 +494,7 @@ mod tests {
                 channel_id: channel_id.to_string(),
             },
         )
-        .unwrap();
+            .unwrap();
         let res: AccountResponse = from_slice(&raw).unwrap();
         assert_eq!(res.account.unwrap(), REFLECT_ADDR);
     }
@@ -509,7 +511,7 @@ mod tests {
             to_address: "my-friend".into(),
             amount: coins(123456789, "uatom"),
         }
-        .into()];
+            .into()];
         let ibc_msg = PacketMsg::Dispatch {
             msgs: msgs_to_dispatch.clone(),
         };
@@ -546,10 +548,10 @@ mod tests {
 
         // parse the output, ensuring it matches
         if let CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr,
-            msg,
-            funds,
-        }) = &res.messages[0].msg
+                                   contract_addr,
+                                   msg,
+                                   funds,
+                               }) = &res.messages[0].msg
         {
             assert_eq!(account, contract_addr.as_str());
             assert_eq!(0, funds.len());
@@ -599,14 +601,14 @@ mod tests {
         assert_eq!(funds, balance);
 
         // close the channel
-        let channel = mock_ibc_channel_close_init(channel_id, IbcOrder::Ordered, IBC_VERSION);
+        let channel = mock_ibc_channel_close_init(channel_id, IbcOrder::Ordered, IBC_APP_VERSION);
         let res = ibc_channel_close(deps.as_mut(), mock_env(), channel).unwrap();
 
         // it pulls out all money from the reflect contract
         assert_eq!(1, res.messages.len());
         if let CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr, msg, ..
-        }) = &res.messages[0].msg
+                                   contract_addr, msg, ..
+                               }) = &res.messages[0].msg
         {
             assert_eq!(contract_addr.as_str(), account);
             let reflect: ReflectExecuteMsg = from_slice(msg).unwrap();
@@ -619,7 +621,7 @@ mod tests {
                             to_address: MOCK_CONTRACT_ADDR.into(),
                             amount: funds
                         }
-                        .into()
+                            .into()
                     )
                 }
             }
