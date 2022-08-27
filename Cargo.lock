@@ -1166,7 +1166,7 @@ dependencies = [
  "cosmwasm-storage",
  "cosmwasm-vm",
  "cw-multi-test",
- "cyber-std 0.2.2",
+ "cyber-std 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "schemars",
  "serde",
 ]
