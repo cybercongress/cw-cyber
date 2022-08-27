@@ -3,15 +3,16 @@ use anyhow::{anyhow, Result};
 use assert_matches::assert_matches;
 use cosmwasm_std::{to_binary, Addr, CosmosMsg, Empty, QueryRequest, StdError, WasmMsg, WasmQuery};
 use cw1::Cw1Contract;
-use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
+use cw_multi_test::{AppResponse, BasicApp, Contract, ContractWrapper, custom_app, Executor};
+use cyber_std::CyberMsgWrapper;
 use derivative::Derivative;
 use serde::{de::DeserializeOwned, Serialize};
 
-fn mock_app() -> App {
-    App::default()
+fn mock_app() -> BasicApp<CyberMsgWrapper, Empty> {
+    custom_app::<CyberMsgWrapper, Empty, _>(|_router, _, _storage| {})
 }
 
-fn contract_cw1() -> Box<dyn Contract<Empty>> {
+fn contract_cw1() -> Box<dyn Contract<CyberMsgWrapper>> {
     let contract = ContractWrapper::new(
         crate::contract::execute,
         crate::contract::instantiate,
@@ -25,7 +26,7 @@ fn contract_cw1() -> Box<dyn Contract<Empty>> {
 pub struct Suite {
     /// Application mock
     #[derivative(Debug = "ignore")]
-    app: App,
+    app: BasicApp<CyberMsgWrapper, Empty>,
     /// Special account
     pub owner: String,
     /// ID of stored code for cw1 contract

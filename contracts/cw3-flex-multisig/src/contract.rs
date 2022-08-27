@@ -457,12 +457,12 @@ fn list_voters(
 
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{coin, coins, Addr, BankMsg, Coin, Decimal, Timestamp};
+    use cosmwasm_std::{coin, coins, Addr, BankMsg, Coin, Decimal, Timestamp, Empty};
 
     use cw2::{query_contract_info, ContractVersion};
     use cw4::{Cw4ExecuteMsg, Member};
     use cw4_group::helpers::Cw4GroupContract;
-    use cw_multi_test::{next_block, App, AppBuilder, Contract, ContractWrapper, Executor};
+    use cw_multi_test::{next_block, Contract, ContractWrapper, Executor, BasicApp, custom_app};
     use cw_utils::{Duration, Threshold};
 
     use super::*;
@@ -482,7 +482,7 @@ mod tests {
         }
     }
 
-    pub fn contract_flex() -> Box<dyn Contract<Empty>> {
+    pub fn contract_flex() -> Box<dyn Contract<CyberMsgWrapper>> {
         let contract = ContractWrapper::new(
             crate::contract::execute,
             crate::contract::instantiate,
@@ -491,8 +491,8 @@ mod tests {
         Box::new(contract)
     }
 
-    pub fn contract_group() -> Box<dyn Contract<Empty>> {
-        let contract = ContractWrapper::new(
+    pub fn contract_group() -> Box<dyn Contract<CyberMsgWrapper>> {
+        let contract = ContractWrapper::new_with_empty(
             cw4_group::contract::execute,
             cw4_group::contract::instantiate,
             cw4_group::contract::query,
@@ -500,8 +500,8 @@ mod tests {
         Box::new(contract)
     }
 
-    fn mock_app(init_funds: &[Coin]) -> App {
-        AppBuilder::new().build(|router, _, storage| {
+    fn mock_app(init_funds: &[Coin]) -> BasicApp<CyberMsgWrapper, Empty> {
+        custom_app::<CyberMsgWrapper, Empty, _>(|router, _, storage| {
             router
                 .bank
                 .init_balance(storage, &Addr::unchecked(OWNER), init_funds.to_vec())
@@ -510,7 +510,7 @@ mod tests {
     }
 
     // uploads code and returns address of group contract
-    fn instantiate_group(app: &mut App, members: Vec<Member>) -> Addr {
+    fn instantiate_group(app: &mut BasicApp<CyberMsgWrapper, Empty>, members: Vec<Member>) -> Addr {
         let group_id = app.store_code(contract_group());
         let msg = cw4_group::msg::InstantiateMsg {
             admin: Some(OWNER.into()),
@@ -522,7 +522,7 @@ mod tests {
 
     #[track_caller]
     fn instantiate_flex(
-        app: &mut App,
+        app: &mut BasicApp<CyberMsgWrapper, Empty>,
         group: Addr,
         threshold: Threshold,
         max_voting_period: Duration,
@@ -544,7 +544,7 @@ mod tests {
     // Returns (multisig address, group address).
     #[track_caller]
     fn setup_test_case_fixed(
-        app: &mut App,
+        app: &mut BasicApp<CyberMsgWrapper, Empty>,
         weight_needed: u64,
         max_voting_period: Duration,
         init_funds: Vec<Coin>,
@@ -564,7 +564,7 @@ mod tests {
 
     #[track_caller]
     fn setup_test_case(
-        app: &mut App,
+        app: &mut BasicApp<CyberMsgWrapper, Empty>,
         threshold: Threshold,
         max_voting_period: Duration,
         init_funds: Vec<Coin>,
@@ -616,7 +616,7 @@ mod tests {
         (flex_addr, group_addr)
     }
 
-    fn proposal_info() -> (Vec<CosmosMsg<Empty>>, String, String) {
+    fn proposal_info() -> (Vec<CosmosMsg<CyberMsgWrapper>>, String, String) {
         let bank_msg = BankMsg::Send {
             to_address: SOMEBODY.into(),
             amount: coins(1, "BTC"),
@@ -627,7 +627,7 @@ mod tests {
         (msgs, title, description)
     }
 
-    fn pay_somebody_proposal() -> ExecuteMsg {
+    fn pay_somebody_proposal() -> ExecuteMsg<CyberMsgWrapper> {
         let (msgs, title, description) = proposal_info();
         ExecuteMsg::Propose {
             title,
@@ -761,10 +761,10 @@ mod tests {
 
         // Wrong expiration option fails
         let msgs = match proposal.clone() {
-            ExecuteMsg::Propose { msgs, .. } => msgs,
+            ExecuteMsg::<CyberMsgWrapper>::Propose { msgs, .. } => msgs,
             _ => panic!("Wrong variant"),
         };
-        let proposal_wrong_exp = ExecuteMsg::Propose {
+        let proposal_wrong_exp = ExecuteMsg::<CyberMsgWrapper>::Propose {
             title: "Rewarding somebody".to_string(),
             description: "Do we reward her?".to_string(),
             msgs,
@@ -809,7 +809,7 @@ mod tests {
         );
     }
 
-    fn get_tally(app: &App, flex_addr: &str, proposal_id: u64) -> u64 {
+    fn get_tally(app: &BasicApp<CyberMsgWrapper, Empty>, flex_addr: &str, proposal_id: u64) -> u64 {
         // Get all the voters on the proposal
         let voters = QueryMsg::ListVotes {
             proposal_id,
@@ -892,7 +892,7 @@ mod tests {
             start_after: None,
             limit: None,
         };
-        let res: ProposalListResponse = app
+        let res: ProposalListResponse<CyberMsgWrapper> = app
             .wrap()
             .query_wasm_smart(&flex_addr, &list_query)
             .unwrap();
@@ -920,7 +920,7 @@ mod tests {
             start_before: None,
             limit: Some(1),
         };
-        let res: ProposalListResponse = app
+        let res: ProposalListResponse<CyberMsgWrapper> = app
             .wrap()
             .query_wasm_smart(&flex_addr, &list_query)
             .unwrap();
@@ -966,7 +966,7 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Owner with 0 voting power cannot vote
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1007,7 +1007,7 @@ mod tests {
         assert_eq!(tally, 1);
 
         // Cast a No vote
-        let no_vote = ExecuteMsg::Vote {
+        let no_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::No,
         };
@@ -1016,7 +1016,7 @@ mod tests {
             .unwrap();
 
         // Cast a Veto vote
-        let veto_vote = ExecuteMsg::Vote {
+        let veto_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Veto,
         };
@@ -1120,7 +1120,7 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Cast a No vote
-        let no_vote = ExecuteMsg::Vote {
+        let no_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::No,
         };
@@ -1144,7 +1144,7 @@ mod tests {
         );
 
         // Rejected proposals can still be voted (while they are not expired)
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1190,7 +1190,7 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Only Passed can be executed
-        let execution = ExecuteMsg::Execute { proposal_id };
+        let execution = ExecuteMsg::<CyberMsgWrapper>::Execute { proposal_id };
         let err = app
             .execute_contract(Addr::unchecked(OWNER), flex_addr.clone(), &execution, &[])
             .unwrap_err();
@@ -1200,7 +1200,7 @@ mod tests {
         );
 
         // Vote it, so it passes
-        let vote = ExecuteMsg::Vote {
+        let vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1218,7 +1218,7 @@ mod tests {
         );
 
         // In passing: Try to close Passed fails
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::<CyberMsgWrapper>::Close { proposal_id };
         let err = app
             .execute_contract(Addr::unchecked(OWNER), flex_addr.clone(), &closing, &[])
             .unwrap_err();
@@ -1293,14 +1293,14 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Vote it, so it passes
-        let vote = ExecuteMsg::Vote {
+        let vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
         app.execute_contract(Addr::unchecked(VOTER4), flex_addr.clone(), &vote, &[])
             .unwrap();
 
-        let execution = ExecuteMsg::Execute { proposal_id };
+        let execution = ExecuteMsg::<CyberMsgWrapper>::Execute { proposal_id };
         let err = app
             .execute_contract(
                 Addr::unchecked(Addr::unchecked("anyone")), // anyone is not allowed to execute
@@ -1349,14 +1349,14 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Vote it, so it passes
-        let vote = ExecuteMsg::Vote {
+        let vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
         app.execute_contract(Addr::unchecked(VOTER4), flex_addr.clone(), &vote, &[])
             .unwrap();
 
-        let execution = ExecuteMsg::Execute { proposal_id };
+        let execution = ExecuteMsg::<CyberMsgWrapper>::Execute { proposal_id };
         let err = app
             .execute_contract(
                 Addr::unchecked(Addr::unchecked("anyone")), // anyone is not allowed to execute
@@ -1419,7 +1419,7 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Vote it, so it passes after voting period is over
-        let vote = ExecuteMsg::Vote {
+        let vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1454,7 +1454,7 @@ mod tests {
             .execute_contract(
                 Addr::unchecked(SOMEBODY),
                 flex_addr.clone(),
-                &ExecuteMsg::Close { proposal_id },
+                &ExecuteMsg::<CyberMsgWrapper>::Close { proposal_id },
                 &[],
             )
             .unwrap_err();
@@ -1465,7 +1465,7 @@ mod tests {
             .execute_contract(
                 Addr::unchecked(SOMEBODY),
                 flex_addr,
-                &ExecuteMsg::Execute { proposal_id },
+                &ExecuteMsg::<CyberMsgWrapper>::Execute { proposal_id },
                 &[],
             )
             .unwrap();
@@ -1502,7 +1502,7 @@ mod tests {
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // Non-expired proposals cannot be closed
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::<CyberMsgWrapper>::Close { proposal_id };
         let err = app
             .execute_contract(Addr::unchecked(SOMEBODY), flex_addr.clone(), &closing, &[])
             .unwrap_err();
@@ -1523,7 +1523,7 @@ mod tests {
         );
 
         // Trying to close it again fails
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::<CyberMsgWrapper>::Close { proposal_id };
         let err = app
             .execute_contract(Addr::unchecked(SOMEBODY), flex_addr, &closing, &[])
             .unwrap_err();
@@ -1551,7 +1551,7 @@ mod tests {
             .unwrap();
         // Get the proposal id from the logs
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
-        let prop_status = |app: &App, proposal_id: u64| -> Status {
+        let prop_status = |app: &BasicApp<CyberMsgWrapper, Empty>, proposal_id: u64| -> Status {
             let query_prop = QueryMsg::Proposal { proposal_id };
             let prop: ProposalResponse = app
                 .wrap()
@@ -1615,7 +1615,7 @@ mod tests {
         let proposal_id2: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
 
         // VOTER2 can pass this alone with the updated vote (newer height ignores snapshot)
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id: proposal_id2,
             vote: Vote::Yes,
         };
@@ -1624,7 +1624,7 @@ mod tests {
         assert_eq!(prop_status(&app, proposal_id2), Status::Passed);
 
         // VOTER2 can only vote on first proposal with weight of 2 (not enough to pass)
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1709,7 +1709,7 @@ mod tests {
         assert_ne!(cash_proposal_id, update_proposal_id);
 
         // query proposal state
-        let prop_status = |app: &App, proposal_id: u64| -> Status {
+        let prop_status = |app: &BasicApp<CyberMsgWrapper, Empty>, proposal_id: u64| -> Status {
             let query_prop = QueryMsg::Proposal { proposal_id };
             let prop: ProposalResponse = app
                 .wrap()
@@ -1724,13 +1724,13 @@ mod tests {
         app.update_block(|b| b.height += 1);
 
         // Pass and execute first proposal
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id: update_proposal_id,
             vote: Vote::Yes,
         };
         app.execute_contract(Addr::unchecked(VOTER4), flex_addr.clone(), &yes_vote, &[])
             .unwrap();
-        let execution = ExecuteMsg::Execute {
+        let execution = ExecuteMsg::<CyberMsgWrapper>::Execute {
             proposal_id: update_proposal_id,
         };
         app.execute_contract(Addr::unchecked(VOTER4), flex_addr.clone(), &execution, &[])
@@ -1745,7 +1745,7 @@ mod tests {
 
         // VOTER3 can still pass the cash proposal
         // voting on it fails
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id: cash_proposal_id,
             vote: Vote::Yes,
         };
@@ -1766,7 +1766,7 @@ mod tests {
         assert_eq!(ContractError::Unauthorized {}, err.downcast().unwrap());
 
         // extra: ensure no one else can call the hook
-        let hook_hack = ExecuteMsg::MemberChangedHook(MemberChangedHookMsg {
+        let hook_hack = ExecuteMsg::<CyberMsgWrapper>::MemberChangedHook(MemberChangedHookMsg {
             diffs: vec![MemberDiff::new(VOTER1, Some(1), None)],
         });
         let err = app
@@ -1797,7 +1797,7 @@ mod tests {
             .unwrap();
         // Get the proposal id from the logs
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
-        let prop_status = |app: &App| -> Status {
+        let prop_status = |app: &BasicApp<CyberMsgWrapper, Empty>| -> Status {
             let query_prop = QueryMsg::Proposal { proposal_id };
             let prop: ProposalResponse = app
                 .wrap()
@@ -1826,7 +1826,7 @@ mod tests {
 
         // VOTER2 votes according to original weights: 3 + 2 = 5 / 12 => Open
         // with updated weights, it would be 3 + 9 = 12 / 12 => Passed
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1881,7 +1881,7 @@ mod tests {
             .unwrap();
         // Get the proposal id from the logs
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
-        let prop_status = |app: &App| -> Status {
+        let prop_status = |app: &BasicApp<CyberMsgWrapper, Empty>| -> Status {
             let query_prop = QueryMsg::Proposal { proposal_id };
             let prop: ProposalResponse = app
                 .wrap()
@@ -1910,7 +1910,7 @@ mod tests {
 
         // VOTER2 votes yes, according to original weights: 3 yes, 2 no, 5 total (will fail when expired)
         // with updated weights, it would be 3 yes, 9 yes, 11 total (will pass when expired)
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1952,7 +1952,7 @@ mod tests {
             .unwrap();
         // Get the proposal id from the logs
         let proposal_id: u64 = res.custom_attrs(1)[2].value.parse().unwrap();
-        let prop_status = |app: &App| -> Status {
+        let prop_status = |app: &BasicApp<CyberMsgWrapper, Empty>| -> Status {
             let query_prop = QueryMsg::Proposal { proposal_id };
             let prop: ProposalResponse = app
                 .wrap()
@@ -1964,7 +1964,7 @@ mod tests {
         app.update_block(|block| block.height += 3);
 
         // reach 60% of yes votes, not enough to pass early (or late)
-        let yes_vote = ExecuteMsg::Vote {
+        let yes_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::Yes,
         };
@@ -1974,7 +1974,7 @@ mod tests {
         assert_eq!(prop_status(&app), Status::Open);
 
         // add 3 weight no vote and we hit quorum and this passes
-        let no_vote = ExecuteMsg::Vote {
+        let no_vote = ExecuteMsg::<CyberMsgWrapper>::Vote {
             proposal_id,
             vote: Vote::No,
         };

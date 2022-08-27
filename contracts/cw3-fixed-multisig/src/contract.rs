@@ -1066,7 +1066,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             res.attributes,
-            Response::<Empty>::new()
+            Response::new()
                 .add_attribute("action", "execute")
                 .add_attribute("sender", SOMEBODY)
                 .add_attribute("proposal_id", proposal_id.to_string())

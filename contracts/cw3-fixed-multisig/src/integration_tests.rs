@@ -4,23 +4,24 @@ use cosmwasm_std::{to_binary, Addr, Empty, Uint128, WasmMsg};
 use cw20::{BalanceResponse, MinterResponse};
 use cw20_base::msg::QueryMsg;
 use cw3::Vote;
-use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+use cw_multi_test::{BasicApp, Contract, ContractWrapper, Executor, custom_app};
 use cw_utils::{Duration, Threshold};
+use cyber_std::CyberMsgWrapper;
 
 use crate::contract::{execute, instantiate, query};
 use crate::msg::{ExecuteMsg, InstantiateMsg, Voter};
 
-fn mock_app() -> App {
-    App::default()
+fn mock_app() -> BasicApp<CyberMsgWrapper, Empty> {
+    custom_app::<CyberMsgWrapper, Empty, _>(|_router, _, _storage| {})
 }
 
-pub fn contract_cw3_fixed_multisig() -> Box<dyn Contract<Empty>> {
+pub fn contract_cw3_fixed_multisig() -> Box<dyn Contract<CyberMsgWrapper, Empty>> {
     let contract = ContractWrapper::new(execute, instantiate, query);
     Box::new(contract)
 }
 
-pub fn contract_cw20() -> Box<dyn Contract<Empty>> {
-    let contract = ContractWrapper::new(
+pub fn contract_cw20() -> Box<dyn Contract<CyberMsgWrapper, Empty>> {
+    let contract = ContractWrapper::new_with_empty(
         cw20_base::contract::execute,
         cw20_base::contract::instantiate,
         cw20_base::contract::query,
@@ -107,7 +108,7 @@ fn cw3_controls_cw20() {
         msg: to_binary(&cw20_mint_msg).unwrap(),
         funds: vec![],
     };
-    let propose_msg = ExecuteMsg::Propose {
+    let propose_msg = ExecuteMsg::<CyberMsgWrapper>::Propose {
         title: "Mint tokens".to_string(),
         description: "Need to mint tokens".to_string(),
         msgs: vec![execute_mint_msg.into()],
@@ -119,7 +120,7 @@ fn cw3_controls_cw20() {
         .unwrap();
 
     // second votes
-    let vote2_msg = ExecuteMsg::Vote {
+    let vote2_msg = ExecuteMsg::<CyberMsgWrapper>::Vote {
         proposal_id: 1,
         vote: Vote::Yes,
     };
@@ -128,7 +129,7 @@ fn cw3_controls_cw20() {
         .unwrap();
 
     // only 1 vote and msg mint fails
-    let execute_proposal_msg = ExecuteMsg::Execute { proposal_id: 1 };
+    let execute_proposal_msg = ExecuteMsg::<CyberMsgWrapper>::Execute { proposal_id: 1 };
     // execute mint
     router
         .execute_contract(addr1, multisig_addr, &execute_proposal_msg, &[])
