@@ -1,0 +1,32 @@
+[package]
+name = "ibc-reflect"
+version = "0.0.0"
+authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
+edition = "2018"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# Change this to [] if you don't need Windows support and want faster integration tests.
+default = ["cranelift"]
+# Use cranelift backend instead of singlepass. This is required for development on Windows.
+cranelift = ["cosmwasm-vm/cranelift"]
+# for quicker tests, cargo test --lib
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces", "cosmwasm-vm/backtraces"]
+
+[dependencies]
+cosmwasm-std = { version = "1.0.0-beta", features = ["iterator", "staking", "stargate"] }
+cosmwasm-storage = { version = "1.0.0-beta", features = ["iterator"] }
+schemars = "0.8.1"
+serde = { version = "1.0.125", default-features = false, features = ["derive"] }
+cyber-std = { path = "../../packages/cyber-std"}
+
+[dev-dependencies]
+cosmwasm-vm = { version = "1.0.0-beta", default-features = false, features = ["iterator", "stargate"] }
+cosmwasm-schema = { version = "1.0.0-beta" }
+cw-multi-test = { version = "0.14.0" }
