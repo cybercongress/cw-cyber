@@ -1,6 +1,6 @@
 [package]
 name = "cyber-std"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["CyberHead"]
 edition = "2018"
 description = "Bindings for CustomMsg and CustomQuery for the Cyber"
@@ -13,7 +13,7 @@ readme = "README.md"
 [dependencies]
 cosmwasm-std = { version = "1.0.0", features = ["iterator"] }
 schemars = "0.8.1"
-cw721 = { version = "0.13.2" }
+cw721 = { version = "0.13.4" }
 cid = { version = "0.8.0" }
 serde = { version = "1.0.127", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.21" }

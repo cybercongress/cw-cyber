@@ -15,5 +15,6 @@ target/
 # Auto-gen
 .cargo-ok
 
+artifacts
 packages/*/schema
 contracts/*/schema
