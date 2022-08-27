@@ -12,11 +12,11 @@ use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg, SudoMsg};
 use crate::state::{AdminList, ADMIN_LIST};
 
+type Response = cosmwasm_std::Response<CyberMsgWrapper>;
+
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
-type Response = cosmwasm_std::Response<CyberMsgWrapper>;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(

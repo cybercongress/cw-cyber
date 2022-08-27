@@ -362,6 +362,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw1-subkeys"
+version = "0.14.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils 0.14.0",
+ "cw1",
+ "cw1-whitelist",
+ "cw2",
+ "cyber-std 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "schemars",
+ "semver",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "cw1-whitelist"
 version = "0.14.0"
 dependencies = [
