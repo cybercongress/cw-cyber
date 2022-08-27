@@ -1,9 +1,9 @@
+use std::fmt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use std::fmt;
 
 use cosmwasm_std::{CosmosMsg, Empty};
-use cw3::Vote;
+use cw3::{ProposalResponse, Vote};
 use cw_utils::{Duration, Expiration, Threshold};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -44,17 +44,6 @@ pub enum ExecuteMsg<T = Empty>
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum SudoMsg<T = Empty>
-    where
-        T: Clone + fmt::Debug + PartialEq + JsonSchema,
-{
-    Execute {
-        msgs: Vec<CosmosMsg<T>>,
-    }
-}
-
 // We can also add this as a cw3 extension
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -88,4 +77,24 @@ pub enum QueryMsg {
         start_after: Option<String>,
         limit: Option<u32>,
     },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SudoMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    }
+}
+
+// TODO bring PR with ProposalListResponse to cw-plus
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct ProposalListResponse<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema
+{
+    pub proposals: Vec<ProposalResponse<T>>,
 }

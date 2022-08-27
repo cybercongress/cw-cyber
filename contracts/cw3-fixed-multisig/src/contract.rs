@@ -1,10 +1,9 @@
 use std::cmp::Ordering;
-use std::fmt;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, BlockInfo, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Order,
+    to_binary, Binary, BlockInfo, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Order,
     StdResult,
 };
 
@@ -15,13 +14,10 @@ use cw3::{
 };
 use cw_storage_plus::Bound;
 use cw_utils::{Expiration, ThresholdResponse};
-use schemars::JsonSchema;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, ProposalListResponse, QueryMsg, SudoMsg};
 use crate::state::{next_id, Ballot, Config, Proposal, Votes, BALLOTS, CONFIG, PROPOSALS, VOTERS};
-
-use serde::{Deserialize, Serialize};
 
 use cyber_std::CyberMsgWrapper;
 type Response = cosmwasm_std::Response<CyberMsgWrapper>;
@@ -79,6 +75,26 @@ pub fn execute(
         ExecuteMsg::Execute { proposal_id } => execute_execute(deps, env, info, proposal_id),
         ExecuteMsg::Close { proposal_id } => execute_close(deps, env, info, proposal_id),
     }
+}
+
+#[cfg_attr(all(feature = "dmn", not(feature = "library")), entry_point)]
+pub fn sudo(
+    _deps: DepsMut,
+    _env: Env,
+    msg: SudoMsg<CyberMsgWrapper>
+) -> Result<Response, ContractError> {
+    match msg {
+        SudoMsg::Execute { msgs } => execute_execute_sudo(msgs),
+    }
+}
+
+pub fn execute_execute_sudo(
+    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
+) -> Result<Response, ContractError> {
+    Ok(Response::new()
+        .add_attribute("action", "dmn")
+        .add_messages(msgs)
+    )
 }
 
 pub fn execute_propose(
@@ -154,9 +170,11 @@ pub fn execute_vote(
 
     // ensure proposal exists and can be voted on
     let mut prop = PROPOSALS.load(deps.storage, proposal_id)?;
-    if prop.status != Status::Open {
+    // Allow voting on Passed and Rejected proposals too,
+    if ![Status::Open, Status::Passed, Status::Rejected].contains(&prop.status) {
         return Err(ContractError::NotOpen {});
     }
+    // if they are not expired
     if prop.expires.is_expired(&env.block) {
         return Err(ContractError::Expired {});
     }
@@ -184,7 +202,7 @@ pub fn execute_vote(
 
 pub fn execute_execute(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     proposal_id: u64,
 ) -> Result<Response, ContractError> {
@@ -193,6 +211,7 @@ pub fn execute_execute(
     let mut prop = PROPOSALS.load(deps.storage, proposal_id)?;
     // we allow execution even after the proposal "expiration" as long as all vote come in before
     // that point. If it was approved on time, it can be executed any time.
+    prop.update_status(&env.block);
     if prop.status != Status::Passed {
         return Err(ContractError::WrongExecuteStatus {});
     }
@@ -218,10 +237,11 @@ pub fn execute_close(
     // anyone can trigger this if the vote passed
 
     let mut prop = PROPOSALS.load(deps.storage, proposal_id)?;
-    if [Status::Executed, Status::Rejected, Status::Passed]
-        .iter()
-        .any(|x| *x == prop.status)
-    {
+    if [Status::Executed, Status::Rejected, Status::Passed].contains(&prop.status) {
+        return Err(ContractError::WrongCloseStatus {});
+    }
+    // Avoid closing of Passed due to expiration proposals
+    if prop.current_status(&env.block) == Status::Passed {
         return Err(ContractError::WrongCloseStatus {});
     }
     if !prop.expires.is_expired(&env.block) {
@@ -294,7 +314,7 @@ fn list_proposals(
     limit: Option<u32>,
 ) -> StdResult<ProposalListResponse<CyberMsgWrapper>> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
-    let start = start_after.map(Bound::exclusive_int);
+    let start = start_after.map(Bound::exclusive);
     let proposals = PROPOSALS
         .range(deps.storage, start, None, Order::Ascending)
         .take(limit)
@@ -311,7 +331,7 @@ fn reverse_proposals(
     limit: Option<u32>,
 ) -> StdResult<ProposalListResponse<CyberMsgWrapper>> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
-    let end = start_before.map(Bound::exclusive_int);
+    let end = start_before.map(Bound::exclusive);
     let props: StdResult<Vec<_>> = PROPOSALS
         .range(deps.storage, None, end, Order::Descending)
         .take(limit)
@@ -319,13 +339,6 @@ fn reverse_proposals(
         .collect();
 
     Ok(ProposalListResponse { proposals: props? })
-}
-
-#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
-pub struct ProposalListResponse<T = Empty>
-where
-    T: Clone + fmt::Debug + PartialEq + JsonSchema {
-    pub proposals: Vec<ProposalResponse<T>>,
 }
 
 fn map_proposal(
@@ -351,6 +364,7 @@ fn query_vote(deps: Deps, proposal_id: u64, voter: String) -> StdResult<VoteResp
     let voter = deps.api.addr_validate(&voter)?;
     let ballot = BALLOTS.may_load(deps.storage, (proposal_id, &voter))?;
     let vote = ballot.map(|b| VoteInfo {
+        proposal_id,
         voter: voter.into(),
         vote: b.vote,
         weight: b.weight,
@@ -365,7 +379,7 @@ fn list_votes(
     limit: Option<u32>,
 ) -> StdResult<VoteListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
-    let start = start_after.map(Bound::exclusive);
+    let start = start_after.map(|s| Bound::ExclusiveRaw(s.into()));
 
     let votes = BALLOTS
         .prefix(proposal_id)
@@ -373,6 +387,7 @@ fn list_votes(
         .take(limit)
         .map(|item| {
             item.map(|(addr, ballot)| VoteInfo {
+                proposal_id,
                 voter: addr.into(),
                 vote: ballot.vote,
                 weight: ballot.weight,
@@ -395,7 +410,7 @@ fn list_voters(
     limit: Option<u32>,
 ) -> StdResult<VoterListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
-    let start = start_after.map(Bound::exclusive);
+    let start = start_after.map(|s| Bound::ExclusiveRaw(s.into()));
 
     let voters = VOTERS
         .range(deps.storage, start, None, Order::Ascending)
@@ -441,6 +456,7 @@ mod tests {
     const VOTER3: &str = "voter0003";
     const VOTER4: &str = "voter0004";
     const VOTER5: &str = "voter0005";
+    const VOTER6: &str = "voter0006";
     const NOWEIGHT_VOTER: &str = "voterxxxx";
     const SOMEBODY: &str = "somebody";
 
@@ -467,6 +483,7 @@ mod tests {
             voter(VOTER3, 3),
             voter(VOTER4, 4),
             voter(VOTER5, 5),
+            voter(VOTER6, 1),
             voter(NOWEIGHT_VOTER, 0),
         ];
 
@@ -518,7 +535,7 @@ mod tests {
             info.clone(),
             instantiate_msg.clone(),
         )
-        .unwrap_err();
+            .unwrap_err();
         assert_eq!(err, ContractError::NoVoters {});
 
         // Zero required weight fails
@@ -772,10 +789,121 @@ mod tests {
                 .add_attribute("status", "Passed")
         );
 
-        // non-Open proposals cannot be voted
+        // Passed proposals can still be voted (while they are not expired or executed)
         let info = mock_info(VOTER5, &[]);
-        let err = execute(deps.as_mut(), mock_env(), info, yes_vote).unwrap_err();
-        assert_eq!(err, ContractError::NotOpen {});
+        let res = execute(deps.as_mut(), mock_env(), info, yes_vote).unwrap();
+
+        // Verify
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER5)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Passed")
+        );
+
+        // Propose
+        let info = mock_info(OWNER, &[]);
+        let bank_msg = BankMsg::Send {
+            to_address: SOMEBODY.into(),
+            amount: vec![coin(1, "BTC")],
+        };
+        let msgs = vec![CosmosMsg::Bank(bank_msg)];
+        let proposal = ExecuteMsg::Propose {
+            title: "Pay somebody".to_string(),
+            description: "Do I pay her?".to_string(),
+            msgs,
+            latest: None,
+        };
+        let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
+
+        // Get the proposal id from the logs
+        let proposal_id: u64 = res.attributes[2].value.parse().unwrap();
+
+        // Cast a No vote
+        let no_vote = ExecuteMsg::Vote {
+            proposal_id,
+            vote: Vote::No,
+        };
+        // Voter1 vote no, weight 1
+        let info = mock_info(VOTER1, &[]);
+        let res = execute(deps.as_mut(), mock_env(), info, no_vote.clone()).unwrap();
+
+        // Verify it is not enough to reject yet
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER1)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Open")
+        );
+
+        // Voter 4 votes no, weight 4, total weight for no so far 5, need 14 to reject
+        let info = mock_info(VOTER4, &[]);
+        let res = execute(deps.as_mut(), mock_env(), info, no_vote.clone()).unwrap();
+
+        // Verify it is still open as we actually need no votes > 17 - 3
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER4)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Open")
+        );
+
+        // Voter 3 votes no, weight 3, total weight for no far 8, need 14
+        let info = mock_info(VOTER3, &[]);
+        let _res = execute(deps.as_mut(), mock_env(), info, no_vote.clone()).unwrap();
+
+        // Voter 5 votes no, weight 5, total weight for no far 13, need 14
+        let info = mock_info(VOTER5, &[]);
+        let res = execute(deps.as_mut(), mock_env(), info, no_vote.clone()).unwrap();
+
+        // Verify it is still open as we actually need no votes > 17 - 3
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER5)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Open")
+        );
+
+        // Voter 2 votes no, weight 2, total weight for no so far 15, need 14.
+        // Can now reject
+        let info = mock_info(VOTER2, &[]);
+        let res = execute(deps.as_mut(), mock_env(), info, no_vote).unwrap();
+
+        // Verify it is rejected as, 15 no votes > 17 - 3
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER2)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Rejected")
+        );
+
+        // Rejected proposals can still be voted (while they are not expired)
+        let info = mock_info(VOTER6, &[]);
+        let yes_vote = ExecuteMsg::Vote {
+            proposal_id,
+            vote: Vote::Yes,
+        };
+        let res = execute(deps.as_mut(), mock_env(), info, yes_vote).unwrap();
+
+        // Verify
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER6)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Rejected")
+        );
     }
 
     #[test]
@@ -854,6 +982,99 @@ mod tests {
     }
 
     #[test]
+    fn proposal_pass_on_expiration() {
+        let mut deps = mock_dependencies();
+
+        let threshold = Threshold::ThresholdQuorum {
+            threshold: Decimal::percent(51),
+            quorum: Decimal::percent(1),
+        };
+        let voting_period = Duration::Time(2000000);
+
+        let info = mock_info(OWNER, &[]);
+        setup_test_case(deps.as_mut(), info.clone(), threshold, voting_period).unwrap();
+
+        // Propose
+        let bank_msg = BankMsg::Send {
+            to_address: SOMEBODY.into(),
+            amount: vec![coin(1, "BTC")],
+        };
+        let msgs = vec![CosmosMsg::Bank(bank_msg)];
+        let proposal = ExecuteMsg::Propose {
+            title: "Pay somebody".to_string(),
+            description: "Do I pay her?".to_string(),
+            msgs,
+            latest: None,
+        };
+        let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
+
+        // Get the proposal id from the logs
+        let proposal_id: u64 = res.attributes[2].value.parse().unwrap();
+
+        // Vote it, so it passes after voting period is over
+        let vote = ExecuteMsg::Vote {
+            proposal_id,
+            vote: Vote::Yes,
+        };
+        let info = mock_info(VOTER3, &[]);
+        let res = execute(deps.as_mut(), mock_env(), info, vote).unwrap();
+        assert_eq!(
+            res,
+            Response::new()
+                .add_attribute("action", "vote")
+                .add_attribute("sender", VOTER3)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .add_attribute("status", "Open")
+        );
+
+        // Wait until the voting period is over
+        let env = match voting_period {
+            Duration::Time(duration) => mock_env_time(duration + 1),
+            Duration::Height(duration) => mock_env_height(duration + 1),
+        };
+
+        // Proposal should now be passed
+        let prop: ProposalResponse = from_binary(
+            &query(
+                deps.as_ref(),
+                env.clone(),
+                QueryMsg::Proposal { proposal_id },
+            )
+                .unwrap(),
+        )
+            .unwrap();
+        assert_eq!(prop.status, Status::Passed);
+
+        // Closing should NOT be possible
+        let info = mock_info(SOMEBODY, &[]);
+        let err = execute(
+            deps.as_mut(),
+            env.clone(),
+            info.clone(),
+            ExecuteMsg::Close { proposal_id },
+        )
+            .unwrap_err();
+        assert_eq!(err, ContractError::WrongCloseStatus {});
+
+        // Execution should now be possible
+        let res = execute(
+            deps.as_mut(),
+            env,
+            info,
+            ExecuteMsg::Execute { proposal_id },
+        )
+            .unwrap();
+        assert_eq!(
+            res.attributes,
+            Response::<Empty>::new()
+                .add_attribute("action", "execute")
+                .add_attribute("sender", SOMEBODY)
+                .add_attribute("proposal_id", proposal_id.to_string())
+                .attributes
+        )
+    }
+
+    #[test]
     fn test_close_works() {
         let mut deps = mock_dependencies();
 
@@ -913,7 +1134,7 @@ mod tests {
             mock_info(SOMEBODY, &[]),
             closing.clone(),
         )
-        .unwrap();
+            .unwrap();
 
         // Verify
         assert_eq!(

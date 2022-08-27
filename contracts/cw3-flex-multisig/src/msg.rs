@@ -3,9 +3,11 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{CosmosMsg, Empty};
-use cw3::Vote;
+use cw3::{ProposalResponse, Vote};
 use cw4::MemberChangedHookMsg;
 use cw_utils::{Duration, Expiration, Threshold};
+
+use crate::state::Executor;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct InstantiateMsg {
@@ -13,8 +15,12 @@ pub struct InstantiateMsg {
     pub group_addr: String,
     pub threshold: Threshold,
     pub max_voting_period: Duration,
+    // who is able to execute passed proposals
+    // None means that anyone can execute
+    pub executor: Option<Executor>,
 }
 
+// TODO: add some T variants? Maybe good enough as fixed Empty for now
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg<T = Empty>
@@ -40,17 +46,6 @@ pub enum ExecuteMsg<T = Empty>
     },
     /// Handles update hook messages from the group contract
     MemberChangedHook(MemberChangedHookMsg),
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum SudoMsg<T = Empty>
-    where
-        T: Clone + fmt::Debug + PartialEq + JsonSchema,
-{
-    Execute {
-        msgs: Vec<CosmosMsg<T>>,
-    }
 }
 
 // We can also add this as a cw3 extension
@@ -86,4 +81,24 @@ pub enum QueryMsg {
         start_after: Option<String>,
         limit: Option<u32>,
     },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SudoMsg<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
+{
+    Execute {
+        msgs: Vec<CosmosMsg<T>>,
+    }
+}
+
+// TODO bring PR with ProposalListResponse to cw-plus
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct ProposalListResponse<T = Empty>
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema
+{
+    pub proposals: Vec<ProposalResponse<T>>,
 }

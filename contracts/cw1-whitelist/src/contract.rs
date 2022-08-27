@@ -54,7 +54,7 @@ pub fn execute(
     }
 }
 
-#[cfg_attr(not(feature = "library"), entry_point)]
+#[cfg_attr(all(feature = "dmn", not(feature = "library")), entry_point)]
 pub fn sudo(
     _deps: DepsMut,
     _env: Env,
@@ -63,6 +63,15 @@ pub fn sudo(
     match msg {
         SudoMsg::Execute { msgs } => execute_execute_sudo(msgs),
     }
+}
+
+pub fn execute_execute_sudo(
+    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
+) -> Result<Response, ContractError> {
+    Ok(Response::new()
+        .add_attribute("action", "dmn")
+        .add_messages(msgs)
+    )
 }
 
 pub fn execute_execute(
@@ -79,15 +88,6 @@ pub fn execute_execute(
         }
     }
     Ok(res)
-}
-
-pub fn execute_execute_sudo(
-    msgs: Vec<CosmosMsg<CyberMsgWrapper>>,
-) -> Result<Response, ContractError> {
-    Ok(Response::new()
-        .add_attribute("action", "sudo")
-        .add_messages(msgs)
-    )
 }
 
 pub fn execute_freeze(
