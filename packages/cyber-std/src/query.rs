@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CustomQuery, Coin};
+use cosmwasm_std::{CustomQuery, Coin, Decimal};
 use crate::route::CyberRoute;
 use crate::msg::{Trigger, Load, Route};
 
@@ -28,7 +28,7 @@ pub enum CyberQuery {
         program: String,
         name: String,
     },
-    LowestFee {},
+    ThoughtLowestFee {},
     SourceRoutes {
         source: String,
     },
@@ -47,7 +47,22 @@ pub enum CyberQuery {
     BandwidthTotal {},
     NeuronBandwidth {
         neuron: String,
-    }
+    },
+    PoolParams {
+        pool_id: u64,
+    },
+    PoolLiquidity {
+        pool_id: u64,
+    },
+    PoolSupply {
+        pool_id: u64,
+    },
+    PoolPrice {
+        pool_id: u64,
+    },
+    PoolAddress {
+        pool_id: u64,
+    },
 }
 
 impl CustomQuery for CyberQueryWrapper {}
@@ -87,7 +102,7 @@ pub struct ThoughtStatsResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct LowestFeeResponse {
+pub struct ThoughtLowestFeeResponse {
     pub fee: Coin,
 }
 
@@ -128,4 +143,32 @@ pub struct NeuronBandwidthResponse {
     pub remained_value: u64,
     pub last_updated_block: u64,
     pub max_value: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PoolParamsResponse {
+    pub type_id: u32,
+    pub reserve_coin_denoms: Vec<String>,
+    pub reserve_account_address: String,
+    pub pool_coin_denom: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PoolLiquidityResponse {
+    pub liquidity: Vec<Coin>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PoolSupplyResponse {
+    pub supply: Coin,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PoolPriceResponse {
+    pub price: Decimal,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PoolAddressResponse {
+    pub address: String,
 }
