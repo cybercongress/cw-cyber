@@ -9,53 +9,12 @@ This crate provides Cyber-specific bindings to enable your CosmWasm smart contra
 
 Currently, the Cyber bindings include:
 
-- Query support for:
-  - Graph
-    - ParticlesAmount
-    - CyberlinksAmount
-  - Bandwidth
-    - BandwidthPrice
-    - BandwidthLoad
-    - BandwidthTotal
-    - NeuronBandwidth
-  - Rank
-    - ParticleRank
-  - Grid
-    - SourceRoutes
-    - SourceRoutedEnergy
-    - DestinationRoutedEnergy
-    - Route
-  - DMN
-    - Thought
-    - ThoughtStats
-    - ThoughtLowestFee
-  - Liquidity
-    - PoolParams
-    - PoolLiquidity
-    - PoolSupply
-    - PoolPrice
-    - PoolAddress
-- Messages support for:
-  - Graph
-    - MsgCyberlink
-  - Resources
-    - MsgInvestmint
-  - Grid
-    - MsgCreateRoute
-    - MsgEditRoute
-    - MsgEditRouteName
-    - MsgDeleteRoute
-  - DMN
-    - MsgCreateThought
-    - MsgForgetThought
-    - MsgChangeThoughtInput
-    - MsgChangeThoughtPeriod
-    - MsgChangeThoughtBlock
-    - MsgChangeThoughtGasPrice
-    - MsgChangeThoughtParticle
-    - MsgChangeThoughtName
-  - Liquidity
-    - MsgCreatePool
-    - MsgDepositWithinBath
-    - MsgWithdrawWithinBath
-    - MsgSwapWithinBath
+| Module    	| Execute                                                                                                                                                                                          	| Query                                                                  	|
+|-----------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|------------------------------------------------------------------------	|
+| Graph     	| MsgCyberlink                                                                                                                                                                                     	| CyberlinkExist<br>ParticleExist<br>ParticlesAmount<br>CyberlinksAmount 	|
+| Rank      	|                                                                                                                                                                                                  	| ParticleRank                                                           	|
+| Bandwidth 	|                                                                                                                                                                                                  	| BandwidthPrice<br>BandwidthLoad<br>BandwidthTotal<br>NeuronBandwidth   	|
+| Resources 	| MsgInvestmint                                                                                                                                                                                    	|                                                                        	|
+| Grid      	| MsgCreateRoute<br>MsgEditRoute<br>MsgEditRouteName<br>MsgDeleteRoute                                                                                                                             	| SourceRoutes<br>SourceRoutedEnergy<br>DestinationRoutedEnergy<br>Route 	|
+| DMN       	| MsgCreateThought<br>MsgForgetThought<br>MsgChangeThoughtInput<br>MsgChangeThoughtPeriod<br>MsgChangeThoughtBlock<br>MsgChangeThoughtGasPrice<br>MsgChangeThoughtParticle<br>MsgChangeThoughtName 	| Thought<br>ThoughtStats<br>ThoughtLowestFee                            	|
+| Liquidity 	| MsgCreatePool<br>MsgDepositWithinBath<br>MsgWithdrawWithinBath<br>MsgSwapWithinBath                                                                                                              	| PoolParams<br>PoolLiquidity<br>PoolSupply<br>PoolPrice<br>PoolAddress  	|
