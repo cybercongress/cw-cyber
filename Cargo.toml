@@ -1,6 +1,54 @@
 [workspace]
 members = ["packages/*", "contracts/*"]
 
-[profile.release.package.cw-cyber]
+[profile.release.package.cyber-std]
 codegen-units = 1
 incremental = false
+
+[profile.release.package.std-test]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cyber-std-test]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cw1-subkeys]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cw1-whitelist]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cw3-fixed-multisig]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cw3-flex-multisig]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.farm-20-20]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.farm-20-nv]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.farm-nv-20]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.farm-nv-nv]
+codegen-units = 1
+incremental = false
+
+[profile.release]
+rpath = false
+lto = true
+overflow-checks = true
+opt-level = 3
+debug = false
+debug-assertions = false
