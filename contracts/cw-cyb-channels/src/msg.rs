@@ -11,15 +11,21 @@ pub struct InstantiateMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
     NewEntry {
-        channel_id: String,
-        network_source: String,
-        network_destination: String,
+        source_chain_id: String,
+        destination_chain_id: String,
+        source_channel_id: String,
+        destination_channel_id: String,
+        rpc: String,
+        token: String,
     },
     UpdateEntry {
         id: u64,
-        channel_id: Option<String>,
-        network_source: Option<String>,
-        network_destination: Option<String>,
+        source_chain_id: Option<String>,
+        destination_chain_id: Option<String>,
+        source_channel_id: Option<String>,
+        destination_channel_id: Option<String>,
+        rpc: Option<String>,
+        token: Option<String>,
     },
     DeleteEntry {
         id: u64,
@@ -29,7 +35,7 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetTokens {
+    GetItems {
         start_after: Option<u64>,
         limit: Option<u32>,
     },
@@ -39,9 +45,12 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,
-    pub channel_id: String,
-    pub network_source: String,
-    pub network_destination: String,
+    pub source_chain_id: String,
+    pub destination_chain_id: String,
+    pub source_channel_id: String,
+    pub destination_channel_id: String,
+    pub rpc: String,
+    pub token: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

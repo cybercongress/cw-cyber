@@ -13,6 +13,8 @@ pub enum ExecuteMsg {
     NewEntry {
         ticker: String,
         name: String,
+        chain_id: String,
+        metadata: String,
         denom: Uint64,
         logo: String,
         // active: bool,
@@ -22,6 +24,8 @@ pub enum ExecuteMsg {
         id: u64,
         ticker: Option<String>,
         name: Option<String>,
+        chain_id: Option<String>,
+        metadata: Option<String>,
         denom: Option<Uint64>,
         logo: Option<String>,
         // active: Option<bool>,
@@ -35,7 +39,7 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetTokens {
+    GetItems {
         start_after: Option<u64>,
         limit: Option<u32>,
     },
@@ -47,6 +51,9 @@ pub struct EntryResponse {
     pub id: u64,
     pub ticker: String,
     pub name: String,
+    pub chain_id: String,
+    pub metadata: String,
+    
     pub denom: Uint64,
     pub logo: String,
     // pub active: Option<bool>,

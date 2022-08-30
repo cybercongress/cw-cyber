@@ -53,18 +53,22 @@ pub fn execute(
         ExecuteMsg::NewEntry {
             ticker,
             name,
+            chain_id,
+            metadata,
             denom,
             logo,
             // order,
-        } => execute_create_new_item(deps, info, ticker, name, denom, logo),
+        } => execute_create_new_item(deps, info, ticker, name, chain_id, metadata, denom, logo),
         ExecuteMsg::UpdateEntry {
             id,
             ticker,
             name,
+            chain_id,
+            metadata,
             denom,
             logo,
             // order,
-        } => execute_update_item(deps, info, id, ticker, name, denom, logo),
+        } => execute_update_item(deps, info, id, ticker, name, chain_id, metadata, denom, logo),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }
@@ -74,7 +78,7 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetTokens { start_after, limit } => {
+        QueryMsg::GetItems { start_after, limit } => {
             to_binary(&query_list(deps, start_after, limit)?)
         }
     }

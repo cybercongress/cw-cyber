@@ -51,16 +51,23 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::NewEntry {
-            channel_id,
-            network_source,
-            network_destination
-        } => execute_create_new_item(deps, info, channel_id,network_source,network_destination),
+            source_chain_id,
+            destination_chain_id,
+            source_channel_id,
+            destination_channel_id,
+            rpc,
+            token,
+
+        } => execute_create_new_item(deps, info, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, rpc, token),
         ExecuteMsg::UpdateEntry {
             id,
-            channel_id,
-            network_source,
-            network_destination,
-        } => execute_update_item(deps, info, id, channel_id, network_source, network_destination),
+            source_chain_id,
+            destination_chain_id,
+            source_channel_id,
+            destination_channel_id,
+            rpc,
+            token,
+        } => execute_update_item(deps, info, id, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, rpc, token),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }
@@ -70,7 +77,7 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetTokens { start_after, limit } => {
+        QueryMsg::GetItems { start_after, limit } => {
             to_binary(&query_list(deps, start_after, limit)?)
         }
     }

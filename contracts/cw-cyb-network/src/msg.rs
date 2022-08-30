@@ -11,18 +11,20 @@ pub struct InstantiateMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
     NewEntry {
-        address: String,
-        query_hash: String,
-        execute_hash: String,
-        version: String,
+        name: String,
+        chain_id: String,
+        genesis_hash: String,
+        unbonding_period: String,
+        logo: String,
         github: String,
     },
     UpdateEntry {
         id: u64,
-        address: Option<String>,
-        query_hash: Option<String>,
-        execute_hash: Option<String>,
-        version: Option<String>,
+        name: Option<String>,
+        chain_id: Option<String>,
+        genesis_hash: Option<String>,
+        unbonding_period: Option<String>,
+        logo: Option<String>,
         github: Option<String>,
     },
     DeleteEntry {
@@ -43,10 +45,11 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,
-    pub address: String,
-    pub query_hash: String,
-    pub execute_hash: String,
-    pub version: String,
+    pub name: String,
+    pub chain_id: String,
+    pub genesis_hash: String,
+    pub unbonding_period: String,
+    pub logo: String,
     pub github: String,
 }
 

@@ -60,9 +60,12 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         let msg = ExecuteMsg::NewEntry {
-            channel_id: "TST".to_string(),
-            network_source: "TESTCOIN".to_string(),
-            network_destination: "TESTCOIN".to_string(),
+            source_chain_id: "bostrom-1".to_string(),
+            destination_chain_id: "cosmos-1".to_string(),
+            source_channel_id: "channel-256".to_string(),
+            destination_channel_id: "channel-1".to_string(),
+            rpc: "https://explorer.com/{hash}".to_string(),
+            token: "DEM1".to_string(),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -75,9 +78,12 @@ mod tests {
         );
 
         let msg = ExecuteMsg::NewEntry {
-            channel_id: "TST2".to_string(),
-            network_source: "TESTCOIN2".to_string(),
-            network_destination: "TESTCOIN2".to_string(),
+            source_chain_id: "bostrom-2".to_string(),
+            destination_chain_id: "cosmos-2".to_string(),
+            source_channel_id: "channel-2".to_string(),
+            destination_channel_id: "channel-2".to_string(),
+            rpc: "https://explorer.com/{hash}".to_string(),
+            token: "DEM2".to_string(),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -93,7 +99,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -104,15 +110,21 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    channel_id: "TST".to_string(),
-                    network_source: "TESTCOIN".to_string(),
-                    network_destination: "TESTCOIN".to_string(),
+                    source_chain_id: "bostrom-1".to_string(),
+                    destination_chain_id: "cosmos-1".to_string(),
+                    source_channel_id: "channel-256".to_string(),
+                    destination_channel_id: "channel-1".to_string(),
+                    rpc: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM1".to_string(),
                 },
                 Entry {
                     id: 2,
-                    channel_id: "TST2".to_string(),
-                    network_source: "TESTCOIN2".to_string(),
-                    network_destination: "TESTCOIN2".to_string(),
+                    source_chain_id: "bostrom-2".to_string(),
+                    destination_chain_id: "cosmos-2".to_string(),
+                    source_channel_id: "channel-2".to_string(),
+                    destination_channel_id: "channel-2".to_string(),
+                    rpc: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM2".to_string(),
                 }
             ]),
             list.entries
@@ -121,9 +133,12 @@ mod tests {
         // Update entry
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
-            channel_id: Some("TSTUPDATE".to_string()),
-            network_source: Some("TESTCOINUPDATE".to_string()),
-            network_destination: Some("TESTCOINUPDATE".to_string()),
+            source_chain_id: Some("bostrom-1".to_string()),
+            destination_chain_id: Some("cosmos-1".to_string()),
+            source_channel_id: Some("channel-256".to_string()),
+            destination_channel_id: Some("channel-1".to_string()),
+            rpc: Some("https://explorer.com/{hash}".to_string()),
+            token: Some("DEM3".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -141,7 +156,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -152,15 +167,21 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    channel_id: "TSTUPDATE".to_string(),
-                    network_source: "TESTCOINUPDATE".to_string(),
-                    network_destination: "TESTCOINUPDATE".to_string(),
+                    source_chain_id: "bostrom-1".to_string(),
+                    destination_chain_id: "cosmos-1".to_string(),
+                    source_channel_id: "channel-256".to_string(),
+                    destination_channel_id: "channel-1".to_string(),
+                    rpc: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM3".to_string(),
                 },
                 Entry {
                     id: 2,
-                    channel_id: "TST2".to_string(),
-                    network_source: "TESTCOIN2".to_string(),
-                    network_destination: "TESTCOIN2".to_string(),
+                    source_chain_id: "bostrom-2".to_string(),
+                    destination_chain_id: "cosmos-2".to_string(),
+                    source_channel_id: "channel-2".to_string(),
+                    destination_channel_id: "channel-2".to_string(),
+                    rpc: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM2".to_string(),
                 }
             ]),
             list.entries
@@ -181,7 +202,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env,
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -191,9 +212,12 @@ mod tests {
         assert_eq!(
             Vec::from([Entry {
                 id: 2,
-                channel_id: "TST2".to_string(),
-                network_source: "TESTCOIN2".to_string(),
-                network_destination: "TESTCOIN2".to_string(),
+                source_chain_id: "bostrom-2".to_string(),
+                destination_chain_id: "cosmos-2".to_string(),
+                source_channel_id: "channel-2".to_string(),
+                destination_channel_id: "channel-2".to_string(),
+                rpc: "https://explorer.com/{hash}".to_string(),
+                token: "DEM2".to_string(),
             }]),
             list.entries
         );

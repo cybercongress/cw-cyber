@@ -13,9 +13,12 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Entry {
     pub id: u64,
-    pub channel_id: String,
-    pub network_source: String,
-    pub network_destination: String,
+    pub source_chain_id: String,
+    pub destination_chain_id: String,
+    pub source_channel_id: String,
+    pub destination_channel_id: String,
+    pub rpc: String,
+    pub token: String,
 }
 
 

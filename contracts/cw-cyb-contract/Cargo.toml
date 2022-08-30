@@ -46,7 +46,6 @@ cw2 = { version = "0.13.4" }
 schemars = "0.8.10"
 serde = { version = "1.0.140", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.31" }
-regex = "1.6"
 
 [dev-dependencies]
 cosmwasm-schema = "1.0.0"

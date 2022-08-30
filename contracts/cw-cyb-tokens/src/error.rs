@@ -9,8 +9,8 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
-    #[error("IncorrectInputData")]
-    IncorrectInputData {},
+    #[error("IncorrectInputData val: {val:?}")]
+    IncorrectInputData {val: String },
 
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },

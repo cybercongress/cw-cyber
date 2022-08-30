@@ -13,7 +13,7 @@ use crate::query::{query_list, execute_create_new_item, execute_update_item, exe
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
-const CONTRACT_NAME: &str = "cw-contract";
+const CONTRACT_NAME: &str = "cw-network";
 const CONTRACT_VERSION: &str = "1.0.0";
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -51,20 +51,22 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::NewEntry {
-            address,
-            query_hash,
-            execute_hash,
-            version,
+            name,
+            chain_id,
+            genesis_hash,
+            unbonding_period,
+            logo,
             github,
-        } => execute_create_new_item(deps, info,address,query_hash,execute_hash,version,github),
+        } => execute_create_new_item(deps, info,name,chain_id,genesis_hash,unbonding_period,logo,github),
         ExecuteMsg::UpdateEntry {
             id,
-            address,
-            query_hash,
-            execute_hash,
-            version,
-            github
-        } => execute_update_item(deps, info, id, address, query_hash, execute_hash, version, github),
+            name,
+            chain_id,
+            genesis_hash,
+            unbonding_period,
+            logo,
+            github,
+        } => execute_update_item(deps, info, id, name,chain_id,genesis_hash,unbonding_period,logo,github),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

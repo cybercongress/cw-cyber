@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod tests {
     // use super::*;
-    use cosmwasm_std::{Uint64};
+    // use cosmwasm_std::{Uint64};
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{attr, from_binary, Addr};
     use std::vec::Vec;
@@ -60,12 +60,12 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         let msg = ExecuteMsg::NewEntry {
-            chain_id: "testchain-1".to_string(),
-            metadata: "tst".to_string(),
-            ticker: "TST".to_string(),
-            name: "testcoin".to_string(),
-            denom: Uint64::new(8),
+            name: "tst".to_string(),
+            chain_id: "cyber-1".to_string(),
+            genesis_hash: "bostrom0x1".to_string(),
+            unbonding_period: "2950000".to_string(),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            github: "https://github.com/ipfs/js-ipfs.git".to_string(),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -78,12 +78,12 @@ mod tests {
         );
 
         let msg = ExecuteMsg::NewEntry {
-            ticker: "TST2".to_string(),
-            chain_id: "testchain-1".to_string(),
-            metadata: "tst".to_string(),
-            name: "test2".to_string(),
-            denom: Uint64::new(8),
-            logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            name: "tst2".to_string(),
+            chain_id: "cyber-1".to_string(),
+            genesis_hash: "bostrom0x1".to_string(),
+            unbonding_period: "2950000".to_string(), 
+            logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+            github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -110,21 +110,21 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
-                    ticker: "TST".to_string(),
-                    name: "testcoin".to_string(),
-                    denom: Uint64::new(8),
-                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    name: "tst".to_string(),
+                    chain_id: "cyber-1".to_string(),
+                    genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "2950000".to_string(), 
+                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
                 },
                 Entry {
                     id: 2,
-                    ticker: "TST2".to_string(),
-                    chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
-                    name: "test2".to_string(),
-                    denom: Uint64::new(8),
-                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    name: "tst2".to_string(),
+                    chain_id: "cyber-1".to_string(),
+                    genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "2950000".to_string(), 
+                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
                 }
             ]),
             list.entries
@@ -133,12 +133,12 @@ mod tests {
         // Update entry
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
-            ticker: Some("TSTUPDATE".to_string()),
-            name: Some("testcoinupdate".to_string()),
-            chain_id: Some("testchain-1".to_string()),
-            metadata: Some("tst".to_string()),
-            denom: Some(Uint64::new(8)),
-            logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
+            name: Some("tstu".to_string()),
+            chain_id: Some("cyber-1".to_string()),
+            genesis_hash: Some("bostrom0x1".to_string()),
+            unbonding_period: Some("2950000".to_string()), 
+            logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
+            github: Some("https://github.com/ipfs/js-ipfs.git".to_string()), 
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -167,21 +167,21 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    ticker: "TSTUPDATE".to_string(),
-                    name: "testcoinupdate".to_string(),
-                    chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
-                    denom: Uint64::new(8),
-                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    name: "tstu".to_string(),
+                    chain_id: "cyber-1".to_string(),
+                    genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "2950000".to_string(), 
+                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
                 },
                 Entry {
                     id: 2,
-                    ticker: "TST2".to_string(),
-                    name: "test2".to_string(),
-                    chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
-                    denom: Uint64::new(8),
-                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    name: "tst2".to_string(),
+                    chain_id: "cyber-1".to_string(),
+                    genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "2950000".to_string(), 
+                    logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
                 }
             ]),
             list.entries
@@ -212,12 +212,12 @@ mod tests {
         assert_eq!(
             Vec::from([Entry {
                 id: 2,
-                ticker: "TST2".to_string(),
-                name: "test2".to_string(),
-                chain_id: "testchain-1".to_string(),
-                metadata: "tst".to_string(),
-                denom: Uint64::new(8),
-                logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                name: "tst2".to_string(),
+                chain_id: "cyber-1".to_string(),
+                genesis_hash: "bostrom0x1".to_string(),
+                unbonding_period: "2950000".to_string(), 
+                logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
+                github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
             }]),
             list.entries
         );

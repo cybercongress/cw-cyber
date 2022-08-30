@@ -1,6 +1,6 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use cosmwasm_std::{Uint64};
+// use cosmwasm_std::{Uint64};
 
 use cosmwasm_std::Addr;
 use cw_storage_plus::{Item, Map};
@@ -13,13 +13,14 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Entry {
     pub id: u64,
-    pub ticker: String,
     pub name: String,
     pub chain_id: String,
-    pub metadata: String,
-    pub denom: Uint64,
+    pub genesis_hash: String,
+
+    pub unbonding_period: String,
     pub logo: String,
-    // pub order: Option<Uint64>,
+    pub github: String,
+    
 }
 
 

@@ -60,10 +60,11 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         let msg = ExecuteMsg::NewEntry {
-            address: "TST".to_string(),
-            query_hash: "TESTCOIN".to_string(),
-            execute_hash: "TESTCOIN".to_string(),
-            reproduce_info: "v=1|s=2|j=3".to_string(), 
+            address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z1".to_string(),
+            query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            version: "v=1&s=2&j=3".to_string(), 
+            github: "https://github.com/cybercongress/cw-cyber.git".to_string()
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -76,10 +77,11 @@ mod tests {
         );
 
         let msg = ExecuteMsg::NewEntry {
-            address: "TST2".to_string(),
-            query_hash: "TESTCOIN2".to_string(),
-            execute_hash: "TESTCOIN2".to_string(),
-            reproduce_info: "v=1|s=2|j=3".to_string(), 
+            address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
+            query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            version: "v=1&s=2&j=3".to_string(),
+            github: "https://github.com/cybercongress/cw-cyber.git".to_string()
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -95,7 +97,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -106,17 +108,19 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    address: "TST".to_string(),
-                    query_hash: "TESTCOIN".to_string(),
-                    execute_hash: "TESTCOIN".to_string(),
-                    reproduce_info: "v=1|s=2|j=3".to_string(), 
+                    address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z1".to_string(),
+                    query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    version: "v=1&s=2&j=3".to_string(), 
+                    github: "https://github.com/cybercongress/cw-cyber.git".to_string()
                 },
                 Entry {
                     id: 2,
-                    address: "TST2".to_string(),
-                    query_hash: "TESTCOIN2".to_string(),
-                    execute_hash: "TESTCOIN2".to_string(),
-                    reproduce_info: "v=1|s=2|j=3".to_string(), 
+                    address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
+                    query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    version: "v=1&s=2&j=3".to_string(), 
+                    github: "https://github.com/cybercongress/cw-cyber.git".to_string()
                 }
             ]),
             list.entries
@@ -125,10 +129,11 @@ mod tests {
         // Update entry
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
-            address: Some("TSTUPDATE".to_string()),
-            query_hash: Some("TESTCOINUPDATE".to_string()),
-            execute_hash: Some("TESTCOINUPDATE".to_string()),
-            reproduce_info: Some("v=1|s=2|j=3".to_string()), 
+            address: Some("bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z3".to_string()),
+            query_hash: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
+            execute_hash: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
+            version: Some("v=1&s=2&j=3".to_string()), 
+            github: Some("https://github.com/cybercongress/cw-cyber.git".to_string())
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -146,7 +151,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -157,17 +162,19 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    address: "TSTUPDATE".to_string(),
-                    query_hash: "TESTCOINUPDATE".to_string(),
-                    execute_hash: "TESTCOINUPDATE".to_string(),
-                    reproduce_info: "v=1|s=2|j=3".to_string(), 
+                    address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z3".to_string(),
+                    query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    version: "v=1&s=2&j=3".to_string(), 
+                    github: "https://github.com/cybercongress/cw-cyber.git".to_string()
                 },
                 Entry {
                     id: 2,
-                    address: "TST2".to_string(),
-                    query_hash: "TESTCOIN2".to_string(),
-                    execute_hash: "TESTCOIN2".to_string(),
-                    reproduce_info: "v=1|s=2|j=3".to_string(), 
+                    address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
+                    query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    version: "v=1&s=2&j=3".to_string(), 
+                    github: "https://github.com/cybercongress/cw-cyber.git".to_string()
                 }
             ]),
             list.entries
@@ -188,7 +195,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env,
-            QueryMsg::GetTokens {
+            QueryMsg::GetItems {
                 start_after: None,
                 limit: None,
             },
@@ -198,10 +205,11 @@ mod tests {
         assert_eq!(
             Vec::from([Entry {
                 id: 2,
-                address: "TST2".to_string(),
-                query_hash: "TESTCOIN2".to_string(),
-                execute_hash: "TESTCOIN2".to_string(),
-                reproduce_info: "v=1|s=2|j=3".to_string(), 
+                address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
+                query_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                execute_hash: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                version: "v=1&s=2&j=3".to_string(), 
+                github: "https://github.com/cybercongress/cw-cyber.git".to_string()
             }]),
             list.entries
         );

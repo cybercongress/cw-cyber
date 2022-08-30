@@ -16,8 +16,8 @@ pub struct Entry {
     pub address: String,
     pub query_hash: String,
     pub execute_hash: String,
-    pub reproduce_info: String,
-    
+    pub version: String,
+    pub github: String,
 }
 
 
