@@ -113,7 +113,7 @@ pub fn execute_update_item(
         return Err(ContractError::Unauthorized {});
     }
 
-    if !logo.as_ref().unwrap().is_empty() {
+    if !logo.as_ref().is_none() {
         let particle:Cid;
         let try_particle = Cid::from_str(&logo.as_ref().unwrap().clone());
         if try_particle.is_ok() {

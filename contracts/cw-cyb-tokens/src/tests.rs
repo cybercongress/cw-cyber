@@ -138,6 +138,7 @@ mod tests {
             chain_id: Some("testchain-1".to_string()),
             metadata: Some("tst".to_string()),
             denom: Some(Uint64::new(8)),
+            // logo: None,
             logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
