@@ -1,0 +1,55 @@
+use crate::state::{Entry};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct InstantiateMsg {
+    pub owner: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub enum ExecuteMsg {
+    NewEntry {
+        data_type: String,
+        protocol: String,
+        chain_id: String,
+        url: String,
+        particle: Option<String>,
+    },
+    UpdateEntry {
+        id: u64,
+        data_type: String,
+        protocol: String,
+        chain_id: String,
+        url: String,
+        particle: Option<String>,
+    },
+    DeleteEntry {
+        id: u64,
+    },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum QueryMsg {
+    GetItems {
+        start_after: Option<u64>,
+        limit: Option<u32>,
+    },
+}
+
+// Tokens
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct EntryResponse {
+    pub id: u64,
+    pub data_type: String,
+    pub protocol: u64,
+    pub chain_id: String,
+    pub url: String,
+    pub particle: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct ListResponse {
+    pub entries: Vec<Entry>,
+}
