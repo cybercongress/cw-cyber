@@ -14,18 +14,20 @@ pub enum ExecuteMsg {
         name: String,
         chain_id: String,
         genesis_hash: String,
-        unbonding_period: String,
+        protocol: String,
+        // unbonding_period: String,
         logo: String,
-        github: String,
+        particle: Option<String>,
     },
     UpdateEntry {
         id: u64,
         name: Option<String>,
         chain_id: Option<String>,
         genesis_hash: Option<String>,
-        unbonding_period: Option<String>,
+        protocol: Option<String>,
+        // unbonding_period: Option<String>,
         logo: Option<String>,
-        github: Option<String>,
+        particle: Option<String>,
     },
     DeleteEntry {
         id: u64,
@@ -48,9 +50,10 @@ pub struct EntryResponse {
     pub name: String,
     pub chain_id: String,
     pub genesis_hash: String,
-    pub unbonding_period: String,
+    pub protocol: String,
+    // pub unbonding_period: String,
     pub logo: String,
-    pub github: String,
+    pub particle: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

@@ -61,11 +61,11 @@ mod tests {
 
         let msg = ExecuteMsg::NewEntry {
             name: "tst".to_string(),
+            protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
             genesis_hash: "bostrom0x1".to_string(),
-            unbonding_period: "2950000".to_string(),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
-            github: "https://github.com/ipfs/js-ipfs.git".to_string(),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -79,11 +79,11 @@ mod tests {
 
         let msg = ExecuteMsg::NewEntry {
             name: "tst2".to_string(),
+            protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
             genesis_hash: "bostrom0x1".to_string(),
-            unbonding_period: "2950000".to_string(), 
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-            github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -111,20 +111,20 @@ mod tests {
                 Entry {
                     id: 1,
                     name: "tst".to_string(),
+                    protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
-                    unbonding_period: "2950000".to_string(), 
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 },
                 Entry {
                     id: 2,
                     name: "tst2".to_string(),
+                    protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
-                    unbonding_period: "2950000".to_string(), 
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 }
             ]),
             list.entries
@@ -134,11 +134,11 @@ mod tests {
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
             name: Some("tstu".to_string()),
+            protocol: Some("tst2".to_string()),
             chain_id: Some("cyber-1".to_string()),
             genesis_hash: Some("bostrom0x1".to_string()),
-            unbonding_period: Some("2950000".to_string()), 
             logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
-            github: Some("https://github.com/ipfs/js-ipfs.git".to_string()), 
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -168,20 +168,20 @@ mod tests {
                 Entry {
                     id: 1,
                     name: "tstu".to_string(),
+                    protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
-                    unbonding_period: "2950000".to_string(), 
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 },
                 Entry {
                     id: 2,
                     name: "tst2".to_string(),
+                    protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
-                    unbonding_period: "2950000".to_string(), 
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-                    github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 }
             ]),
             list.entries
@@ -213,11 +213,11 @@ mod tests {
             Vec::from([Entry {
                 id: 2,
                 name: "tst2".to_string(),
+                protocol: "tst2".to_string(),
                 chain_id: "cyber-1".to_string(),
                 genesis_hash: "bostrom0x1".to_string(),
-                unbonding_period: "2950000".to_string(), 
                 logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
-                github: "https://github.com/ipfs/js-ipfs.git".to_string(), 
+                particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
             }]),
             list.entries
         );

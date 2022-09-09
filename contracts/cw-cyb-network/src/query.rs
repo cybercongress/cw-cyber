@@ -4,6 +4,7 @@ use std::str::FromStr;
 use cosmwasm_std::{
     Deps, DepsMut, MessageInfo, Order, Response, StdResult,
 };
+use crate::validating::{validate_by_basic_rule,validate_ipfs_cid};
 
 use cw_storage_plus::Bound;
 use std::ops::Add;
@@ -23,61 +24,52 @@ pub fn execute_create_new_item(
     name: String,
     chain_id: String,
     genesis_hash: String,
-    unbonding_period: String,
+    protocol: String,
+    // unbonding_period: String,
     logo: String,
-    github: String,
+    particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
 
-
-    let particle:Cid;
-    let try_particle = Cid::from_str(&logo.clone());
-    if try_particle.is_ok() {
-        particle = try_particle.unwrap();
-        if particle.version() != Version::V0 {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
-        }
-    } else {
-        return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
+    let validate_logo = validate_ipfs_cid(logo.clone());
+    if validate_logo.is_err() {
+        return validate_logo;
     }
 
-    for byte in chain_id.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Chain-id. a-z0-9- allowed".to_string()});
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
+    }
+    
+    
+    let validate_chainid = validate_by_basic_rule(chain_id.clone(), "chain-id".to_string());
+    let validate_genesishash = validate_by_basic_rule(genesis_hash.clone(), "genesis_hash".to_string());
+    let validate_name = validate_by_basic_rule(name.clone(), "name".to_string());
+    let validate_protocol = validate_by_basic_rule(protocol.clone(), "protocol".to_string());
+    
+
+
+    if validate_chainid.is_err() {
+        return validate_chainid;
+    }
+    if validate_chainid.is_err() {
+        return validate_chainid;
+    }
+    if validate_genesishash.is_err() {
+        return validate_genesishash;
+    }
+    if validate_name.is_err() {
+        return validate_name;
+    }
+    if validate_protocol.is_err() {
+        return validate_protocol;
     }
 
-    for byte in genesis_hash.as_bytes().iter() {
-        // - && 0-9 && a-z 
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Genesis_hash. a-z0-9- allowed".to_string()});
-        }
-    }
-
-    for byte in name.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Name. a-z0-9- allowed".to_string()});
-        }
-    }
-
-    for byte in unbonding_period.as_bytes().iter() {
-        // 0-9
-        if  *byte < 48 || *byte > 57 {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Unbonding_period. 0-9 allowed".to_string()});
-        }
-    }
-
-    for byte in github.as_bytes().iter() {
-        // :/.-_0-9a-zA-Z
-        if  (*byte != 58) && (*byte != 95) && (*byte != 45) && (*byte != 47) && (*byte != 46) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) && (*byte < 65 || *byte > 90)  {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Github. Only url allowed".to_string()});
-        }
-    }
 
 
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
@@ -87,9 +79,10 @@ pub fn execute_create_new_item(
         name,
         chain_id,
         genesis_hash,
-        unbonding_period,
+        protocol,
+        // unbonding_period,
         logo,
-        github,
+        particle: particle.unwrap_or("".to_string()),
     };
     LIST.save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
@@ -104,62 +97,101 @@ pub fn execute_update_item(
     name: Option<String>,
     chain_id: Option<String>,
     genesis_hash: Option<String>,
-    unbonding_period: Option<String>,
+    protocol: Option<String>,
+    // unbonding_period: Option<String>,
     logo: Option<String>,
-    github: Option<String>,
+    particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
 
-    if !logo.as_ref().is_none() {
-        let particle:Cid;
-        let try_particle = Cid::from_str(&logo.as_ref().unwrap().clone());
-        if try_particle.is_ok() {
-            particle = try_particle.unwrap();
-            if particle.version() != Version::V0 {
-                return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
-            }
-        } else {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
-        }
+    let validate_logo = validate_ipfs_cid(logo.clone().unwrap());
+    if validate_logo.is_err() {
+        return validate_logo;
     }
 
-    for byte in chain_id.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Chain-id. a-z0-9- allowed".to_string()});
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
+    }
+    
+    
+    let validate_chainid = validate_by_basic_rule(chain_id.as_ref().unwrap().clone(), "chain-id".to_string());
+    let validate_genesishash = validate_by_basic_rule(genesis_hash.as_ref().unwrap().clone(), "genesis_hash".to_string());
+    let validate_name = validate_by_basic_rule(name.as_ref().unwrap().clone(), "name".to_string());
+    let validate_protocol = validate_by_basic_rule(protocol.as_ref().unwrap().clone(), "protocol".to_string());
+    
+
+
+    if validate_chainid.is_err() {
+        return validate_chainid;
+    }
+    if validate_chainid.is_err() {
+        return validate_chainid;
+    }
+    if validate_genesishash.is_err() {
+        return validate_genesishash;
+    }
+    if validate_name.is_err() {
+        return validate_name;
+    }
+    if validate_protocol.is_err() {
+        return validate_protocol;
     }
 
-    for byte in genesis_hash.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z 
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Genesis_hash. a-z0-9- allowed".to_string()});
-        }
-    }
+    ////////
 
-    for byte in name.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Name. a-z0-9- allowed".to_string()});
-        }
-    }
+    // if !logo.as_ref().is_none() {
+    //     let particle:Cid;
+    //     let try_particle = Cid::from_str(&logo.as_ref().unwrap().clone());
+    //     if try_particle.is_ok() {
+    //         particle = try_particle.unwrap();
+    //         if particle.version() != Version::V0 {
+    //             return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
+    //         }
+    //     } else {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
+    //     }
+    // }
 
-    for byte in unbonding_period.as_ref().unwrap().as_bytes().iter() {
-        // 0-9
-        if  *byte < 48 || *byte > 57 {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Unbonding_period. 0-9 allowed".to_string()});
-        }
-    }
+    // for byte in chain_id.as_ref().unwrap().as_bytes().iter() {
+    //     // - && 0-9 && a-z
+    //     if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect Chain-id. a-z0-9- allowed".to_string()});
+    //     }
+    // }
 
-    for byte in github.as_ref().unwrap().as_bytes().iter() {
-        // :/.-_0-9a-zA-Z
-        if  (*byte != 58) && (*byte != 95) && (*byte != 45) && (*byte != 47) && (*byte != 46) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) && (*byte < 65 || *byte > 90)  {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Github. Only url allowed".to_string()});
-        }
-    }
+    // for byte in genesis_hash.as_ref().unwrap().as_bytes().iter() {
+    //     // - && 0-9 && a-z 
+    //     if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect Genesis_hash. a-z0-9- allowed".to_string()});
+    //     }
+    // }
+
+    // for byte in name.as_ref().unwrap().as_bytes().iter() {
+    //     // - && 0-9 && a-z
+    //     if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect Name. a-z0-9- allowed".to_string()});
+    //     }
+    // }
+
+    // for byte in unbonding_period.as_ref().unwrap().as_bytes().iter() {
+    //     // 0-9
+    //     if  *byte < 48 || *byte > 57 {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect Unbonding_period. 0-9 allowed".to_string()});
+    //     }
+    // }
+
+    // for byte in particle.as_ref().unwrap().as_bytes().iter() {
+    //     // :/.-_0-9a-zA-Z
+    //     if  (*byte != 58) && (*byte != 95) && (*byte != 45) && (*byte != 47) && (*byte != 46) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) && (*byte < 65 || *byte > 90)  {
+    //         return Err(ContractError::IncorrectInputData {val: "Incorrect particle. Only url allowed".to_string()});
+    //     }
+    // }
 
     let entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
@@ -167,9 +199,10 @@ pub fn execute_update_item(
         name: name.unwrap_or(entry.name),
         chain_id: chain_id.unwrap_or(entry.chain_id),
         genesis_hash: genesis_hash.unwrap_or(entry.genesis_hash),
-        unbonding_period: unbonding_period.unwrap_or(entry.unbonding_period),
+        protocol: protocol.unwrap_or(entry.protocol),
+        // unbonding_period: unbonding_period.unwrap_or(entry.unbonding_period),
         logo: logo.unwrap_or(entry.logo),
-        github: github.unwrap_or(entry.github),
+        particle: particle.unwrap_or(entry.particle),
     };
     LIST.save(deps.storage, id, &updated_entry)?;
     Ok(Response::new()
