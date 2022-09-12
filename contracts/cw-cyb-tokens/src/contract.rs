@@ -52,23 +52,19 @@ pub fn execute(
     match msg {
         ExecuteMsg::NewEntry {
             ticker,
-            name,
             chain_id,
-            metadata,
             denom,
             logo,
-            // order,
-        } => execute_create_new_item(deps, info, ticker, name, chain_id, metadata, denom, logo),
+            particle,
+        } => execute_create_new_item(deps, info, ticker, chain_id, denom, logo, particle),
         ExecuteMsg::UpdateEntry {
             id,
             ticker,
-            name,
             chain_id,
-            metadata,
             denom,
             logo,
-            // order,
-        } => execute_update_item(deps, info, id, ticker, name, chain_id, metadata, denom, logo),
+            particle,
+        } => execute_update_item(deps, info, id, ticker, chain_id, denom, logo, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

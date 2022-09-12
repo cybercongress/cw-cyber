@@ -61,11 +61,10 @@ mod tests {
 
         let msg = ExecuteMsg::NewEntry {
             chain_id: "testchain-1".to_string(),
-            metadata: "tst".to_string(),
             ticker: "TST".to_string(),
-            name: "testcoin".to_string(),
             denom: Uint64::new(8),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -80,10 +79,9 @@ mod tests {
         let msg = ExecuteMsg::NewEntry {
             ticker: "TST2".to_string(),
             chain_id: "testchain-1".to_string(),
-            metadata: "tst".to_string(),
-            name: "test2".to_string(),
             denom: Uint64::new(8),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -111,20 +109,18 @@ mod tests {
                 Entry {
                     id: 1,
                     chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
                     ticker: "TST".to_string(),
-                    name: "testcoin".to_string(),
                     denom: Uint64::new(8),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
                     id: 2,
                     ticker: "TST2".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
-                    name: "test2".to_string(),
                     denom: Uint64::new(8),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
             list.entries
@@ -134,12 +130,11 @@ mod tests {
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
             ticker: Some("TSTUPDATE".to_string()),
-            name: Some("testcoinupdate".to_string()),
             chain_id: Some("testchain-1".to_string()),
-            metadata: Some("tst".to_string()),
             denom: Some(Uint64::new(8)),
             // logo: None,
             logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -169,20 +164,18 @@ mod tests {
                 Entry {
                     id: 1,
                     ticker: "TSTUPDATE".to_string(),
-                    name: "testcoinupdate".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
                     denom: Uint64::new(8),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
                     id: 2,
                     ticker: "TST2".to_string(),
-                    name: "test2".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    metadata: "tst".to_string(),
                     denom: Uint64::new(8),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
             list.entries
@@ -214,11 +207,10 @@ mod tests {
             Vec::from([Entry {
                 id: 2,
                 ticker: "TST2".to_string(),
-                name: "test2".to_string(),
                 chain_id: "testchain-1".to_string(),
-                metadata: "tst".to_string(),
                 denom: Uint64::new(8),
                 logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             }]),
             list.entries
         );

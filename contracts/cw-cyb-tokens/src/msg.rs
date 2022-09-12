@@ -12,24 +12,18 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     NewEntry {
         ticker: String,
-        name: String,
         chain_id: String,
-        metadata: String,
         denom: Uint64,
         logo: String,
-        // active: bool,
-        // order: Option<Uint64>
+        particle: Option<String>,
     },
     UpdateEntry {
         id: u64,
         ticker: Option<String>,
-        name: Option<String>,
         chain_id: Option<String>,
-        metadata: Option<String>,
         denom: Option<Uint64>,
         logo: Option<String>,
-        // active: Option<bool>,
-        // order: Option<Uint64>
+        particle: Option<String>,
     },
     DeleteEntry {
         id: u64,
@@ -50,14 +44,10 @@ pub enum QueryMsg {
 pub struct EntryResponse {
     pub id: u64,
     pub ticker: String,
-    pub name: String,
     pub chain_id: String,
-    pub metadata: String,
-    
     pub denom: Uint64,
     pub logo: String,
-    // pub active: Option<bool>,
-    // pub order: Uint64,
+    pub particle: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

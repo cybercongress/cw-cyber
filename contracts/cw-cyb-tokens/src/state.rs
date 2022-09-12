@@ -14,12 +14,10 @@ pub struct Config {
 pub struct Entry {
     pub id: u64,
     pub ticker: String,
-    pub name: String,
     pub chain_id: String,
-    pub metadata: String,
     pub denom: Uint64,
     pub logo: String,
-    // pub order: Option<Uint64>,
+    pub particle: String,
 }
 
 

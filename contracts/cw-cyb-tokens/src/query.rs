@@ -1,6 +1,6 @@
 use cosmwasm_std::{Uint64};
-use cid::{Cid, Version};
-use std::str::FromStr;
+// use cid::{Cid, Version};
+// use std::str::FromStr;
 // use cid::multihash::{Code, MultihashDigest};
 use cosmwasm_std::{
     Deps, DepsMut, MessageInfo, Order, Response, StdResult,
@@ -9,7 +9,7 @@ use cosmwasm_std::{
 use cw_storage_plus::Bound;
 use std::ops::Add;
 
-
+use crate::validating::{validate_by_basic_rule,validate_by_basic_uppercase_rule,validate_ipfs_cid,validate_by_int_range};
 use crate::error::ContractError;
 use crate::msg::{ListResponse};
 use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
@@ -22,54 +22,41 @@ pub fn execute_create_new_item(
     deps: DepsMut,
     info: MessageInfo,
     ticker: String,
-    name: String,
     chain_id: String,
-    metadata: String,
     denom: Uint64,
     logo: String,
+    particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
 
-    let particle:Cid;
-    let try_particle = Cid::from_str(&logo.clone());
-    if try_particle.is_ok() {
-        particle = try_particle.unwrap();
-        if particle.version() != Version::V0 {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
-        }
-    } else {
-        return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
+    let validate_logo = validate_ipfs_cid(logo.clone(),"logo".to_string());
+    if validate_logo.is_err() {
+        return validate_logo;
     }
-    
-    for byte in metadata.as_bytes().iter() {
-        // "="" && "&" && 0-9 && a-z  (sample string: a=1&b=2&c=3)
-        if (*byte != 61) && (*byte != 38) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Metadata. a-z0-9=& allowed".to_string()});
+
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap(),"particle".to_string());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
     }
 
-    for byte in chain_id.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Chain-id. a-z0-9- allowed".to_string()});
-        }
-    }
 
-    for byte in name.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Name. a-z0-9- allowed".to_string()});
-        }
-    }
+    let validate_ticker = validate_by_basic_uppercase_rule(ticker.clone(), "ticker".to_string());
+    let validate_chain_id = validate_by_basic_rule(chain_id.clone(), "chain_id".to_string());
+    let validate_denom = validate_by_int_range(Uint64::from(1u64),Uint64::from(18u64), denom.clone(),"denom".to_string());
 
-    for byte in ticker.as_bytes().iter() {
-        // 0-9 && A-Z
-        if (*byte < 48 || *byte > 57) && (*byte < 65 || *byte > 90) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect ticker. 0-9A-Z allowed".to_string()});
-        }
+    if validate_ticker.is_err() {
+        return validate_ticker;
+    }
+    if validate_chain_id.is_err() {
+        return validate_chain_id;
+    }
+    if validate_denom.is_err() {
+        return validate_denom;
     }
 
 
@@ -79,11 +66,10 @@ pub fn execute_create_new_item(
     let new_entry = Entry {
         id,
         ticker,
-        name,
         chain_id,
-        metadata,
         denom,
         logo,
+        particle: particle.unwrap_or("".to_string())
     };
     LIST.save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
@@ -96,71 +82,52 @@ pub fn execute_update_item(
     info: MessageInfo,
     id: u64,
     ticker: Option<String>,
-    name: Option<String>,
     chain_id: Option<String>,
-    metadata: Option<String>,
     denom: Option<Uint64>,
     logo: Option<String>,
-    // order: Option<Uint64>
+    particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
-    // .unwrap().is_empty()
-    if !logo.as_ref().is_none() {
-        let particle:Cid;
-        let try_particle = Cid::from_str(&logo.as_ref().unwrap().clone());
-        if try_particle.is_ok() {
-            particle = try_particle.unwrap();
-            if particle.version() != Version::V0 {
-                return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
-            }
-        } else {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Logo".to_string()});
+
+    let validate_logo = validate_ipfs_cid(logo.clone().unwrap(),"logo".to_string());
+    if validate_logo.is_err() {
+        return validate_logo;
+    }
+
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap(),"particle".to_string());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
     }
 
-    for byte in metadata.as_ref().unwrap().as_bytes().iter() {
-        // "="" && "&" && 0-9 && a-z  (sample string: a=1&b=2&c=3)
-        if (*byte != 61) && (*byte != 38) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Metadata. a-z0-9=& allowed".to_string()});
-        }
-    }
 
-    for byte in chain_id.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Chain-id. a-z0-9- allowed".to_string()});
-        }
-    }
+    let validate_ticker = validate_by_basic_uppercase_rule(ticker.clone().unwrap(), "ticker".to_string());
+    let validate_chain_id = validate_by_basic_rule(chain_id.clone().unwrap(), "chain_id".to_string());
+    let validate_denom = validate_by_int_range(Uint64::from(1u64),Uint64::from(18u64), denom.clone().unwrap(),"denom".to_string());
 
-    for byte in name.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Name. a-z0-9- allowed".to_string()});
-        }
+    if validate_ticker.is_err() {
+        return validate_ticker;
     }
-
-    for byte in ticker.as_ref().unwrap().as_bytes().iter() {
-        // 0-9 && A-Z
-        if (*byte < 48 || *byte > 57) && (*byte < 65 || *byte > 90) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect ticker. 0-9A-Z allowed".to_string()});
-        }
+    if validate_chain_id.is_err() {
+        return validate_chain_id;
     }
-    
+    if validate_denom.is_err() {
+        return validate_denom;
+    } 
 
 
     let entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
         id,
         ticker: ticker.unwrap_or(entry.ticker),
-        name: name.unwrap_or(entry.name),
         denom: denom.unwrap_or(entry.denom),
         chain_id: chain_id.unwrap_or(entry.chain_id),
-        metadata: metadata.unwrap_or(entry.metadata),
         logo: logo.unwrap_or(entry.logo),
-        // order: order.unwrap_or(entry.order),
+        particle: particle.unwrap_or("".to_string()),
     };
     LIST.save(deps.storage, id, &updated_entry)?;
     Ok(Response::new()
@@ -186,15 +153,6 @@ pub fn execute_delete_entry(
 
 
 
-// fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
-//     let entry = LIST.load(deps.storage, id)?;
-//     Ok(EntryResponse {
-//         id: entry.id,
-//         description: entry.description,
-//         status: entry.status,
-//         priority: entry.priority,
-//     })
-// }
 
 
 pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>) -> StdResult<ListResponse> {
