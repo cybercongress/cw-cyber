@@ -9,6 +9,7 @@ use cw_storage_plus::Bound;
 use std::ops::Add;
 
 
+use crate::validating::{validate_by_basic_rule,validate_ipfs_cid,validate_url,validate_by_basic_uppercase_rule};
 use crate::error::ContractError;
 use crate::msg::{ListResponse};
 use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
@@ -24,55 +25,51 @@ pub fn execute_create_new_item(
     destination_chain_id: String,
     source_channel_id: String,
     destination_channel_id: String,
-    rpc: String,
+    explorer_url: String,
     token: String,
+    particle: Option<String>
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
 
-    for byte in source_chain_id.as_bytes().iter() {
-        //  - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect source_chain_id. a-z0-9- allowed".to_string()});
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
     }
+    
 
-    for byte in destination_chain_id.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect destination_chain_id. a-z0-9- allowed".to_string()});
-        }
-    }
+    let validate_source_chain_id = validate_by_basic_rule(source_chain_id.clone(), "source_chain_id".to_string());
+    let validate_destination_chain_id = validate_by_basic_rule(destination_chain_id.clone(), "destination_chain_id".to_string());
+    let validate_source_channel_id = validate_by_basic_rule(source_channel_id.clone(), "source_channel_id".to_string());
+    let validate_destination_channel_id = validate_by_basic_rule(destination_channel_id.clone(), "destination_channel_id".to_string());
 
-    for byte in source_channel_id.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect source_channel_id. a-z0-9- allowed".to_string()});
-        }
-    }
+    let validate_explorer_url = validate_url(explorer_url.clone(), "explorer_url".to_string());
+    let validate_token = validate_by_basic_uppercase_rule(token.clone(), "token".to_string());
 
-    for byte in destination_channel_id.as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect destination_channel_id. a-z0-9- allowed".to_string()});
-        }
+    if validate_source_chain_id.is_err() {
+        return validate_source_chain_id;
     }
+    if validate_destination_chain_id.is_err() {
+        return validate_destination_chain_id;
+    }
+    if validate_source_channel_id.is_err() {
+        return validate_source_channel_id;
+    }
+    if validate_destination_channel_id.is_err() {
+        return validate_destination_channel_id;
+    }
+    if validate_explorer_url.is_err() {
+        return validate_explorer_url;
+    }
+    if validate_token.is_err() {
+        return validate_token;
+    }
+    
 
-    for byte in rpc.as_bytes().iter() {
-        // :/.-_0-9a-zA-Z
-        if  (*byte != 123) && (*byte != 125) && (*byte != 58) && (*byte != 95) && (*byte != 45) && (*byte != 47) && (*byte != 46) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) && (*byte < 65 || *byte > 90)  {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Rpc. Only url allowed".to_string()});
-        }
-    }
-
-    for byte in token.as_bytes().iter() {
-        // 0-9 && A-Z
-        if (*byte < 48 || *byte > 57) && (*byte < 65 || *byte > 90) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect token. 0-9A-Z allowed".to_string()});
-        }
-    }
 
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
 
@@ -82,8 +79,9 @@ pub fn execute_create_new_item(
         destination_chain_id,
         source_channel_id,
         destination_channel_id,
-        rpc,
+        explorer_url,
         token,
+        particle: particle.unwrap_or("".to_string()),
     };
     LIST.save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
@@ -99,55 +97,49 @@ pub fn execute_update_item(
     destination_chain_id: Option<String>,
     source_channel_id: Option<String>,
     destination_channel_id: Option<String>,
-    rpc: Option<String>,
+    explorer_url: Option<String>,
     token: Option<String>,
+    particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
     if info.sender != owner {
         return Err(ContractError::Unauthorized {});
     }
 
-    for byte in source_chain_id.as_ref().unwrap().as_bytes().iter() {
-        //  - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect source_chain_id. a-z0-9- allowed".to_string()});
+    if !particle.as_ref().is_none()  {
+        let validate_particle = validate_ipfs_cid(particle.clone().unwrap());
+        if validate_particle.is_err() {
+            return validate_particle;
         }
     }
 
-    for byte in destination_chain_id.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect destination_chain_id. a-z0-9- allowed".to_string()});
-        }
+    let validate_source_chain_id = validate_by_basic_rule(source_chain_id.clone().unwrap(), "source_chain_id".to_string());
+    let validate_destination_chain_id = validate_by_basic_rule(destination_chain_id.clone().unwrap(), "destination_chain_id".to_string());
+    let validate_source_channel_id = validate_by_basic_rule(source_channel_id.clone().unwrap(), "source_channel_id".to_string());
+    let validate_destination_channel_id = validate_by_basic_rule(destination_channel_id.clone().unwrap(), "destination_channel_id".to_string());
+
+    let validate_explorer_url = validate_url(explorer_url.clone().unwrap(), "explorer_url".to_string());
+    let validate_token = validate_by_basic_uppercase_rule(token.clone().unwrap(), "token".to_string());
+
+    if validate_source_chain_id.is_err() {
+        return validate_source_chain_id;
+    }
+    if validate_destination_chain_id.is_err() {
+        return validate_destination_chain_id;
+    }
+    if validate_source_channel_id.is_err() {
+        return validate_source_channel_id;
+    }
+    if validate_destination_channel_id.is_err() {
+        return validate_destination_channel_id;
+    }
+    if validate_explorer_url.is_err() {
+        return validate_explorer_url;
+    }
+    if validate_token.is_err() {
+        return validate_token;
     }
 
-    for byte in source_channel_id.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect source_channel_id. a-z0-9- allowed".to_string()});
-        }
-    }
-
-    for byte in destination_channel_id.as_ref().unwrap().as_bytes().iter() {
-        // - && 0-9 && a-z
-        if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect destination_channel_id. a-z0-9- allowed".to_string()});
-        }
-    }
-
-    for byte in rpc.as_ref().unwrap().as_bytes().iter() {
-        // :/.-_0-9a-zA-Z
-        if  (*byte != 123) && (*byte != 125) &&  (*byte != 58) && (*byte != 95) && (*byte != 45) && (*byte != 47) && (*byte != 46) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) && (*byte < 65 || *byte > 90)  {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect Rpc. Only url allowed".to_string()});
-        }
-    }
-
-    for byte in token.as_ref().unwrap().as_bytes().iter() {
-        // 0-9 && A-Z
-        if (*byte < 48 || *byte > 57) && (*byte < 65 || *byte > 90) {
-            return Err(ContractError::IncorrectInputData {val: "Incorrect token. 0-9A-Z allowed".to_string()});
-        }
-    }
 
     let entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
@@ -156,8 +148,9 @@ pub fn execute_update_item(
         destination_chain_id: destination_chain_id.unwrap_or(entry.destination_chain_id),
         source_channel_id: source_channel_id.unwrap_or(entry.source_channel_id),
         destination_channel_id: destination_channel_id.unwrap_or(entry.destination_channel_id),
-        rpc: rpc.unwrap_or(entry.rpc),
+        explorer_url: explorer_url.unwrap_or(entry.explorer_url),
         token: token.unwrap_or(entry.token),
+        particle: particle.unwrap_or("".to_string()),
     };
     LIST.save(deps.storage, id, &updated_entry)?;
     Ok(Response::new()

@@ -15,8 +15,9 @@ pub enum ExecuteMsg {
         destination_chain_id: String,
         source_channel_id: String,
         destination_channel_id: String,
-        rpc: String,
+        explorer_url: String,
         token: String,
+        particle: Option<String>,
     },
     UpdateEntry {
         id: u64,
@@ -24,8 +25,9 @@ pub enum ExecuteMsg {
         destination_chain_id: Option<String>,
         source_channel_id: Option<String>,
         destination_channel_id: Option<String>,
-        rpc: Option<String>,
+        explorer_url: Option<String>,
         token: Option<String>,
+        particle: Option<String>,
     },
     DeleteEntry {
         id: u64,
@@ -49,7 +51,7 @@ pub struct EntryResponse {
     pub destination_chain_id: String,
     pub source_channel_id: String,
     pub destination_channel_id: String,
-    pub rpc: String,
+    pub explorer_url: String,
     pub token: String,
 }
 

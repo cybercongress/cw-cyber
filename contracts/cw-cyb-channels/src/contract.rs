@@ -55,19 +55,21 @@ pub fn execute(
             destination_chain_id,
             source_channel_id,
             destination_channel_id,
-            rpc,
+            explorer_url,
             token,
+            particle
 
-        } => execute_create_new_item(deps, info, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, rpc, token),
+        } => execute_create_new_item(deps, info, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, explorer_url, token, particle),
         ExecuteMsg::UpdateEntry {
             id,
             source_chain_id,
             destination_chain_id,
             source_channel_id,
             destination_channel_id,
-            rpc,
+            explorer_url,
             token,
-        } => execute_update_item(deps, info, id, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, rpc, token),
+            particle,
+        } => execute_update_item(deps, info, id, source_chain_id,destination_chain_id,source_channel_id, destination_channel_id, explorer_url, token, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

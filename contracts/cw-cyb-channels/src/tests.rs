@@ -64,8 +64,9 @@ mod tests {
             destination_chain_id: "cosmos-1".to_string(),
             source_channel_id: "channel-256".to_string(),
             destination_channel_id: "channel-1".to_string(),
-            rpc: "https://explorer.com/{hash}".to_string(),
-            token: "DEM1".to_string(),
+            explorer_url: "https://explorer.com/{hash}".to_string(),
+            token: "DEM2".to_string(),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -82,8 +83,9 @@ mod tests {
             destination_chain_id: "cosmos-2".to_string(),
             source_channel_id: "channel-2".to_string(),
             destination_channel_id: "channel-2".to_string(),
-            rpc: "https://explorer.com/{hash}".to_string(),
+            explorer_url: "https://explorer.com/{hash}".to_string(),
             token: "DEM2".to_string(),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -114,8 +116,9 @@ mod tests {
                     destination_chain_id: "cosmos-1".to_string(),
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
-                    rpc: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM1".to_string(),
+                    explorer_url: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM2".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
                     id: 2,
@@ -123,8 +126,9 @@ mod tests {
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
-                    rpc: "https://explorer.com/{hash}".to_string(),
+                    explorer_url: "https://explorer.com/{hash}".to_string(),
                     token: "DEM2".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
             list.entries
@@ -137,8 +141,9 @@ mod tests {
             destination_chain_id: Some("cosmos-1".to_string()),
             source_channel_id: Some("channel-256".to_string()),
             destination_channel_id: Some("channel-1".to_string()),
-            rpc: Some("https://explorer.com/{hash}".to_string()),
-            token: Some("DEM3".to_string()),
+            explorer_url: Some("https://explorer.com/{hash}".to_string()),
+            token: Some("DEM2".to_string()),
+            particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
         let res = execute(deps.as_mut(), env.clone(), info.clone(), message).unwrap();
@@ -171,8 +176,9 @@ mod tests {
                     destination_chain_id: "cosmos-1".to_string(),
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
-                    rpc: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM3".to_string(),
+                    explorer_url: "https://explorer.com/{hash}".to_string(),
+                    token: "DEM2".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
                     id: 2,
@@ -180,8 +186,9 @@ mod tests {
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
-                    rpc: "https://explorer.com/{hash}".to_string(),
+                    explorer_url: "https://explorer.com/{hash}".to_string(),
                     token: "DEM2".to_string(),
+                    particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
             list.entries
@@ -216,8 +223,9 @@ mod tests {
                 destination_chain_id: "cosmos-2".to_string(),
                 source_channel_id: "channel-2".to_string(),
                 destination_channel_id: "channel-2".to_string(),
-                rpc: "https://explorer.com/{hash}".to_string(),
+                explorer_url: "https://explorer.com/{hash}".to_string(),
                 token: "DEM2".to_string(),
+                particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             }]),
             list.entries
         );
