@@ -12,18 +12,20 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     NewEntry {
         address: String,
-        query_hash: String,
-        execute_hash: String,
+        query_cid: String,
+        execute_cid: String,
         version: String,
-        github: String,
+        chain_id: String,
+        particle: Option<String>,
     },
     UpdateEntry {
         id: u64,
         address: Option<String>,
-        query_hash: Option<String>,
-        execute_hash: Option<String>,
+        query_cid: Option<String>,
+        execute_cid: Option<String>,
         version: Option<String>,
-        github: Option<String>,
+        chain_id: Option<String>,
+        particle: Option<String>,
     },
     DeleteEntry {
         id: u64,
@@ -44,10 +46,11 @@ pub enum QueryMsg {
 pub struct EntryResponse {
     pub id: u64,
     pub address: String,
-    pub query_hash: String,
-    pub execute_hash: String,
+    pub query_cid: String,
+    pub execute_cid: String,
     pub version: String,
-    pub github: String,
+    pub chain_id: String,
+    pub particle: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

@@ -14,10 +14,11 @@ pub struct Config {
 pub struct Entry {
     pub id: u64,
     pub address: String,
-    pub query_hash: String,
-    pub execute_hash: String,
+    pub query_cid: String,
+    pub execute_cid: String,
     pub version: String,
-    pub github: String,
+    pub chain_id: String,
+    pub particle: String,
 }
 
 

@@ -52,19 +52,21 @@ pub fn execute(
     match msg {
         ExecuteMsg::NewEntry {
             address,
-            query_hash,
-            execute_hash,
+            query_cid,
+            execute_cid,
             version,
-            github,
-        } => execute_create_new_item(deps, info,address,query_hash,execute_hash,version,github),
+            chain_id,
+            particle,
+        } => execute_create_new_item(deps, info,address,query_cid,execute_cid,version,chain_id, particle),
         ExecuteMsg::UpdateEntry {
             id,
             address,
-            query_hash,
-            execute_hash,
+            query_cid,
+            execute_cid,
             version,
-            github
-        } => execute_update_item(deps, info, id, address, query_hash, execute_hash, version, github),
+            chain_id,
+            particle,
+        } => execute_update_item(deps, info, id, address,query_cid,execute_cid,version,chain_id, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }
