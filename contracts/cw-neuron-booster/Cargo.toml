@@ -1,0 +1,27 @@
+[package]
+name = "cw-neuron-booster"
+version = "0.1.0"
+edition = "2018"
+authors = ["CyberHead"]
+description = "Neuron Booster"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all init/handle/query exports
+library = []
+
+[dependencies]
+cosmwasm-schema = { version = "1.0.0" }
+cw-utils = { version = "0.14.0" }
+cw2 = { version = "0.14.0" }
+cw1155 = { version = "0.14.0" }
+cw-storage-plus = { version = "0.14.0" }
+cw20-bonding = { version = "0.11.1", features = ["library"] }
+cosmwasm-std = { version = "1.0.0",  features = ["iterator", "abort"] }
+schemars = "0.8.10"
+serde = { version = "1.0.139", default-features = false, features = ["derive"] }
+thiserror = { version = "1.0.31" }
+semver = "1"
