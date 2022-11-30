@@ -1,6 +1,4 @@
-use cosmwasm_std::{
-    Deps, DepsMut, MessageInfo, Order, Response, StdResult,
-};
+use cosmwasm_std::{attr, Deps, DepsMut, Env, MessageInfo, Order, Response, StdResult};
 
 use cw_storage_plus::Bound;
 use std::ops::Add;
@@ -14,6 +12,30 @@ use crate::validating::{validate_particle,validate_datatype};
 const MAX_LIMIT: u32 = 30;
 const DEFAULT_LIMIT: u32 = 20;
 
+pub fn execute_update_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_owner: Option<String>,
+) -> Result<Response, ContractError> {
+    let cfg = CONFIG.load(deps.storage)?;
+    let owner = cfg.owner.ok_or(ContractError::Unauthorized {})?;
+    if info.sender != owner {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let mut tmp_owner = None;
+    if let Some(addr) = new_owner {
+        tmp_owner = Some(deps.api.addr_validate(&addr)?)
+    }
+
+    CONFIG.update(deps.storage, |mut exists| -> StdResult<_> {
+        exists.owner = tmp_owner;
+        Ok(exists)
+    })?;
+
+    Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
+}
 
 pub fn execute_create_new_item(
     deps: DepsMut,
@@ -22,11 +44,12 @@ pub fn execute_create_new_item(
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
-
-
 
     let validate_particle = validate_particle(particle.clone());
     let validate_data_typer = validate_datatype(data_type.clone());
@@ -61,7 +84,10 @@ pub fn execute_update_item(
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -74,11 +100,8 @@ pub fn execute_update_item(
     if validate_data_typer.is_err() {
         return validate_data_typer;
     }
-    
 
-
-
-    let entry = LIST.load(deps.storage, id)?;
+    let _entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
         id,
         data_type: data_type,
@@ -96,7 +119,10 @@ pub fn execute_delete_entry(
     id: u64,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
 

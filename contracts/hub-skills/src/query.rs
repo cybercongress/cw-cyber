@@ -1,6 +1,4 @@
-use cosmwasm_std::{
-    Deps, DepsMut, MessageInfo, Order, Response, StdResult, Addr,
-};
+use cosmwasm_std::{Deps, DepsMut, MessageInfo, Order, Response, StdResult, Addr, Env, attr};
 
 // use cw_storage_plus::Bound;
 use std::ops::Add;
@@ -8,13 +6,38 @@ use std::ops::Add;
 use crate::validating::{validate_by_basic_rule,validate_ipfs_cid, validate_url};
 use crate::error::ContractError;
 use crate::msg::{ListResponse};
-use crate::state::{Entry, ENTRY_SEQ, items};
+use crate::state::{CONFIG, Entry, ENTRY_SEQ, items};
 
 const MAX_LIMIT: u32 = 50;
 const DEFAULT_LIMIT: u32 = 30;
 
 pub fn uniq_key_by_owner(owner: Addr, id: u64) -> (Addr, u64) {
     (owner.clone(), id.clone())
+}
+
+pub fn execute_update_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_owner: Option<String>,
+) -> Result<Response, ContractError> {
+    let cfg = CONFIG.load(deps.storage)?;
+    let owner = cfg.owner.ok_or(ContractError::Unauthorized {})?;
+    if info.sender != owner {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let mut tmp_owner = None;
+    if let Some(addr) = new_owner {
+        tmp_owner = Some(deps.api.addr_validate(&addr)?)
+    }
+
+    CONFIG.update(deps.storage, |mut exists| -> StdResult<_> {
+        exists.owner = tmp_owner;
+        Ok(exists)
+    })?;
+
+    Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
 }
 
 pub fn execute_create_item(

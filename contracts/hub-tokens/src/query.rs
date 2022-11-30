@@ -50,7 +50,10 @@ pub fn execute_create_new_item(
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -108,7 +111,10 @@ pub fn execute_update_item(
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -161,7 +167,10 @@ pub fn execute_delete_entry(
     id: u64,
 ) -> Result<Response, ContractError> {
     let owner = CONFIG.load(deps.storage)?.owner;
-    if info.sender != owner {
+
+    if owner.is_none() {
+        return Err(ContractError::Unauthorized {});
+    } else if info.sender != owner.unwrap() {
         return Err(ContractError::Unauthorized {});
     }
 

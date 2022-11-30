@@ -31,7 +31,7 @@ pub fn instantiate(
         .unwrap_or(info.sender);
 
     let config = Config {
-        owner: owner.clone(),
+        owner: Some(owner.clone()),
     };
     CONFIG.save(deps.storage, &config)?;
 

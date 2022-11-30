@@ -1,5 +1,4 @@
 use crate::state::{Entry};
-// use cosmwasm_std::{Uint64};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +9,9 @@ pub struct InstantiateMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
+    UpdateOwner {
+        new_owner: Option<String>,
+    },
     NewEntry {
         address: String,
         query_cid: String,
