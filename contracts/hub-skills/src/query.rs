@@ -1,7 +1,6 @@
 use cosmwasm_std::{
     Deps, DepsMut, MessageInfo, Order, Response, StdResult, Addr,
 };
-use cw_storage_plus::IndexedMap;
 
 // use cw_storage_plus::Bound;
 use std::ops::Add;
@@ -18,10 +17,11 @@ pub fn uniq_key_by_owner(owner: Addr, id: u64) -> (Addr, u64) {
     (owner.clone(), id.clone())
 }
 
-pub fn execute_create_new_item(
+pub fn execute_create_item(
     deps: DepsMut,
     info: MessageInfo,
     neuron: String,
+    network: String,
     protocol: String,
     endpoint: String,
     particle: Option<String>,
@@ -34,13 +34,16 @@ pub fn execute_create_new_item(
         }
     }
 
-
     let validate_neuron = validate_by_basic_rule(neuron.clone(), "neuron".to_string());
+    let validate_network = validate_by_basic_rule(network.clone(), "network".to_string());
     let validate_protocol = validate_by_basic_rule(protocol.clone(), "protocol".to_string());
     let validate_endpoint = validate_url(endpoint.clone(), "endpoint".to_string());
 
     if validate_neuron.is_err() {
         return validate_neuron;
+    }
+    if validate_network.is_err() {
+        return validate_network;
     }
     if validate_protocol.is_err() {
         return validate_protocol;
@@ -49,24 +52,21 @@ pub fn execute_create_new_item(
         return validate_endpoint;
     }
 
-
-
-
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
 
     let new_entry = Entry {
         id,
         neuron,
+        network,
         protocol,
         endpoint,
         owner: info.sender,
         particle: particle.unwrap_or("".to_string())
     };
 
-
     items().save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
-        .add_attribute("method", "execute_create_new_item")
+        .add_attribute("method", "execute_create_item")
         .add_attribute("new_entry_id", id.to_string()))
 }
 
@@ -75,15 +75,11 @@ pub fn execute_update_item(
     info: MessageInfo,
     id: u64,
     neuron: Option<String>,
+    network: Option<String>,
     protocol: Option<String>,
     endpoint: Option<String>,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
-    // let owner = CONFIG.load(deps.storage)?.owner;
-    // if info.sender != owner {
-    //     return Err(ContractError::Unauthorized {});
-    // }
-
     if !particle.as_ref().is_none()  {
         let validate_particle = validate_ipfs_cid(particle.clone().unwrap(),"particle".to_string());
         if validate_particle.is_err() {
@@ -92,11 +88,15 @@ pub fn execute_update_item(
     }
 
     let validate_neuron = validate_by_basic_rule(neuron.clone().unwrap(), "neuron".to_string());
+    let validate_network = validate_by_basic_rule(network.clone().unwrap(), "network".to_string());
     let validate_protocol = validate_by_basic_rule(protocol.clone().unwrap(), "protocol".to_string());
     let validate_endpoint = validate_url(endpoint.clone().unwrap(), "endpoint".to_string());
 
     if validate_neuron.is_err() {
         return validate_neuron;
+    }
+    if validate_network.is_err() {
+        return validate_network;
     }
     if validate_protocol.is_err() {
         return validate_protocol;
@@ -111,11 +111,11 @@ pub fn execute_update_item(
     if entry.owner != info.sender {
         return Err(ContractError::Unauthorized {});
     }
-    
 
     let updated_entry = Entry {
         id,
         neuron: neuron.unwrap_or(entry.neuron),
+        network: network.unwrap_or(entry.network),
         protocol: protocol.unwrap_or(entry.protocol),
         endpoint: endpoint.unwrap_or(entry.endpoint),
         owner: entry.owner,
@@ -132,12 +132,6 @@ pub fn execute_delete_entry(
     info: MessageInfo,
     id: u64,
 ) -> Result<Response, ContractError> {
-    // let owner = CONFIG.load(deps.storage)?.owner;
-    // if info.sender != owner {
-    //     return Err(ContractError::Unauthorized {});
-    // }
-
-    // let key = uniq_key_by_owner(info.sender, id);
     let entry = items().load(deps.storage, id)?;
 
     if entry.owner != info.sender {
@@ -146,26 +140,19 @@ pub fn execute_delete_entry(
 
     let _result = items().remove(deps.storage, id);
 
-
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))
 }
 
-
-
-
-
-pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>, protocol: Option<String>, owner: Option<Addr>) -> StdResult<ListResponse> {
+pub fn query_list(deps: Deps, _start_after: Option<u64>, limit: Option<u32>, _protocol: Option<String>, owner: Option<Addr>) -> StdResult<ListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
 
-
-    // let indexedArr =  items();
     let indexed_arr = items().idx.owner;
 
+    // TODO add start_after and protocol
+
     let entries: StdResult<Vec<_>> = indexed_arr
-        // .idx
-        // .owner
         .prefix(owner.clone().unwrap_or(Addr::unchecked("")).to_string())
         .range(
             deps.storage,            
@@ -175,7 +162,6 @@ pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>, prot
         )
         .take(limit)
         .collect();
-
 
     let result = ListResponse {
         entries: entries?.into_iter().map(|l| l.1).collect(),

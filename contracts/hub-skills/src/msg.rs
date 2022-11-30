@@ -13,8 +13,11 @@ pub struct InstantiateMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
+    // TODO add change owner contract
+    // TODO add change owner item
     NewEntry {
         neuron: String,
+        network: String,
         protocol: String,
         endpoint: String,
         particle: Option<String>,
@@ -22,6 +25,7 @@ pub enum ExecuteMsg {
     UpdateEntry {
         id: u64,
         neuron: Option<String>,
+        network: Option<String>,
         protocol: Option<String>,
         endpoint: Option<String>,
         particle: Option<String>,

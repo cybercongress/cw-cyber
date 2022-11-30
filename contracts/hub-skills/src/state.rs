@@ -13,23 +13,21 @@ pub struct Config {
 pub struct Entry {
     pub id: u64,
     pub neuron: String,
+    pub network: String,
     pub protocol: String,
     pub endpoint: String,
     pub owner: Addr,
     pub particle: String,
 }
 
-
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const ENTRY_SEQ: Item<u64> = Item::new("entry_seq");
-
-
 
 pub struct EntryIndexes<'a> {
     pub id: UniqueIndex<'a, u64, Entry>,
     pub owner: MultiIndex<'a, String, Entry, String>,
+    pub network: MultiIndex<'a, String, Entry, String>,
     pub protocol: MultiIndex<'a, String, Entry, String>,
-    
 }
 
 impl<'a> IndexList<Entry> for EntryIndexes<'a> {
@@ -45,6 +43,11 @@ pub fn items<'a>() -> IndexedMap<'a, u64, Entry, EntryIndexes<'a>> {
             |d| (d.owner.clone().to_string()),
             "list",
             "list_owner"
+        ),
+        network: MultiIndex::new(
+            |d| (d.owner.clone().to_string()),
+            "list",
+            "list_network"
         ),
         protocol: MultiIndex::new(
             |d| (d.protocol.clone().to_string()),

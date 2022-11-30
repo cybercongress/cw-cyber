@@ -8,7 +8,7 @@ use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_list, execute_create_new_item, execute_update_item, execute_delete_entry};
+use crate::query::{query_list, execute_create_item, execute_update_item, execute_delete_entry};
 // Token constructor
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
@@ -53,16 +53,18 @@ pub fn execute(
         ExecuteMsg::NewEntry {
             neuron,
             protocol,
+            network,
             endpoint,
             particle,
-        } => execute_create_new_item(deps, info, neuron, protocol,endpoint,particle),
+        } => execute_create_item(deps, info, neuron, network, protocol, endpoint, particle),
         ExecuteMsg::UpdateEntry {
             id,
             neuron,
             protocol,
+            network,
             endpoint,
             particle,
-        } => execute_update_item(deps, info, id, neuron, protocol, endpoint, particle),
+        } => execute_update_item(deps, info, id, neuron, network, protocol, endpoint, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

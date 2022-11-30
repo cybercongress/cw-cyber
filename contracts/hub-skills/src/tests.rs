@@ -62,6 +62,7 @@ mod tests {
 
         let msg = ExecuteMsg::NewEntry {
             neuron: "testchain-1".to_string(),
+            network: "cosmos".to_string(),
             protocol: "testchain-1".to_string(),
             endpoint: "https:/abcd.com".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
@@ -71,13 +72,14 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "1")
             ]
         );
 
         let msg = ExecuteMsg::NewEntry {
             neuron: "testchain-1".to_string(),
+            network: "cosmos".to_string(),
             protocol: "testchain-1".to_string(),
             endpoint: "https:/abcd.com".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
@@ -87,7 +89,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "2")
             ]
         );
@@ -111,6 +113,7 @@ mod tests {
                 Entry {
                     id: 1,
                     neuron: "testchain-1".to_string(),
+                    network: "cosmos".to_string(),
                     protocol: "testchain-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
@@ -119,6 +122,7 @@ mod tests {
                 Entry {
                     id: 2,
                     neuron: "testchain-1".to_string(),
+                    network: "cosmos".to_string(),
                     protocol: "testchain-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
@@ -132,6 +136,7 @@ mod tests {
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
             neuron: Some("testchain-1".to_string()),
+            network: Some("cosmos".to_string()),
             protocol: Some("testchain-1".to_string()),
             endpoint: Some("https:/abcd.com".to_string()),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
@@ -166,6 +171,7 @@ mod tests {
                 Entry {
                     id: 1,
                     neuron: "testchain-1".to_string(),
+                    network: "cosmos".to_string(),
                     protocol: "testchain-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
@@ -174,6 +180,7 @@ mod tests {
                 Entry {
                     id: 2,
                     neuron: "testchain-1".to_string(),
+                    network: "cosmos".to_string(),
                     protocol: "testchain-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
@@ -211,6 +218,7 @@ mod tests {
             Vec::from([Entry {
                 id: 2,
                 neuron: "testchain-1".to_string(),
+                network: "cosmos".to_string(),
                 protocol: "testchain-1".to_string(),
                 endpoint: "https:/abcd.com".to_string(),
                 particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
