@@ -56,7 +56,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             source_chain_id: "bostrom-1".to_string(),
             destination_chain_id: "cosmos-1".to_string(),
             source_channel_id: "channel-256".to_string(),
@@ -74,7 +74,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             source_chain_id: "bostrom-2".to_string(),
             destination_chain_id: "cosmos-2".to_string(),
             source_channel_id: "channel-2".to_string(),

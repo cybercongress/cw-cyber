@@ -59,7 +59,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
             query_cid: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             execute_cid: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
@@ -77,7 +77,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             address: "bostrom1fzm6gzyccl8jvdv3qq6hp9vs6ylaruervs4m06c7k0ntzn2f8faq7ha2z2".to_string(),
             query_cid: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             execute_cid: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),

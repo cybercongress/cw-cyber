@@ -50,7 +50,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::UpdateOwner { new_owner } => execute_update_owner(deps, env, info, new_owner),
-        ExecuteMsg::NewEntry {
+        ExecuteMsg::CreateEntry {
             source_chain_id,
             destination_chain_id,
             source_channel_id,

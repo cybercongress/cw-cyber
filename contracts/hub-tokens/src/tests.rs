@@ -57,7 +57,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             chain_id: "testchain-1".to_string(),
             ticker: "TST".to_string(),
             denom: "cyb".to_string(),
@@ -75,7 +75,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             ticker: "TST2".to_string(),
             chain_id: "testchain-1".to_string(),
             denom: "cyb".to_string(),

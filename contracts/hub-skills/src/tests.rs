@@ -60,7 +60,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             neuron: "testchain-1".to_string(),
             network: "cosmos".to_string(),
             protocol: "testchain-1".to_string(),
@@ -77,7 +77,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             neuron: "testchain-1".to_string(),
             network: "cosmos".to_string(),
             protocol: "testchain-1".to_string(),

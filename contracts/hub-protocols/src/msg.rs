@@ -12,7 +12,7 @@ pub enum ExecuteMsg {
     UpdateOwner {
         new_owner: Option<String>,
     },
-    NewEntry {
+    CreateEntry {
         data_type: String,
         particle: Option<String>,
     },
@@ -39,7 +39,6 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct MigrateMsg {}
 
-// Tokens
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,

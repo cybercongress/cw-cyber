@@ -48,7 +48,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::UpdateOwner { new_owner } => execute_update_owner(deps, env, info, new_owner),
         ExecuteMsg::UpdateEntryOwner { id, new_owner } => execute_update_entry_owner(deps, env, info, id, new_owner),
-        ExecuteMsg::NewEntry {
+        ExecuteMsg::CreateEntry {
             neuron,
             protocol,
             network,

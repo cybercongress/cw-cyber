@@ -13,7 +13,7 @@ pub enum ExecuteMsg {
     UpdateOwner {
         new_owner: Option<String>,
     },
-    NewEntry {
+    CreateEntry {
         ticker: String,
         chain_id: String,
         denom: String,
@@ -48,7 +48,6 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct MigrateMsg {}
 
-// Tokens
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,

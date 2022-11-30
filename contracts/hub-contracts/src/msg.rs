@@ -12,7 +12,7 @@ pub enum ExecuteMsg {
     UpdateOwner {
         new_owner: Option<String>,
     },
-    NewEntry {
+    CreateEntry {
         address: String,
         query_cid: String,
         execute_cid: String,

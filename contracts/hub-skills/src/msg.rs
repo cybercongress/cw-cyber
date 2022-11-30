@@ -20,7 +20,7 @@ pub enum ExecuteMsg {
         id: u64,
         new_owner: String,
     },
-    NewEntry {
+    CreateEntry {
         neuron: String,
         network: String,
         protocol: String,

@@ -59,7 +59,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             data_type: "testchain-1".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -73,7 +73,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             data_type: "testchain-1".to_string(),
             // particle: None,
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),

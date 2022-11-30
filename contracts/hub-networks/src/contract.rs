@@ -49,7 +49,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::UpdateOwner { new_owner } => execute_update_owner(deps, env, info, new_owner),
-        ExecuteMsg::NewEntry {
+        ExecuteMsg::CreateEntry {
             name,
             chain_id,
             prefix,

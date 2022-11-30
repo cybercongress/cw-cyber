@@ -12,7 +12,7 @@ pub enum ExecuteMsg {
     UpdateOwner {
         new_owner: Option<String>,
     },
-    NewEntry {
+    CreateEntry {
         name: String,
         chain_id: String,
         prefix: String,

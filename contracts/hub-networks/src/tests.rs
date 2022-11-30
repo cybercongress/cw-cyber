@@ -56,7 +56,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             name: "tst".to_string(),
             protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
@@ -76,7 +76,7 @@ mod tests {
             ]
         );
 
-        let msg = ExecuteMsg::NewEntry {
+        let msg = ExecuteMsg::CreateEntry {
             name: "tst2".to_string(),
             protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
