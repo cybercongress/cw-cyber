@@ -6,8 +6,9 @@ use cosmwasm_std::entry_point;
 use cw2::{get_contract_version, set_contract_version};
 
 use crate::error::ContractError;
+use crate::execute::{execute_create_entry, execute_delete_entry, execute_update_entry, execute_update_owner};
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::query::{execute_create_entry, execute_delete_entry, execute_update_entry, execute_update_owner, query_entry, query_list};
+use crate::query::{query_entry, query_list};
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
