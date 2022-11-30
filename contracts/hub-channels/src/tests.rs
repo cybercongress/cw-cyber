@@ -2,14 +2,11 @@
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
-    // use cosmwasm_std::{Uint64};
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{attr, from_binary, Addr};
     use std::vec::Vec;
     use crate::state::{Entry, CONFIG, Config};
     use crate::msg::{ ListResponse, QueryMsg, InstantiateMsg, ExecuteMsg};
-    // use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
     use crate::contract::{query, execute, instantiate};
 
     #[test]
@@ -65,7 +62,6 @@ mod tests {
             source_channel_id: "channel-256".to_string(),
             destination_channel_id: "channel-1".to_string(),
             explorer_url: "https://explorer.com/{hash}".to_string(),
-            token: "DEM2".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
@@ -73,7 +69,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "1")
             ]
         );
@@ -84,7 +80,6 @@ mod tests {
             source_channel_id: "channel-2".to_string(),
             destination_channel_id: "channel-2".to_string(),
             explorer_url: "https://explorer.com/{hash}".to_string(),
-            token: "DEM2".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
@@ -92,7 +87,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "2")
             ]
         );
@@ -117,7 +112,6 @@ mod tests {
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
                     explorer_url: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM2".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
@@ -127,7 +121,6 @@ mod tests {
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
                     explorer_url: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM2".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
@@ -142,7 +135,6 @@ mod tests {
             source_channel_id: Some("channel-256".to_string()),
             destination_channel_id: Some("channel-1".to_string()),
             explorer_url: Some("https://explorer.com/{hash}".to_string()),
-            token: Some("DEM2".to_string()),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
 
@@ -154,8 +146,6 @@ mod tests {
                 attr("updated_entry_id", "1")
             ]
         );
-
-        
 
         // Query the list of entries
         let res = query(
@@ -177,7 +167,6 @@ mod tests {
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
                     explorer_url: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM2".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
                 Entry {
@@ -187,7 +176,6 @@ mod tests {
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
                     explorer_url: "https://explorer.com/{hash}".to_string(),
-                    token: "DEM2".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
             ]),
@@ -224,7 +212,6 @@ mod tests {
                 source_channel_id: "channel-2".to_string(),
                 destination_channel_id: "channel-2".to_string(),
                 explorer_url: "https://explorer.com/{hash}".to_string(),
-                token: "DEM2".to_string(),
                 particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             }]),
             list.entries

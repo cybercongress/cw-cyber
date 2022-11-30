@@ -1,6 +1,3 @@
-use cid::{Cid, Version};
-use std::str::FromStr;
-
 use cosmwasm_std::{
     Deps, DepsMut, MessageInfo, Order, Response, StdResult,
 };

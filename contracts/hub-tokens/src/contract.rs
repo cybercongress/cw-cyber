@@ -54,17 +54,19 @@ pub fn execute(
             ticker,
             chain_id,
             denom,
+            channel,
             logo,
             particle,
-        } => execute_create_new_item(deps, info, ticker, chain_id, denom, logo, particle),
+        } => execute_create_new_item(deps, info, ticker, chain_id, denom, channel, logo,particle),
         ExecuteMsg::UpdateEntry {
             id,
             ticker,
             chain_id,
             denom,
+            channel,
             logo,
             particle,
-        } => execute_update_item(deps, info, id, ticker, chain_id, denom, logo, particle),
+        } => execute_update_item(deps, info, id, ticker, chain_id, denom, channel, logo, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

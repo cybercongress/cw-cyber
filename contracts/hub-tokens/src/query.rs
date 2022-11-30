@@ -1,7 +1,4 @@
 use cosmwasm_std::{Uint64};
-// use cid::{Cid, Version};
-// use std::str::FromStr;
-// use cid::multihash::{Code, MultihashDigest};
 use cosmwasm_std::{
     Deps, DepsMut, MessageInfo, Order, Response, StdResult,
 };
@@ -9,7 +6,7 @@ use cosmwasm_std::{
 use cw_storage_plus::Bound;
 use std::ops::Add;
 
-use crate::validating::{validate_by_basic_rule,validate_by_basic_uppercase_rule,validate_ipfs_cid,validate_by_int_range};
+use crate::validating::{validate_by_basic_rule, validate_by_basic_uppercase_rule, validate_ipfs_cid};
 use crate::error::ContractError;
 use crate::msg::{ListResponse};
 use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
@@ -23,7 +20,8 @@ pub fn execute_create_new_item(
     info: MessageInfo,
     ticker: String,
     chain_id: String,
-    denom: Uint64,
+    denom: String,
+    channel: Uint64,
     logo: String,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
@@ -44,10 +42,8 @@ pub fn execute_create_new_item(
         }
     }
 
-
     let validate_ticker = validate_by_basic_uppercase_rule(ticker.clone(), "ticker".to_string());
     let validate_chain_id = validate_by_basic_rule(chain_id.clone(), "chain_id".to_string());
-    let validate_denom = validate_by_int_range(Uint64::from(1u64),Uint64::from(18u64), denom.clone(),"denom".to_string());
 
     if validate_ticker.is_err() {
         return validate_ticker;
@@ -55,11 +51,9 @@ pub fn execute_create_new_item(
     if validate_chain_id.is_err() {
         return validate_chain_id;
     }
-    if validate_denom.is_err() {
-        return validate_denom;
-    }
 
-
+    // TODO add denom validation
+    // TODO add channel validation
 
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
 
@@ -68,12 +62,13 @@ pub fn execute_create_new_item(
         ticker,
         chain_id,
         denom,
+        channel,
         logo,
         particle: particle.unwrap_or("".to_string())
     };
     LIST.save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
-        .add_attribute("method", "execute_create_new_item")
+        .add_attribute("method", "execute_create_item")
         .add_attribute("new_entry_id", id.to_string()))
 }
 
@@ -83,7 +78,8 @@ pub fn execute_update_item(
     id: u64,
     ticker: Option<String>,
     chain_id: Option<String>,
-    denom: Option<Uint64>,
+    denom: Option<String>,
+    channel: Option<Uint64>,
     logo: Option<String>,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
@@ -107,7 +103,9 @@ pub fn execute_update_item(
 
     let validate_ticker = validate_by_basic_uppercase_rule(ticker.clone().unwrap(), "ticker".to_string());
     let validate_chain_id = validate_by_basic_rule(chain_id.clone().unwrap(), "chain_id".to_string());
-    let validate_denom = validate_by_int_range(Uint64::from(1u64),Uint64::from(18u64), denom.clone().unwrap(),"denom".to_string());
+
+    // TODO add denom validation
+    // TODO add channel validation
 
     if validate_ticker.is_err() {
         return validate_ticker;
@@ -115,9 +113,6 @@ pub fn execute_update_item(
     if validate_chain_id.is_err() {
         return validate_chain_id;
     }
-    if validate_denom.is_err() {
-        return validate_denom;
-    } 
 
 
     let entry = LIST.load(deps.storage, id)?;
@@ -126,6 +121,7 @@ pub fn execute_update_item(
         ticker: ticker.unwrap_or(entry.ticker),
         denom: denom.unwrap_or(entry.denom),
         chain_id: chain_id.unwrap_or(entry.chain_id),
+        channel: channel.unwrap_or(entry.channel),
         logo: logo.unwrap_or(entry.logo),
         particle: particle.unwrap_or("".to_string()),
     };
@@ -150,10 +146,6 @@ pub fn execute_delete_entry(
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))
 }
-
-
-
-
 
 pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>) -> StdResult<ListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;

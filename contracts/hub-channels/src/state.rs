@@ -18,7 +18,6 @@ pub struct Entry {
     pub source_channel_id: String,
     pub destination_channel_id: String,
     pub explorer_url: String,
-    pub token: String,
     pub particle: String,
 }
 

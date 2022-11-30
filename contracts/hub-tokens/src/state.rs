@@ -15,11 +15,11 @@ pub struct Entry {
     pub id: u64,
     pub ticker: String,
     pub chain_id: String,
-    pub denom: Uint64,
+    pub denom: String,
+    pub channel: Uint64,
     pub logo: String,
     pub particle: String,
 }
-
 
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const ENTRY_SEQ: Item<u64> = Item::new("entry_seq");

@@ -2,14 +2,12 @@
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
     use cosmwasm_std::{Uint64};
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{attr, from_binary, Addr};
     use std::vec::Vec;
     use crate::state::{Entry, CONFIG, Config};
     use crate::msg::{ ListResponse, QueryMsg, InstantiateMsg, ExecuteMsg};
-    // use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
     use crate::contract::{query, execute, instantiate};
 
     #[test]
@@ -62,7 +60,8 @@ mod tests {
         let msg = ExecuteMsg::NewEntry {
             chain_id: "testchain-1".to_string(),
             ticker: "TST".to_string(),
-            denom: Uint64::new(8),
+            denom: "cyb".to_string(),
+            channel: Uint64::new(1),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -71,7 +70,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "1")
             ]
         );
@@ -79,7 +78,8 @@ mod tests {
         let msg = ExecuteMsg::NewEntry {
             ticker: "TST2".to_string(),
             chain_id: "testchain-1".to_string(),
-            denom: Uint64::new(8),
+            denom: "cyb".to_string(),
+            channel: Uint64::new(1),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -88,7 +88,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "2")
             ]
         );
@@ -110,7 +110,8 @@ mod tests {
                     id: 1,
                     chain_id: "testchain-1".to_string(),
                     ticker: "TST".to_string(),
-                    denom: Uint64::new(8),
+                    denom: "cyb".to_string(),
+                    channel: Uint64::new(1),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
@@ -118,7 +119,8 @@ mod tests {
                     id: 2,
                     ticker: "TST2".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    denom: Uint64::new(8),
+                    denom: "cyb".to_string(),
+                    channel: Uint64::new(1),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
@@ -131,8 +133,8 @@ mod tests {
             id: 1,
             ticker: Some("TSTUPDATE".to_string()),
             chain_id: Some("testchain-1".to_string()),
-            denom: Some(Uint64::new(8)),
-            // logo: None,
+            denom: Some("cyb".to_string()),
+            channel: Some(Uint64::new(1)),
             logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -165,7 +167,8 @@ mod tests {
                     id: 1,
                     ticker: "TSTUPDATE".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    denom: Uint64::new(8),
+                    denom: "cyb".to_string(),
+                    channel: Uint64::new(1),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 },
@@ -173,7 +176,8 @@ mod tests {
                     id: 2,
                     ticker: "TST2".to_string(),
                     chain_id: "testchain-1".to_string(),
-                    denom: Uint64::new(8),
+                    denom: "cyb".to_string(),
+                    channel: Uint64::new(1),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 }
@@ -208,7 +212,8 @@ mod tests {
                 id: 2,
                 ticker: "TST2".to_string(),
                 chain_id: "testchain-1".to_string(),
-                denom: Uint64::new(8),
+                denom: "cyb".to_string(),
+                channel: Uint64::new(1),
                 logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             }]),

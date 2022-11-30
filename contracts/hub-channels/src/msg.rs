@@ -16,7 +16,6 @@ pub enum ExecuteMsg {
         source_channel_id: String,
         destination_channel_id: String,
         explorer_url: String,
-        token: String,
         particle: Option<String>,
     },
     UpdateEntry {
@@ -26,7 +25,6 @@ pub enum ExecuteMsg {
         source_channel_id: Option<String>,
         destination_channel_id: Option<String>,
         explorer_url: Option<String>,
-        token: Option<String>,
         particle: Option<String>,
     },
     DeleteEntry {
@@ -52,7 +50,6 @@ pub struct EntryResponse {
     pub source_channel_id: String,
     pub destination_channel_id: String,
     pub explorer_url: String,
-    pub token: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

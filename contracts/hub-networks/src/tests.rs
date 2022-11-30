@@ -2,14 +2,11 @@
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
-    // use cosmwasm_std::{Uint64};
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{attr, from_binary, Addr};
     use std::vec::Vec;
     use crate::state::{Entry, CONFIG, Config};
     use crate::msg::{ ListResponse, QueryMsg, InstantiateMsg, ExecuteMsg};
-    // use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
     use crate::contract::{query, execute, instantiate};
 
     #[test]
