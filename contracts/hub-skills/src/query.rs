@@ -6,7 +6,7 @@ use std::ops::Add;
 use crate::validating::{validate_by_basic_rule,validate_ipfs_cid, validate_url};
 use crate::error::ContractError;
 use crate::msg::{EntryResponse, ListResponse};
-use crate::state::{CONFIG, Entry, ENTRY_SEQ, items};
+use crate::state::{CONFIG, Entry, ENTRY_SEQ, entries};
 
 const MAX_LIMIT: u32 = 50;
 const DEFAULT_LIMIT: u32 = 30;
@@ -47,7 +47,7 @@ pub fn execute_update_entry_owner(
     id: u64,
     new_owner: String,
 ) -> Result<Response, ContractError> {
-    let entry = items().load(deps.storage, id)?;
+    let entry = entries().load(deps.storage, id)?;
 
     if entry.owner != info.sender {
         return Err(ContractError::Unauthorized {});
@@ -63,14 +63,14 @@ pub fn execute_update_entry_owner(
         particle: entry.particle,
     };
 
-    items().save(deps.storage, id, &updated_entry)?;
+    entries().save(deps.storage, id, &updated_entry)?;
 
     Ok(Response::new()
         .add_attribute("method", "execute_update_entry_owner")
         .add_attribute("updated_entry_id", id.to_string()))
 }
 
-pub fn execute_create_item(
+pub fn execute_create_entry(
     deps: DepsMut,
     info: MessageInfo,
     neuron: String,
@@ -116,13 +116,13 @@ pub fn execute_create_item(
         particle: particle.unwrap_or("".to_string())
     };
 
-    items().save(deps.storage, id, &new_entry)?;
+    entries().save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
-        .add_attribute("method", "execute_create_item")
+        .add_attribute("method", "execute_create_entry")
         .add_attribute("new_entry_id", id.to_string()))
 }
 
-pub fn execute_update_item(
+pub fn execute_update_entry(
     deps: DepsMut,
     info: MessageInfo,
     id: u64,
@@ -157,7 +157,7 @@ pub fn execute_update_item(
         return validate_endpoint;
     }
 
-    let entry = items().load(deps.storage, id)?;
+    let entry = entries().load(deps.storage, id)?;
 
     if entry.owner != info.sender {
         return Err(ContractError::Unauthorized {});
@@ -173,10 +173,10 @@ pub fn execute_update_item(
         particle: particle.unwrap_or("".to_string()),
     };
 
-    items().save(deps.storage, id, &updated_entry)?;
+    entries().save(deps.storage, id, &updated_entry)?;
 
     Ok(Response::new()
-        .add_attribute("method", "execute_update_item")
+        .add_attribute("method", "execute_update_entry")
         .add_attribute("updated_entry_id", id.to_string()))
 }
 
@@ -185,13 +185,13 @@ pub fn execute_delete_entry(
     info: MessageInfo,
     id: u64,
 ) -> Result<Response, ContractError> {
-    let entry = items().load(deps.storage, id)?;
+    let entry = entries().load(deps.storage, id)?;
 
     if entry.owner != info.sender {
         return Err(ContractError::Unauthorized {});
     }
 
-    let _result = items().remove(deps.storage, id);
+    let _result = entries().remove(deps.storage, id);
 
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
@@ -199,7 +199,7 @@ pub fn execute_delete_entry(
 }
 
 pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
-    let entry = items().load(deps.storage, id)?;
+    let entry = entries().load(deps.storage, id)?;
     Ok(EntryResponse {
         id,
         neuron: entry.neuron,
@@ -212,7 +212,7 @@ pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
 pub fn query_list(deps: Deps, _start_after: Option<u64>, limit: Option<u32>, _protocol: Option<String>, owner: Option<Addr>) -> StdResult<ListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
 
-    let indexed_arr = items().idx.owner;
+    let indexed_arr = entries().idx.owner;
 
     // TODO add start_after and protocol
 

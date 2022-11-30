@@ -16,7 +16,6 @@ pub struct Entry {
     pub particle: String,
 }
 
-
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const ENTRY_SEQ: Item<u64> = Item::new("entry_seq");
 pub const LIST: Map<u64, Entry> = Map::new("list");

@@ -37,7 +37,7 @@ pub fn execute_update_owner(
     Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
 }
 
-pub fn execute_create_item(
+pub fn execute_create_entry(
     deps: DepsMut,
     info: MessageInfo,
     name: String,
@@ -110,11 +110,11 @@ pub fn execute_create_item(
     };
     LIST.save(deps.storage, id, &new_entry)?;
     Ok(Response::new()
-        .add_attribute("method", "execute_create_item")
+        .add_attribute("method", "execute_create_entry")
         .add_attribute("new_entry_id", id.to_string()))
 }
 
-pub fn execute_update_item(
+pub fn execute_update_entry(
     deps: DepsMut,
     info: MessageInfo,
     id: u64,
@@ -190,7 +190,7 @@ pub fn execute_update_item(
     };
     LIST.save(deps.storage, id, &updated_entry)?;
     Ok(Response::new()
-        .add_attribute("method", "execute_update_item")
+        .add_attribute("method", "execute_update_entry")
         .add_attribute("updated_entry_id", id.to_string()))
 }
 

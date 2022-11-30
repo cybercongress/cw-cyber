@@ -7,7 +7,7 @@ use cw2::{get_contract_version, set_contract_version};
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::query::{execute_create_item, execute_delete_entry, execute_update_item, execute_update_owner, query_entry, query_list};
+use crate::query::{execute_create_entry, execute_delete_entry, execute_update_entry, execute_update_owner, query_entry, query_list};
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
@@ -52,12 +52,12 @@ pub fn execute(
         ExecuteMsg::NewEntry {
             data_type,
             particle,
-        } => execute_create_item(deps, info, data_type, particle),
+        } => execute_create_entry(deps, info, data_type, particle),
         ExecuteMsg::UpdateEntry {
             id,
             data_type,
             particle,
-        } => execute_update_item(deps, info, id, data_type, particle),
+        } => execute_update_entry(deps, info, id, data_type, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

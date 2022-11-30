@@ -37,7 +37,7 @@ impl<'a> IndexList<Entry> for EntryIndexes<'a> {
     }
 }
 
-pub fn items<'a>() -> IndexedMap<'a, u64, Entry, EntryIndexes<'a>> {
+pub fn entries<'a>() -> IndexedMap<'a, u64, Entry, EntryIndexes<'a>> {
     let indexes = EntryIndexes {
         owner: MultiIndex::new(
             |d| (d.owner.clone().to_string()),
@@ -45,7 +45,7 @@ pub fn items<'a>() -> IndexedMap<'a, u64, Entry, EntryIndexes<'a>> {
             "list_owner"
         ),
         network: MultiIndex::new(
-            |d| (d.owner.clone().to_string()),
+            |d| (d.network.clone().to_string()),
             "list",
             "list_network"
         ),

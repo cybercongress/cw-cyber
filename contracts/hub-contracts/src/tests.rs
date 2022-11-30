@@ -72,7 +72,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_item"),
+                attr("method", "execute_create_entry"),
                 attr("new_entry_id", "1")
             ]
         );
@@ -90,7 +90,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_item"),
+                attr("method", "execute_create_entry"),
                 attr("new_entry_id", "2")
             ]
         );
@@ -145,7 +145,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_update_item"),
+                attr("method", "execute_update_entry"),
                 attr("updated_entry_id", "1")
             ]
         );
