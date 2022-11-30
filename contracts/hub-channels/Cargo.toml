@@ -1,5 +1,5 @@
 [package]
-name = "cw-cyb-protocols"
+name = "hub-channels"
 version = "0.1.0"
 authors = ["Bloqhub"]
 edition = "2018"

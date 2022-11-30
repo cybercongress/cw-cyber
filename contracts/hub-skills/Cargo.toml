@@ -1,5 +1,5 @@
 [package]
-name = "cw-cyb-tokens"
+name = "hub-skills"
 version = "0.1.0"
 authors = ["Bloqhub"]
 edition = "2018"
@@ -41,7 +41,7 @@ optimize = """docker run --rm -v "$(pwd)":/code \
 
 [dependencies]
 cosmwasm-std = { version = "1.0.0",  features = ["iterator", "abort"] }
-cw-storage-plus = { version = "0.13.4" }
+cw-storage-plus = { version = "0.14.0" }
 cw2 = { version = "0.13.4" }
 schemars = "0.8.10"
 serde = { version = "1.0.140", default-features = false, features = ["derive"] }
