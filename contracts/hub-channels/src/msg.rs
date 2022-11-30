@@ -10,6 +10,9 @@ pub struct InstantiateMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum ExecuteMsg {
+    UpdateOwner {
+        new_owner: Option<String>,
+    },
     NewEntry {
         source_chain_id: String,
         destination_chain_id: String,

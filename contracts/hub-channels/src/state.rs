@@ -7,7 +7,7 @@ use cw_storage_plus::{Item, Map};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Config {
-    pub owner: Addr,
+    pub owner: Option<Addr>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -20,7 +20,6 @@ pub struct Entry {
     pub explorer_url: String,
     pub particle: String,
 }
-
 
 pub const CONFIG: Item<Config> = Item::new("config");
 pub const ENTRY_SEQ: Item<u64> = Item::new("entry_seq");

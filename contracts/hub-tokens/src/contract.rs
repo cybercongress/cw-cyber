@@ -8,7 +8,7 @@ use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_list, execute_create_new_item, execute_update_item, execute_delete_entry};
+use crate::query::{query_list, execute_create_new_item, execute_update_item, execute_delete_entry, execute_update_owner};
 // Token constructor
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
@@ -31,7 +31,7 @@ pub fn instantiate(
         .unwrap_or(info.sender);
 
     let config = Config {
-        owner: owner.clone(),
+        owner: Some(owner.clone()),
     };
     CONFIG.save(deps.storage, &config)?;
 
@@ -45,11 +45,12 @@ pub fn instantiate(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
+        ExecuteMsg::UpdateOwner { new_owner } => execute_update_owner(deps, env, info, new_owner),
         ExecuteMsg::NewEntry {
             ticker,
             chain_id,

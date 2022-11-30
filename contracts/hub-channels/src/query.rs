@@ -1,9 +1,7 @@
 // use regex::Regex;
 // use cosmwasm_std::{Uint64};
 
-use cosmwasm_std::{
-    Deps, DepsMut, MessageInfo, Order, Response, StdResult,
-};
+use cosmwasm_std::{attr, Deps, DepsMut, Env, MessageInfo, Order, Response, StdResult};
 
 use cw_storage_plus::Bound;
 use std::ops::Add;
@@ -17,6 +15,30 @@ use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
 const MAX_LIMIT: u32 = 30;
 const DEFAULT_LIMIT: u32 = 20;
 
+pub fn execute_update_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_owner: Option<String>,
+) -> Result<Response, ContractError> {
+    let cfg = CONFIG.load(deps.storage)?;
+    let owner = cfg.owner.ok_or(ContractError::Unauthorized {})?;
+    if info.sender != owner {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let mut tmp_owner = None;
+    if let Some(addr) = new_owner {
+        tmp_owner = Some(deps.api.addr_validate(&addr)?)
+    }
+
+    CONFIG.update(deps.storage, |mut exists| -> StdResult<_> {
+        exists.owner = tmp_owner;
+        Ok(exists)
+    })?;
+
+    Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
+}
 
 pub fn execute_create_new_item(
     deps: DepsMut,
