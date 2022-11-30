@@ -5,8 +5,8 @@ use cosmwasm_std::{
     Response,
 };
 
-/**
- * Baseic rule /[a-z0-9-]/
+/*
+ * Basic rule /[a-z0-9-]/
  */
 pub fn validate_by_basic_rule(
     val: String,
@@ -23,8 +23,8 @@ pub fn validate_by_basic_rule(
     Ok(Response::default())
 }
 
-/**
- * Baseic rule /[0-9]/
+/*
+ * Basic rule /[0-9]/
  */
 pub fn validate_period(
     val: String,
