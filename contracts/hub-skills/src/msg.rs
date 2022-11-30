@@ -40,12 +40,13 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetItems {
+    GetEntries {
         start_after: Option<u64>,
         owner: Option<Addr>,
         protocol: Option<String>,
         limit: Option<u32>,
     },
+    GetEntry { id: u64 }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

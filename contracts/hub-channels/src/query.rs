@@ -6,7 +6,7 @@ use std::ops::Add;
 
 use crate::validating::{validate_by_basic_rule, validate_ipfs_cid, validate_url};
 use crate::error::ContractError;
-use crate::msg::{ListResponse};
+use crate::msg::{EntryResponse, ListResponse};
 use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
 
 const MAX_LIMIT: u32 = 30;
@@ -184,18 +184,17 @@ pub fn execute_delete_entry(
         .add_attribute("deleted_entry_id", id.to_string()))
 }
 
-
-
-// fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
-//     let entry = LIST.load(deps.storage, id)?;
-//     Ok(EntryResponse {
-//         id: entry.id,
-//         description: entry.description,
-//         status: entry.status,
-//         priority: entry.priority,
-//     })
-// }
-
+pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
+    let entry = LIST.load(deps.storage, id)?;
+    Ok(EntryResponse {
+        id: entry.id,
+        source_chain_id: entry.source_chain_id,
+        destination_chain_id: entry.destination_chain_id,
+        source_channel_id: entry.source_channel_id,
+        destination_channel_id: entry.destination_channel_id,
+        explorer_url: entry.explorer_url
+    })
+}
 
 pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>) -> StdResult<ListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;

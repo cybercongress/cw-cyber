@@ -5,7 +5,7 @@ use std::ops::Add;
 
 
 use crate::error::ContractError;
-use crate::msg::{ListResponse};
+use crate::msg::{EntryResponse, ListResponse};
 use crate::state::{Entry, CONFIG, ENTRY_SEQ, LIST};
 use crate::validating::{validate_particle,validate_datatype};
 
@@ -132,6 +132,14 @@ pub fn execute_delete_entry(
         .add_attribute("deleted_entry_id", id.to_string()))
 }
 
+pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
+    let entry = LIST.load(deps.storage, id)?;
+    Ok(EntryResponse {
+        id,
+        data_type: entry.data_type,
+        particle: entry.particle
+    })
+}
 
 pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>) -> StdResult<ListResponse> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;

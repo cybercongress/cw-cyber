@@ -92,7 +92,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetItems {
+            QueryMsg::GetEntries {
                 start_after: None,
                 limit: None,
             },
@@ -139,7 +139,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env.clone(),
-            QueryMsg::GetItems {
+            QueryMsg::GetEntries {
                 start_after: None,
                 limit: None,
             },
@@ -178,7 +178,7 @@ mod tests {
         let res = query(
             deps.as_ref(),
             env,
-            QueryMsg::GetItems {
+            QueryMsg::GetEntries {
                 start_after: None,
                 limit: None,
             },

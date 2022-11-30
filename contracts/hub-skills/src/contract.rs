@@ -5,7 +5,7 @@ use cw2::{get_contract_version, set_contract_version};
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::query::{execute_create_item, execute_delete_entry, execute_update_item, execute_update_owner, query_list};
+use crate::query::{execute_create_item, execute_delete_entry, execute_update_item, execute_update_owner, query_entry, query_list};
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
@@ -69,8 +69,11 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetItems { start_after, limit, protocol, owner } => {
+        QueryMsg::GetEntries { start_after, limit, protocol, owner } => {
             to_binary(&query_list(deps, start_after, limit, protocol, owner)?)
+        }
+        QueryMsg::GetEntry { id } => {
+            to_binary(&query_entry(deps, id)?)
         }
     }
 }

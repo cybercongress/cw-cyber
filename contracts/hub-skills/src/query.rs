@@ -5,7 +5,7 @@ use std::ops::Add;
 
 use crate::validating::{validate_by_basic_rule,validate_ipfs_cid, validate_url};
 use crate::error::ContractError;
-use crate::msg::{ListResponse};
+use crate::msg::{EntryResponse, ListResponse};
 use crate::state::{CONFIG, Entry, ENTRY_SEQ, items};
 
 const MAX_LIMIT: u32 = 50;
@@ -166,6 +166,17 @@ pub fn execute_delete_entry(
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))
+}
+
+pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
+    let entry = items().load(deps.storage, id)?;
+    Ok(EntryResponse {
+        id,
+        neuron: entry.neuron,
+        protocol: entry.protocol,
+        endpoint: entry.endpoint,
+        particle: entry.particle
+    })
 }
 
 pub fn query_list(deps: Deps, _start_after: Option<u64>, limit: Option<u32>, _protocol: Option<String>, owner: Option<Addr>) -> StdResult<ListResponse> {
