@@ -40,6 +40,36 @@ pub fn execute_update_owner(
     Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
 }
 
+pub fn execute_update_entry_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    id: u64,
+    new_owner: String,
+) -> Result<Response, ContractError> {
+    let entry = items().load(deps.storage, id)?;
+
+    if entry.owner != info.sender {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let updated_entry = Entry {
+        id,
+        neuron: entry.neuron,
+        network: entry.network,
+        protocol: entry.protocol,
+        endpoint: entry.endpoint,
+        owner: deps.api.addr_validate(&new_owner)?,
+        particle: entry.particle,
+    };
+
+    items().save(deps.storage, id, &updated_entry)?;
+
+    Ok(Response::new()
+        .add_attribute("method", "execute_update_entry_owner")
+        .add_attribute("updated_entry_id", id.to_string()))
+}
+
 pub fn execute_create_item(
     deps: DepsMut,
     info: MessageInfo,
@@ -49,7 +79,6 @@ pub fn execute_create_item(
     endpoint: String,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
-
     if !particle.as_ref().is_none()  {
         let validate_particle = validate_ipfs_cid(particle.clone().unwrap(),"particle".to_string());
         if validate_particle.is_err() {
@@ -127,7 +156,6 @@ pub fn execute_update_item(
     if validate_endpoint.is_err() {
         return validate_endpoint;
     }
-    
 
     let entry = items().load(deps.storage, id)?;
 
@@ -144,7 +172,9 @@ pub fn execute_update_item(
         owner: entry.owner,
         particle: particle.unwrap_or("".to_string()),
     };
+
     items().save(deps.storage, id, &updated_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_update_item")
         .add_attribute("updated_entry_id", id.to_string()))
@@ -200,5 +230,6 @@ pub fn query_list(deps: Deps, _start_after: Option<u64>, limit: Option<u32>, _pr
     let result = ListResponse {
         entries: entries?.into_iter().map(|l| l.1).collect(),
     };
+
     Ok(result)
 }

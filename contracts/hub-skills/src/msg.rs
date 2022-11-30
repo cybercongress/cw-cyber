@@ -16,7 +16,10 @@ pub enum ExecuteMsg {
     UpdateOwner {
         new_owner: Option<String>,
     },
-    // TODO add change owner item
+    UpdateEntryOwner {
+        id: u64,
+        new_owner: String,
+    },
     NewEntry {
         neuron: String,
         network: String,
