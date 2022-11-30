@@ -1,15 +1,13 @@
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
 };
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-
-use cw2::set_contract_version;
+use cw2::{get_contract_version, set_contract_version};
 
 use crate::error::ContractError;
-use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_list, execute_create_item, execute_update_item, execute_delete_entry, execute_update_owner};
-// Token constructor
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
+use crate::query::{execute_create_item, execute_delete_entry, execute_update_item, execute_update_owner, query_list};
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
@@ -83,4 +81,15 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
             to_binary(&query_list(deps, start_after, limit)?)
         }
     }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
+    let version = get_contract_version(deps.storage)?;
+    if version.contract != CONTRACT_NAME {
+        return Err(ContractError::CannotMigrate {
+            previous_contract: version.contract,
+        });
+    }
+    Ok(Response::default())
 }

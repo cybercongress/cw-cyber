@@ -14,4 +14,7 @@ pub enum ContractError {
 
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },
+
+    #[error("Cannot migrate from different contract type: {previous_contract}")]
+    CannotMigrate { previous_contract: String },
 }
