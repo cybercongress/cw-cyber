@@ -13,8 +13,8 @@ use crate::query::{query_list, execute_create_new_item, execute_update_item, exe
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
-const CONTRACT_NAME: &str = "cw-tokens";
-const CONTRACT_VERSION: &str = "1.0.0";
+const CONTRACT_NAME: &str = "hub-tokens";
+const CONTRACT_VERSION: &str = "0.1.0";
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(

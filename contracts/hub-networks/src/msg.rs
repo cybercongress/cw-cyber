@@ -1,5 +1,4 @@
 use crate::state::{Entry};
-// use cosmwasm_std::{Uint64};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -13,9 +12,10 @@ pub enum ExecuteMsg {
     NewEntry {
         name: String,
         chain_id: String,
+        prefix: String,
         genesis_hash: String,
         protocol: String,
-        // unbonding_period: String,
+        unbonding_period: String,
         logo: String,
         particle: Option<String>,
     },
@@ -23,9 +23,10 @@ pub enum ExecuteMsg {
         id: u64,
         name: Option<String>,
         chain_id: Option<String>,
+        prefix: Option<String>,
         genesis_hash: Option<String>,
         protocol: Option<String>,
-        // unbonding_period: Option<String>,
+        unbonding_period: Option<String>,
         logo: Option<String>,
         particle: Option<String>,
     },
@@ -43,15 +44,15 @@ pub enum QueryMsg {
     },
 }
 
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,
     pub name: String,
     pub chain_id: String,
+    pub prefix: String,
     pub genesis_hash: String,
     pub protocol: String,
-    // pub unbonding_period: String,
+    pub unbonding_period: String,
     pub logo: String,
     pub particle: String,
 }

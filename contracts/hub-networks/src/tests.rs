@@ -63,7 +63,9 @@ mod tests {
             name: "tst".to_string(),
             protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
+            prefix: "cyb".to_string(),
             genesis_hash: "bostrom0x1".to_string(),
+            unbonding_period: "42".to_string(),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -72,7 +74,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "1")
             ]
         );
@@ -81,7 +83,9 @@ mod tests {
             name: "tst2".to_string(),
             protocol: "tst2".to_string(),
             chain_id: "cyber-1".to_string(),
+            prefix: "cyb".to_string(),
             genesis_hash: "bostrom0x1".to_string(),
+            unbonding_period: "42".to_string(),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
         };
@@ -90,7 +94,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "2")
             ]
         );
@@ -113,7 +117,9 @@ mod tests {
                     name: "tst".to_string(),
                     protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
+                    prefix: "cyb".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "42".to_string(),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 },
@@ -122,7 +128,9 @@ mod tests {
                     name: "tst2".to_string(),
                     protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
+                    prefix: "cyb".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "42".to_string(),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 }
@@ -136,7 +144,9 @@ mod tests {
             name: Some("tstu".to_string()),
             protocol: Some("tst2".to_string()),
             chain_id: Some("cyber-1".to_string()),
+            prefix: Some("cyb".to_string()),
             genesis_hash: Some("bostrom0x1".to_string()),
+            unbonding_period: Some("42".to_string()),
             logo: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()), 
         };
@@ -170,7 +180,9 @@ mod tests {
                     name: "tstu".to_string(),
                     protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
+                    prefix: "cyb".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "42".to_string(),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 },
@@ -179,7 +191,9 @@ mod tests {
                     name: "tst2".to_string(),
                     protocol: "tst2".to_string(),
                     chain_id: "cyber-1".to_string(),
+                    prefix: "cyb".to_string(),
                     genesis_hash: "bostrom0x1".to_string(),
+                    unbonding_period: "42".to_string(),
                     logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 }
@@ -215,7 +229,9 @@ mod tests {
                 name: "tst2".to_string(),
                 protocol: "tst2".to_string(),
                 chain_id: "cyber-1".to_string(),
+                prefix: "cyb".to_string(),
                 genesis_hash: "bostrom0x1".to_string(),
+                unbonding_period: "42".to_string(),
                 logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
                 particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(), 
             }]),

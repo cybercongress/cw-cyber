@@ -15,8 +15,9 @@ pub struct Entry {
     pub id: u64,
     pub name: String,
     pub chain_id: String,
+    pub prefix: String,
     pub genesis_hash: String,
-
+    pub unbonding_period: String,
     pub protocol: String,
     pub logo: String,
     pub particle: String,

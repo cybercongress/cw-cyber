@@ -23,6 +23,24 @@ pub fn validate_by_basic_rule(
     Ok(Response::default())
 }
 
+/**
+ * Baseic rule /[0-9]/
+ */
+pub fn validate_period(
+    val: String,
+    field_name: String,
+) -> Result<Response, ContractError> {
+
+    for byte in val.as_bytes().iter() {
+        // 0-9
+        if *byte < 48 || *byte > 57 {
+            return Err(ContractError::IncorrectInputData {val: format!("Incorrect value for field field {}. Allowed expression /[0-9]/", field_name).to_string()});
+        }
+    }
+
+    Ok(Response::default())
+}
+
 pub fn validate_datatype(
     val: String
 ) -> Result<Response, ContractError> {

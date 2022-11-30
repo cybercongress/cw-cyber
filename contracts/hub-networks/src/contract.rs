@@ -8,13 +8,13 @@ use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_list, execute_create_new_item, execute_update_item, execute_delete_entry};
+use crate::query::{query_list, execute_create_item, execute_update_item, execute_delete_entry};
 // Token constructor
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
-const CONTRACT_NAME: &str = "cw-network";
-const CONTRACT_VERSION: &str = "1.0.0";
+const CONTRACT_NAME: &str = "hub-networks";
+const CONTRACT_VERSION: &str = "0.1.0";
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -53,22 +53,24 @@ pub fn execute(
         ExecuteMsg::NewEntry {
             name,
             chain_id,
+            prefix,
             genesis_hash,
             protocol,
-            // unbonding_period,
+            unbonding_period,
             logo,
             particle,
-        } => execute_create_new_item(deps, info,name,chain_id,genesis_hash, protocol, logo, particle),
+        } => execute_create_item(deps, info, name, chain_id, prefix, genesis_hash, protocol, unbonding_period, logo, particle),
         ExecuteMsg::UpdateEntry {
             id,
             name,
             chain_id,
+            prefix,
             genesis_hash,
             protocol,
-            // unbonding_period,
+            unbonding_period,
             logo,
             particle,
-        } => execute_update_item(deps, info, id, name,chain_id,genesis_hash,protocol,logo,particle),
+        } => execute_update_item(deps, info, id, name,chain_id,prefix,genesis_hash,protocol,unbonding_period, logo,particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

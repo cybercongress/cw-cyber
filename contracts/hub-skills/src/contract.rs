@@ -14,7 +14,7 @@ use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
 const CONTRACT_NAME: &str = "cw-skills";
-const CONTRACT_VERSION: &str = "1.0.0";
+const CONTRACT_VERSION: &str = "0.1.0";
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
