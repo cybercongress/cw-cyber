@@ -25,7 +25,7 @@ mod tests {
         assert_eq!(
             state,
             Config {
-                owner: Addr::unchecked("creator".to_string()),
+                owner: Some(Addr::unchecked("creator".to_string())),
             }
         );
         //specifying an owner address in the instantiation message
@@ -41,7 +41,7 @@ mod tests {
         assert_eq!(
             state,
             Config {
-                owner: Addr::unchecked("specified_owner".to_string()),
+                owner: Some(Addr::unchecked("specified_owner".to_string())),
             }
         );
     }

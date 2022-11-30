@@ -1,6 +1,3 @@
-// use regex::Regex;
-// use cosmwasm_std::{Uint64};
-
 use cosmwasm_std::{attr, Deps, DepsMut, Env, MessageInfo, Order, Response, StdResult};
 
 use cw_storage_plus::Bound;
@@ -40,7 +37,7 @@ pub fn execute_update_owner(
     Ok(Response::new().add_attributes(vec![attr("action", "update_owner")]))
 }
 
-pub fn execute_create_new_item(
+pub fn execute_create_item(
     deps: DepsMut,
     info: MessageInfo,
     source_chain_id: String,

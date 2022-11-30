@@ -28,7 +28,7 @@ mod tests {
         assert_eq!(
             state,
             Config {
-                owner: Addr::unchecked("creator".to_string()),
+                owner: Some(Addr::unchecked("creator".to_string())),
             }
         );
         //specifying an owner address in the instantiation message
@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(
             state,
             Config {
-                owner: Addr::unchecked("specified_owner".to_string()),
+                owner: Some(Addr::unchecked("specified_owner".to_string())),
             }
         );
     }
@@ -72,7 +72,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "1")
             ]
         );
@@ -90,7 +90,7 @@ mod tests {
         assert_eq!(
             res.attributes,
             vec![
-                attr("method", "execute_create_new_item"),
+                attr("method", "execute_create_item"),
                 attr("new_entry_id", "2")
             ]
         );
