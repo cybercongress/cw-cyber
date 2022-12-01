@@ -6,7 +6,7 @@ use cw2::{get_contract_version, set_contract_version};
 use crate::error::ContractError;
 use crate::execute::{execute_create_entry, execute_delete_entry, execute_update_entry, execute_update_entry_owner, execute_update_owner};
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::query::{query_entry, query_list};
+use crate::query::{query_entry, query_list_by_network, query_list_by_owner, query_list_by_protocol};
 use crate::state::{Config, CONFIG, ENTRY_SEQ};
 
 //@TODO git version iteract
@@ -71,8 +71,14 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetEntries { start_after, limit, protocol, owner } => {
-            to_binary(&query_list(deps, start_after, limit, protocol, owner)?)
+        QueryMsg::GetEntries { start_after, limit, owner } => {
+            to_binary(&query_list_by_owner(deps, start_after, limit, owner)?)
+        }
+        QueryMsg::GetEntriesProtocol { start_after, limit, protocol } => {
+            to_binary(&query_list_by_protocol(deps, start_after, limit, protocol)?)
+        }
+        QueryMsg::GetEntriesNetwork { start_after, limit, network } => {
+            to_binary(&query_list_by_network(deps, start_after, limit, network)?)
         }
         QueryMsg::GetEntry { id } => {
             to_binary(&query_entry(deps, id)?)

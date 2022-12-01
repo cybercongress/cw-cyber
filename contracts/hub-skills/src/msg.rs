@@ -45,9 +45,18 @@ pub enum ExecuteMsg {
 pub enum QueryMsg {
     GetEntries {
         start_after: Option<u64>,
-        owner: Option<Addr>,
-        protocol: Option<String>,
         limit: Option<u32>,
+        owner: Addr,
+    },
+    GetEntriesProtocol {
+        start_after: Option<u64>,
+        limit: Option<u32>,
+        protocol: String,
+    },
+    GetEntriesNetwork {
+        start_after: Option<u64>,
+        limit: Option<u32>,
+        network: String,
     },
     GetEntry { id: u64 }
 }
@@ -59,8 +68,10 @@ pub struct MigrateMsg {}
 pub struct EntryResponse {
     pub id: u64,
     pub neuron: String,
+    pub network: String,
     pub protocol: String,
     pub endpoint: String,
+    pub owner: String,
     pub particle: String,
 }
 

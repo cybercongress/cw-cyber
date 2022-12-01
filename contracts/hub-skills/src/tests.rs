@@ -9,7 +9,7 @@ mod tests {
     // use std::convert::TryFrom;
     use std::vec::Vec;
     use crate::state::{Entry, CONFIG, Config};
-    use crate::msg::{ ListResponse, QueryMsg, InstantiateMsg, ExecuteMsg};
+    use crate::msg::{ListResponse, QueryMsg, InstantiateMsg, ExecuteMsg, EntryResponse};
     // use crate::msg::{ ExecuteMsg, InstantiateMsg, QueryMsg};
     use crate::contract::{query, execute, instantiate};
 
@@ -63,7 +63,7 @@ mod tests {
         let msg = ExecuteMsg::CreateEntry {
             neuron: "testchain-1".to_string(),
             network: "cosmos".to_string(),
-            protocol: "testchain-1".to_string(),
+            protocol: "cosmos-1".to_string(),
             endpoint: "https:/abcd.com".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -79,8 +79,8 @@ mod tests {
 
         let msg = ExecuteMsg::CreateEntry {
             neuron: "testchain-1".to_string(),
-            network: "cosmos".to_string(),
-            protocol: "testchain-1".to_string(),
+            network: "bostrom".to_string(),
+            protocol: "bostrom-1".to_string(),
             endpoint: "https:/abcd.com".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -101,9 +101,7 @@ mod tests {
             QueryMsg::GetEntries {
                 start_after: None,
                 limit: None,
-                protocol: None,
-                // owner: None,
-                owner: Some(Addr::unchecked("creator")),
+                owner: Addr::unchecked("creator"),
             },
         )
         .unwrap();
@@ -114,7 +112,7 @@ mod tests {
                     id: 1,
                     neuron: "testchain-1".to_string(),
                     network: "cosmos".to_string(),
-                    protocol: "testchain-1".to_string(),
+                    protocol: "cosmos-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     owner: cosmwasm_std::Addr::unchecked("creator"),
@@ -122,8 +120,8 @@ mod tests {
                 Entry {
                     id: 2,
                     neuron: "testchain-1".to_string(),
-                    network: "cosmos".to_string(),
-                    protocol: "testchain-1".to_string(),
+                    network: "bostrom".to_string(),
+                    protocol: "bostrom-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     owner: cosmwasm_std::Addr::unchecked("creator"),
@@ -137,7 +135,7 @@ mod tests {
             id: 1,
             neuron: Some("testchain-1".to_string()),
             network: Some("cosmos".to_string()),
-            protocol: Some("testchain-1".to_string()),
+            protocol: Some("cosmos-1".to_string()),
             endpoint: Some("https:/abcd.com".to_string()),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
         };
@@ -160,8 +158,7 @@ mod tests {
             QueryMsg::GetEntries {
                 start_after: None,
                 limit: None,
-                protocol: None,
-                owner: Some(Addr::unchecked("creator")),
+                owner: Addr::unchecked("creator"),
             },
         )
         .unwrap();
@@ -172,7 +169,7 @@ mod tests {
                     id: 1,
                     neuron: "testchain-1".to_string(),
                     network: "cosmos".to_string(),
-                    protocol: "testchain-1".to_string(),
+                    protocol: "cosmos-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     owner: cosmwasm_std::Addr::unchecked("creator"),
@@ -180,8 +177,8 @@ mod tests {
                 Entry {
                     id: 2,
                     neuron: "testchain-1".to_string(),
-                    network: "cosmos".to_string(),
-                    protocol: "testchain-1".to_string(),
+                    network: "bostrom".to_string(),
+                    protocol: "bostrom-1".to_string(),
                     endpoint: "https:/abcd.com".to_string(),
                     particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                     owner: cosmwasm_std::Addr::unchecked("creator"),
@@ -204,11 +201,10 @@ mod tests {
         // Query the list of entries
         let res = query(
             deps.as_ref(),
-            env,
+            env.clone(),
             QueryMsg::GetEntries {
                 start_after: None,
-                protocol: None,
-                owner: Some(Addr::unchecked("creator")),
+                owner: Addr::unchecked("creator"),
                 limit: None,
             },
         )
@@ -218,13 +214,72 @@ mod tests {
             Vec::from([Entry {
                 id: 2,
                 neuron: "testchain-1".to_string(),
-                network: "cosmos".to_string(),
-                protocol: "testchain-1".to_string(),
+                network: "bostrom".to_string(),
+                protocol: "bostrom-1".to_string(),
                 endpoint: "https:/abcd.com".to_string(),
                 particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
                 owner: cosmwasm_std::Addr::unchecked("creator"),
             }]),
             list.entries
+        );
+
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetEntry {
+                id: 2
+            },
+        ).unwrap();
+        let entry: EntryResponse = from_binary(&res).unwrap();
+        assert_eq!(
+            EntryResponse {
+                id: 2,
+                neuron: "testchain-1".to_string(),
+                network: "bostrom".to_string(),
+                protocol: "bostrom-1".to_string(),
+                endpoint: "https:/abcd.com".to_string(),
+                owner: cosmwasm_std::Addr::unchecked("creator").to_string(),
+                particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+            },
+            entry
+        );
+
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetEntriesProtocol {
+                start_after: None,
+                limit: None,
+                protocol: "bostrom-1".to_string()
+            },
+        ).unwrap();
+        let list: ListResponse = from_binary(&res).unwrap();
+        assert_eq!(
+            Vec::from([Entry {
+                id: 2,
+                neuron: "testchain-1".to_string(),
+                network: "bostrom".to_string(),
+                protocol: "bostrom-1".to_string(),
+                endpoint: "https:/abcd.com".to_string(),
+                particle: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
+                owner: cosmwasm_std::Addr::unchecked("creator"),
+            }]),
+            list.entries
+        );
+
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetEntriesNetwork {
+                start_after: None,
+                limit: None,
+                network: "cosmos".to_string()
+            },
+        ).unwrap();
+        let list: ListResponse = from_binary(&res).unwrap();
+        assert_eq!(
+            0,
+            list.entries.len()
         );
     }
 }

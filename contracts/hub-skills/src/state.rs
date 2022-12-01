@@ -32,7 +32,7 @@ pub struct EntryIndexes<'a> {
 
 impl<'a> IndexList<Entry> for EntryIndexes<'a> {
     fn get_indexes(&'_ self) -> Box<dyn Iterator<Item = &'_ dyn Index<Entry>> + '_> {
-        let v: Vec<&dyn Index<Entry>> = vec![&self.owner, &self.id];
+        let v: Vec<&dyn Index<Entry>> = vec![&self.id, &self.owner, &self.network, &self.protocol];
         Box::new(v.into_iter())
     }
 }
