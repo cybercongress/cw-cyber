@@ -8,7 +8,6 @@ use cosmwasm_std::{
 pub fn validate_datatype(
     val: String
 ) -> Result<Response, ContractError> {
-
     for byte in val.as_bytes().iter() {
         // - && 0-9 && a-z
         if (*byte != 45) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
@@ -23,7 +22,6 @@ pub fn validate_datatype(
 pub fn validate_particle(
     particle: Option<String>
 ) -> Result<Response, ContractError> {
-
     if !particle.as_ref().is_none() {
         let particle_value:Cid;
         let try_particle = Cid::from_str(&particle.as_ref().unwrap().clone());

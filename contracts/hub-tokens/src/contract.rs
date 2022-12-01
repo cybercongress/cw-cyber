@@ -32,6 +32,7 @@ pub fn instantiate(
     let config = Config {
         owner: Some(owner.clone()),
     };
+
     CONFIG.save(deps.storage, &config)?;
 
     ENTRY_SEQ.save(deps.storage, &0u64)?;
@@ -93,5 +94,6 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, C
             previous_contract: version.contract,
         });
     }
+
     Ok(Response::default())
 }

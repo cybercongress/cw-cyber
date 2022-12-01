@@ -89,7 +89,9 @@ pub fn execute_create_entry(
         chain_id,
         particle: particle.unwrap_or("".to_string()),
     };
+
     LIST.save(deps.storage, id, &new_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_create_entry")
         .add_attribute("new_entry_id", id.to_string()))
@@ -155,6 +157,7 @@ pub fn execute_update_entry(
     };
 
     LIST.save(deps.storage, id, &updated_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_update_entry")
         .add_attribute("updated_entry_id", id.to_string()))
@@ -174,6 +177,7 @@ pub fn execute_delete_entry(
     }
 
     LIST.remove(deps.storage, id);
+
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))

@@ -9,6 +9,7 @@ const DEFAULT_LIMIT: u32 = 20;
 
 pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
     let entry = LIST.load(deps.storage, id)?;
+
     Ok(EntryResponse {
         id: entry.id,
         source_chain_id: entry.source_chain_id,
@@ -30,5 +31,6 @@ pub fn query_list(deps: Deps, start_after: Option<u64>, limit: Option<u32>) -> S
     let result = ListResponse {
         entries: entries?.into_iter().map(|l| l.1).collect(),
     };
+
     Ok(result)
 }

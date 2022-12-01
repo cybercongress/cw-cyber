@@ -55,8 +55,6 @@ pub fn execute_create_entry(
         return validate_data_typer;
     }
 
-
-
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
 
     let new_entry = Entry {
@@ -64,7 +62,9 @@ pub fn execute_create_entry(
         data_type: data_type,
         particle: particle.unwrap_or("".to_string()).to_string(),
     };
+
     LIST.save(deps.storage, id, &new_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_create_entry")
         .add_attribute("new_entry_id", id.to_string()))
@@ -101,7 +101,9 @@ pub fn execute_update_entry(
         data_type: data_type,
         particle: particle.unwrap_or("".to_string()),
     };
+
     LIST.save(deps.storage, id, &updated_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_update_entry")
         .add_attribute("updated_entry_id", id.to_string()))
@@ -121,6 +123,7 @@ pub fn execute_delete_entry(
     }
 
     LIST.remove(deps.storage, id);
+
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))

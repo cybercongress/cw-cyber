@@ -86,7 +86,9 @@ pub fn execute_create_entry(
         logo,
         particle: particle.unwrap_or("".to_string())
     };
+
     LIST.save(deps.storage, id, &new_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_create_entry")
         .add_attribute("new_entry_id", id.to_string()))
@@ -123,7 +125,6 @@ pub fn execute_update_entry(
         }
     }
 
-
     let validate_ticker = validate_by_basic_uppercase_rule(ticker.clone().unwrap(), "ticker".to_string());
     let validate_chain_id = validate_by_basic_rule(chain_id.clone().unwrap(), "chain_id".to_string());
 
@@ -137,7 +138,6 @@ pub fn execute_update_entry(
         return validate_chain_id;
     }
 
-
     let entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
         id,
@@ -149,6 +149,7 @@ pub fn execute_update_entry(
         particle: particle.unwrap_or("".to_string()),
     };
     LIST.save(deps.storage, id, &updated_entry)?;
+
     Ok(Response::new()
         .add_attribute("method", "execute_update_entry")
         .add_attribute("updated_entry_id", id.to_string()))
@@ -168,6 +169,7 @@ pub fn execute_delete_entry(
     }
 
     LIST.remove(deps.storage, id);
+
     Ok(Response::new()
         .add_attribute("method", "execute_delete_entry")
         .add_attribute("deleted_entry_id", id.to_string()))
