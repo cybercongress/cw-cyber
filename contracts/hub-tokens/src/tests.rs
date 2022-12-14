@@ -60,7 +60,8 @@ mod tests {
         let msg = ExecuteMsg::CreateEntry {
             chain_id: "testchain-1".to_string(),
             ticker: "TST".to_string(),
-            denom: "cyb".to_string(),
+            contract: "cyb".to_string(),
+            decimals: Uint64::new(6),
             channel: Uint64::new(1),
             logo: "QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string(),
             particle: Some("QmYpTB36duejmy1szbdL1D2EzC5fgRL4dyhSFsHkMYPtny".to_string()),
