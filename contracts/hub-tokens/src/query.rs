@@ -14,7 +14,8 @@ pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
         id,
         ticker: entry.ticker,
         chain_id: entry.chain_id,
-        denom: entry.denom,
+        contract: entry.contract,
+        decimals: entry.decimals,
         channel: entry.channel,
         logo: entry.logo,
         particle: entry.particle
