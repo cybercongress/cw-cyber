@@ -59,7 +59,7 @@ pub fn execute(
             channel,
             logo,
             particle,
-        } => execute_create_entry(deps, info, ticker, chain_id, denom, channel, logo, particle),
+        } => execute_create_entry(deps, info, ticker, chain_id, contract, decimals, channel, logo, particle),
         ExecuteMsg::UpdateEntry {
             id,
             ticker,
@@ -69,7 +69,7 @@ pub fn execute(
             channel,
             logo,
             particle,
-        } => execute_update_entry(deps, info, id, ticker, chain_id, denom, channel, logo, particle),
+        } => execute_update_entry(deps, info, id, ticker, chain_id, contract, decimals, channel, logo, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }
