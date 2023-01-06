@@ -69,7 +69,7 @@ pub fn execute(
             destination_channel_id,
             explorer_url,
             particle,
-        } => execute_update_entry(deps, info, id, source_chain_id, destination_chain_id, source_channel_id, destination_channel_id, explorer_url, particle),
+        } => execute_update_entry(deps, info, id, Some(active), source_chain_id, destination_chain_id, source_channel_id, destination_channel_id, explorer_url, particle),
         ExecuteMsg::DeleteEntry { id } => execute_delete_entry(deps, info, id),
     }
 }

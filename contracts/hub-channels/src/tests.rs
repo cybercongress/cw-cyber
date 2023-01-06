@@ -57,7 +57,7 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         let msg = ExecuteMsg::CreateEntry {
-            active: true,
+            active: "active".to_string(),
             source_chain_id: "bostrom-1".to_string(),
             destination_chain_id: "cosmos-1".to_string(),
             source_channel_id: "channel-256".to_string(),
@@ -76,7 +76,7 @@ mod tests {
         );
 
         let msg = ExecuteMsg::CreateEntry {
-            active: true,
+            active: "active".to_string(),
             source_chain_id: "bostrom-2".to_string(),
             destination_chain_id: "cosmos-2".to_string(),
             source_channel_id: "channel-2".to_string(),
@@ -109,7 +109,7 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    active: true,
+                    active: "active".to_string(),
                     source_chain_id: "bostrom-1".to_string(),
                     destination_chain_id: "cosmos-1".to_string(),
                     source_channel_id: "channel-256".to_string(),
@@ -119,7 +119,7 @@ mod tests {
                 },
                 Entry {
                     id: 2,
-                    active: true,
+                    active: "active".to_string(),
                     source_chain_id: "bostrom-2".to_string(),
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
@@ -134,7 +134,7 @@ mod tests {
         // Update entry
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
-            active: false,
+            active: "active".to_string(),
             source_chain_id: Some("bostrom-1".to_string()),
             destination_chain_id: Some("cosmos-1".to_string()),
             source_channel_id: Some("channel-256".to_string()),
@@ -167,7 +167,7 @@ mod tests {
             Vec::from([
                 Entry {
                     id: 1,
-                    active: true,
+                    active: "active".to_string(),
                     source_chain_id: "bostrom-1".to_string(),
                     destination_chain_id: "cosmos-1".to_string(),
                     source_channel_id: "channel-256".to_string(),
@@ -177,7 +177,7 @@ mod tests {
                 },
                 Entry {
                     id: 2,
-                    active: false,
+                    active: "active".to_string(),
                     source_chain_id: "bostrom-2".to_string(),
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
@@ -214,7 +214,7 @@ mod tests {
         assert_eq!(
             Vec::from([Entry {
                 id: 2,
-                active: false,
+                active: "active".to_string(),
                 source_chain_id: "bostrom-2".to_string(),
                 destination_chain_id: "cosmos-2".to_string(),
                 source_channel_id: "channel-2".to_string(),

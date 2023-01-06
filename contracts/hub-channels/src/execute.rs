@@ -34,7 +34,7 @@ pub fn execute_update_owner(
 pub fn execute_create_entry(
     deps: DepsMut,
     info: MessageInfo,
-    active: bool,
+    active: String,
     source_chain_id: String,
     destination_chain_id: String,
     source_channel_id: String,
@@ -103,7 +103,7 @@ pub fn execute_update_entry(
     deps: DepsMut,
     info: MessageInfo,
     id: u64,
-    active: bool,
+    active: Option<String>,
     source_chain_id: Option<String>,
     destination_chain_id: Option<String>,
     source_channel_id: Option<String>,
@@ -151,6 +151,7 @@ pub fn execute_update_entry(
     let entry = LIST.load(deps.storage, id)?;
     let updated_entry = Entry {
         id,
+        active: active.unwrap_or(entry.active),
         source_chain_id: source_chain_id.unwrap_or(entry.source_chain_id),
         destination_chain_id: destination_chain_id.unwrap_or(entry.destination_chain_id),
         source_channel_id: source_channel_id.unwrap_or(entry.source_channel_id),
