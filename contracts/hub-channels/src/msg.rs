@@ -14,6 +14,7 @@ pub enum ExecuteMsg {
         new_owner: Option<String>,
     },
     CreateEntry {
+        active: bool,
         source_chain_id: String,
         destination_chain_id: String,
         source_channel_id: String,
@@ -23,6 +24,7 @@ pub enum ExecuteMsg {
     },
     UpdateEntry {
         id: u64,
+        active: bool,
         source_chain_id: Option<String>,
         destination_chain_id: Option<String>,
         source_channel_id: Option<String>,
@@ -51,6 +53,7 @@ pub struct MigrateMsg {}
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct EntryResponse {
     pub id: u64,
+    pub active: bool,
     pub source_chain_id: String,
     pub destination_chain_id: String,
     pub source_channel_id: String,

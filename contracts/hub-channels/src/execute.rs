@@ -34,6 +34,7 @@ pub fn execute_update_owner(
 pub fn execute_create_entry(
     deps: DepsMut,
     info: MessageInfo,
+    active: bool,
     source_chain_id: String,
     destination_chain_id: String,
     source_channel_id: String,
@@ -82,6 +83,7 @@ pub fn execute_create_entry(
 
     let new_entry = Entry {
         id,
+        active,
         source_chain_id,
         destination_chain_id,
         source_channel_id,
@@ -101,6 +103,7 @@ pub fn execute_update_entry(
     deps: DepsMut,
     info: MessageInfo,
     id: u64,
+    active: bool,
     source_chain_id: Option<String>,
     destination_chain_id: Option<String>,
     source_channel_id: Option<String>,

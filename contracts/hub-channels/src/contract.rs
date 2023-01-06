@@ -51,6 +51,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::UpdateOwner { new_owner } => execute_update_owner(deps, env, info, new_owner),
         ExecuteMsg::CreateEntry {
+            active,
             source_chain_id,
             destination_chain_id,
             source_channel_id,
@@ -58,9 +59,10 @@ pub fn execute(
             explorer_url,
             particle
 
-        } => execute_create_entry(deps, info, source_chain_id, destination_chain_id, source_channel_id, destination_channel_id, explorer_url, particle),
+        } => execute_create_entry(deps, info, active, source_chain_id, destination_chain_id, source_channel_id, destination_channel_id, explorer_url, particle),
         ExecuteMsg::UpdateEntry {
             id,
+            active,
             source_chain_id,
             destination_chain_id,
             source_channel_id,

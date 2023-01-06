@@ -12,6 +12,7 @@ pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
 
     Ok(EntryResponse {
         id: entry.id,
+        active: entry.active,
         source_chain_id: entry.source_chain_id,
         destination_chain_id: entry.destination_chain_id,
         source_channel_id: entry.source_channel_id,

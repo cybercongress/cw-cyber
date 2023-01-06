@@ -13,12 +13,14 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Entry {
     pub id: u64,
+    pub active: bool,
     pub source_chain_id: String,
     pub destination_chain_id: String,
     pub source_channel_id: String,
     pub destination_channel_id: String,
     pub explorer_url: String,
     pub particle: String,
+    pub(crate) active: bool,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");
