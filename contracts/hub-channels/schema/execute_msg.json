@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecuteMsg",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "UpdateOwner"
+      ],
+      "properties": {
+        "UpdateOwner": {
+          "type": "object",
+          "properties": {
+            "new_owner": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "CreateEntry"
+      ],
+      "properties": {
+        "CreateEntry": {
+          "type": "object",
+          "required": [
+            "active",
+            "destination_chain_id",
+            "destination_channel_id",
+            "explorer_url",
+            "source_chain_id",
+            "source_channel_id"
+          ],
+          "properties": {
+            "active": {
+              "type": "string"
+            },
+            "destination_chain_id": {
+              "type": "string"
+            },
+            "destination_channel_id": {
+              "type": "string"
+            },
+            "explorer_url": {
+              "type": "string"
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_chain_id": {
+              "type": "string"
+            },
+            "source_channel_id": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "UpdateEntry"
+      ],
+      "properties": {
+        "UpdateEntry": {
+          "type": "object",
+          "required": [
+            "active",
+            "id"
+          ],
+          "properties": {
+            "active": {
+              "type": "string"
+            },
+            "destination_chain_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "destination_channel_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "explorer_url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_chain_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_channel_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "DeleteEntry"
+      ],
+      "properties": {
+        "DeleteEntry": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

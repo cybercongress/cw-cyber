@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecuteMsg",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "UpdateOwner"
+      ],
+      "properties": {
+        "UpdateOwner": {
+          "type": "object",
+          "properties": {
+            "new_owner": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "CreateEntry"
+      ],
+      "properties": {
+        "CreateEntry": {
+          "type": "object",
+          "required": [
+            "chain_id",
+            "genesis_hash",
+            "logo",
+            "name",
+            "prefix",
+            "protocol",
+            "unbonding_period"
+          ],
+          "properties": {
+            "chain_id": {
+              "type": "string"
+            },
+            "genesis_hash": {
+              "type": "string"
+            },
+            "logo": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "prefix": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": "string"
+            },
+            "unbonding_period": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "UpdateEntry"
+      ],
+      "properties": {
+        "UpdateEntry": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "chain_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "genesis_hash": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "logo": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "prefix": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "protocol": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "unbonding_period": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "DeleteEntry"
+      ],
+      "properties": {
+        "DeleteEntry": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}
