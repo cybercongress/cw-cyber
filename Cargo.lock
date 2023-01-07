@@ -1294,6 +1294,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "hub-libs"
+version = "0.1.0"
+dependencies = [
+ "cid",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-multi-test 0.13.4",
+ "cw-storage-plus 0.13.4",
+ "cw2 0.13.4",
+ "schemars",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "hub-networks"
 version = "0.1.0"
 dependencies = [
