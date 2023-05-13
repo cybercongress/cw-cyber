@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecuteMsg",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "UpdateOwner"
+      ],
+      "properties": {
+        "UpdateOwner": {
+          "type": "object",
+          "properties": {
+            "new_owner": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "CreateEntry"
+      ],
+      "properties": {
+        "CreateEntry": {
+          "type": "object",
+          "required": [
+            "address",
+            "chain_id",
+            "init_particle",
+            "version"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "chain_id": {
+              "type": "string"
+            },
+            "init_particle": {
+              "type": "string"
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "UpdateEntry"
+      ],
+      "properties": {
+        "UpdateEntry": {
+          "type": "object",
+          "required": [
+            "address",
+            "id"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "chain_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "init_particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "particle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "DeleteEntry"
+      ],
+      "properties": {
+        "DeleteEntry": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

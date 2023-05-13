@@ -17,4 +17,3 @@ target/
 
 artifacts
 packages/*/schema
-contracts/*/schema
