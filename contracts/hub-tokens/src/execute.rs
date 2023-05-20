@@ -39,7 +39,7 @@ pub fn execute_create_entry(
     chain_id: String,
     contract: String,
     decimals: Uint64,
-    channel: Uint64,
+    channel_id: String,
     logo: String,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
@@ -74,7 +74,7 @@ pub fn execute_create_entry(
     }
 
     // TODO add denom validation
-    // TODO add channel validation
+    // TODO add channel_id validation
 
     let id = ENTRY_SEQ.update::<_, cosmwasm_std::StdError>(deps.storage, |id| Ok(id.add(1)))?;
 
@@ -84,7 +84,7 @@ pub fn execute_create_entry(
         chain_id,
         contract,
         decimals,
-        channel,
+        channel_id,
         logo,
         particle: particle.unwrap_or("".to_string())
     };
@@ -104,7 +104,7 @@ pub fn execute_update_entry(
     chain_id: Option<String>,
     contract: Option<String>,
     decimals: Option<Uint64>,
-    channel: Option<Uint64>,
+    channel_id: Option<String>,
     logo: Option<String>,
     particle: Option<String>,
 ) -> Result<Response, ContractError> {
@@ -132,7 +132,7 @@ pub fn execute_update_entry(
     let validate_chain_id = validate_by_basic_rule(chain_id.clone().unwrap(), "chain_id".to_string());
 
     // TODO add denom validation
-    // TODO add channel validation
+    // TODO add channel_id validation
 
     if validate_ticker.is_err() {
         return validate_ticker;
@@ -148,7 +148,7 @@ pub fn execute_update_entry(
         contract: contract.unwrap_or(entry.contract),
         decimals: decimals.unwrap_or(entry.decimals),
         chain_id: chain_id.unwrap_or(entry.chain_id),
-        channel: channel.unwrap_or(entry.channel),
+        channel_id: channel_id.unwrap_or(entry.channel_id),
         logo: logo.unwrap_or(entry.logo),
         particle: particle.unwrap_or("".to_string()),
     };

@@ -32,7 +32,7 @@
           "type": "object",
           "required": [
             "chain_id",
-            "channel",
+            "channel_id",
             "contract",
             "decimals",
             "logo",
@@ -42,8 +42,8 @@
             "chain_id": {
               "type": "string"
             },
-            "channel": {
-              "$ref": "#/definitions/Uint64"
+            "channel_id": {
+              "type": "string"
             },
             "contract": {
               "type": "string"
@@ -86,14 +86,10 @@
                 "null"
               ]
             },
-            "channel": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/Uint64"
-                },
-                {
-                  "type": "null"
-                }
+            "channel_id": {
+              "type": [
+                "string",
+                "null"
               ]
             },
             "contract": {

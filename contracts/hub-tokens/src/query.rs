@@ -16,7 +16,7 @@ pub fn query_entry(deps: Deps, id: u64) -> StdResult<EntryResponse> {
         chain_id: entry.chain_id,
         contract: entry.contract,
         decimals: entry.decimals,
-        channel: entry.channel,
+        channel_id: entry.channel_id,
         logo: entry.logo,
         particle: entry.particle
     })

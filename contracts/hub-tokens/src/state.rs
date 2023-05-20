@@ -17,7 +17,7 @@ pub struct Entry {
     pub chain_id: String,
     pub contract: String,
     pub decimals: Uint64,
-    pub channel: Uint64,
+    pub channel_id: String,
     pub logo: String,
     pub particle: String,
 }
