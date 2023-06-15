@@ -4,7 +4,7 @@ use cosmwasm_std::{attr, DepsMut, Env, MessageInfo, Response, StdResult};
 
 use crate::error::ContractError;
 use crate::state::{CONFIG, Entry, ENTRY_SEQ, LIST};
-use crate::validating::{validate_by_basic_rule, validate_ipfs_cid, validate_url};
+use crate::validating::{validate_by_basic_rule, validate_chain_id, validate_ipfs_cid, validate_url};
 
 pub fn execute_update_owner(
     deps: DepsMut,
@@ -57,8 +57,8 @@ pub fn execute_create_entry(
         }
     }
 
-    let validate_source_chain_id = validate_by_basic_rule(source_chain_id.clone(), "source_chain_id".to_string());
-    let validate_destination_chain_id = validate_by_basic_rule(destination_chain_id.clone(), "destination_chain_id".to_string());
+    let validate_source_chain_id = validate_chain_id(source_chain_id.clone(), "source_chain_id".to_string());
+    let validate_destination_chain_id = validate_chain_id(destination_chain_id.clone(), "destination_chain_id".to_string());
     let validate_source_channel_id = validate_by_basic_rule(source_channel_id.clone(), "source_channel_id".to_string());
     let validate_destination_channel_id = validate_by_basic_rule(destination_channel_id.clone(), "destination_channel_id".to_string());
     let validate_explorer_url = validate_url(explorer_url.clone(), "explorer_url".to_string());
@@ -126,8 +126,8 @@ pub fn execute_update_entry(
         }
     }
 
-    let validate_source_chain_id = validate_by_basic_rule(source_chain_id.clone().unwrap(), "source_chain_id".to_string());
-    let validate_destination_chain_id = validate_by_basic_rule(destination_chain_id.clone().unwrap(), "destination_chain_id".to_string());
+    let validate_source_chain_id = validate_chain_id(source_chain_id.clone().unwrap(), "source_chain_id".to_string());
+    let validate_destination_chain_id = validate_chain_id(destination_chain_id.clone().unwrap(), "destination_chain_id".to_string());
     let validate_source_channel_id = validate_by_basic_rule(source_channel_id.clone().unwrap(), "source_channel_id".to_string());
     let validate_destination_channel_id = validate_by_basic_rule(destination_channel_id.clone().unwrap(), "destination_channel_id".to_string());
     let validate_explorer_url = validate_url(explorer_url.clone().unwrap(), "explorer_url".to_string());

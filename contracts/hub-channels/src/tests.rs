@@ -59,7 +59,7 @@ mod tests {
         let msg = ExecuteMsg::CreateEntry {
             active: "active".to_string(),
             source_chain_id: "bostrom-1".to_string(),
-            destination_chain_id: "cosmos-1".to_string(),
+            destination_chain_id: "evmos_9001-2".to_string(),
             source_channel_id: "channel-256".to_string(),
             destination_channel_id: "channel-1".to_string(),
             explorer_url: "https://explorer.com/{hash}".to_string(),
@@ -77,7 +77,7 @@ mod tests {
 
         let msg = ExecuteMsg::CreateEntry {
             active: "active".to_string(),
-            source_chain_id: "bostrom-2".to_string(),
+            source_chain_id: "evmos_9001-2".to_string(),
             destination_chain_id: "cosmos-2".to_string(),
             source_channel_id: "channel-2".to_string(),
             destination_channel_id: "channel-2".to_string(),
@@ -111,7 +111,7 @@ mod tests {
                     id: 1,
                     active: "active".to_string(),
                     source_chain_id: "bostrom-1".to_string(),
-                    destination_chain_id: "cosmos-1".to_string(),
+                    destination_chain_id: "evmos_9001-2".to_string(),
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
                     explorer_url: "https://explorer.com/{hash}".to_string(),
@@ -120,7 +120,7 @@ mod tests {
                 Entry {
                     id: 2,
                     active: "active".to_string(),
-                    source_chain_id: "bostrom-2".to_string(),
+                    source_chain_id: "evmos_9001-2".to_string(),
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
@@ -135,7 +135,7 @@ mod tests {
         let message = ExecuteMsg::UpdateEntry {
             id: 1,
             active: "active".to_string(),
-            source_chain_id: Some("bostrom-1".to_string()),
+            source_chain_id: Some("evmos_9001-2".to_string()),
             destination_chain_id: Some("cosmos-1".to_string()),
             source_channel_id: Some("channel-256".to_string()),
             destination_channel_id: Some("channel-1".to_string()),
@@ -168,7 +168,7 @@ mod tests {
                 Entry {
                     id: 1,
                     active: "active".to_string(),
-                    source_chain_id: "bostrom-1".to_string(),
+                    source_chain_id: "evmos_9001-2".to_string(),
                     destination_chain_id: "cosmos-1".to_string(),
                     source_channel_id: "channel-256".to_string(),
                     destination_channel_id: "channel-1".to_string(),
@@ -178,7 +178,7 @@ mod tests {
                 Entry {
                     id: 2,
                     active: "active".to_string(),
-                    source_chain_id: "bostrom-2".to_string(),
+                    source_chain_id: "evmos_9001-2".to_string(),
                     destination_chain_id: "cosmos-2".to_string(),
                     source_channel_id: "channel-2".to_string(),
                     destination_channel_id: "channel-2".to_string(),
@@ -215,7 +215,7 @@ mod tests {
             Vec::from([Entry {
                 id: 2,
                 active: "active".to_string(),
-                source_chain_id: "bostrom-2".to_string(),
+                source_chain_id: "evmos_9001-2".to_string(),
                 destination_chain_id: "cosmos-2".to_string(),
                 source_channel_id: "channel-2".to_string(),
                 destination_channel_id: "channel-2".to_string(),
