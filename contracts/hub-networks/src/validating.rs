@@ -23,6 +23,23 @@ pub fn validate_by_basic_rule(
 }
 
 /*
+ * Basic rule /[a-z0-9-_]/
+ */
+pub fn validate_chain_id(
+    val: String,
+    field_name: String,
+) -> Result<Response, ContractError> {
+    for byte in val.as_bytes().iter() {
+        // - && 0-9 && a-z
+        if (*byte != 45) && (*byte != 95) && (*byte < 48 || *byte > 57) && (*byte < 97 || *byte > 122) {
+            return Err(ContractError::IncorrectInputData {val: format!("Incorrect value for field field {}. Allowed expression /[a-z0-9-]/", field_name).to_string()});
+        }
+    }
+
+    Ok(Response::default())
+}
+
+/*
  * Basic rule /[0-9]/
  */
 pub fn validate_period(

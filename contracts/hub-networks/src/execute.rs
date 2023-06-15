@@ -4,7 +4,7 @@ use cosmwasm_std::{attr, DepsMut, Env, MessageInfo, Response, StdResult};
 
 use crate::error::ContractError;
 use crate::state::{CONFIG, Entry, ENTRY_SEQ, LIST};
-use crate::validating::{validate_by_basic_rule, validate_ipfs_cid, validate_period};
+use crate::validating::{validate_by_basic_rule, validate_chain_id, validate_ipfs_cid, validate_period};
 
 pub fn execute_update_owner(
     deps: DepsMut,
@@ -51,6 +51,11 @@ pub fn execute_create_entry(
         return Err(ContractError::Unauthorized {});
     }
 
+    let validate_genesis_hash = validate_ipfs_cid(genesis_hash.clone());
+    if validate_genesis_hash.is_err() {
+        return validate_genesis_hash;
+    }
+
     let validate_logo = validate_ipfs_cid(logo.clone());
     if validate_logo.is_err() {
         return validate_logo;
@@ -63,21 +68,20 @@ pub fn execute_create_entry(
         }
     }
 
-    let validate_chainid = validate_by_basic_rule(chain_id.clone(), "chain-id".to_string());
+    let validate_chain_id = validate_chain_id(chain_id.clone(), "chain-id".to_string());
     let validate_prefix = validate_by_basic_rule(prefix.clone(), "prefix".to_string());
-    let validate_genesishash = validate_by_basic_rule(genesis_hash.clone(), "genesis_hash".to_string());
     let validate_name = validate_by_basic_rule(name.clone(), "name".to_string());
     let validate_protocol = validate_by_basic_rule(protocol.clone(), "protocol".to_string());
     let validate_unbonding_period = validate_period(unbonding_period.clone(), "protocol".to_string());
 
-    if validate_chainid.is_err() {
-        return validate_chainid;
+    if validate_chain_id.is_err() {
+        return validate_chain_id;
     }
     if validate_prefix.is_err() {
         return validate_prefix;
     }
-    if validate_genesishash.is_err() {
-        return validate_genesishash;
+    if validate_genesis_hash.is_err() {
+        return validate_genesis_hash;
     }
     if validate_name.is_err() {
         return validate_name;
@@ -129,6 +133,11 @@ pub fn execute_update_entry(
         return Err(ContractError::Unauthorized {});
     }
 
+    let validate_genesis_hash = validate_ipfs_cid(genesis_hash.clone().unwrap());
+    if validate_genesis_hash.is_err() {
+        return validate_genesis_hash;
+    }
+
     let validate_logo = validate_ipfs_cid(logo.clone().unwrap());
     if validate_logo.is_err() {
         return validate_logo;
@@ -141,24 +150,20 @@ pub fn execute_update_entry(
         }
     }
 
-    let validate_chainid = validate_by_basic_rule(chain_id.as_ref().unwrap().clone(), "chain-id".to_string());
+    let validate_chain_id = validate_chain_id(chain_id.as_ref().unwrap().clone(), "chain-id".to_string());
     let validate_prefix = validate_by_basic_rule(prefix.as_ref().unwrap().clone(), "prefix".to_string());
-    let validate_genesishash = validate_by_basic_rule(genesis_hash.as_ref().unwrap().clone(), "genesis_hash".to_string());
     let validate_name = validate_by_basic_rule(name.as_ref().unwrap().clone(), "name".to_string());
     let validate_protocol = validate_by_basic_rule(protocol.as_ref().unwrap().clone(), "protocol".to_string());
     let validate_unbonding_period = validate_period(unbonding_period.as_ref().unwrap().clone(), "protocol".to_string());
 
-    if validate_chainid.is_err() {
-        return validate_chainid;
-    }
-    if validate_chainid.is_err() {
-        return validate_chainid;
+    if validate_chain_id.is_err() {
+        return validate_chain_id;
     }
     if validate_prefix.is_err() {
         return validate_prefix;
     }
-    if validate_genesishash.is_err() {
-        return validate_genesishash;
+    if validate_genesis_hash.is_err() {
+        return validate_genesis_hash;
     }
     if validate_name.is_err() {
         return validate_name;
